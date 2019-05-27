@@ -7,6 +7,8 @@ class Player extends Element {
     }
 
     setBomb(position) {
+      //  test
+        this.setWall()
 
     }
 
