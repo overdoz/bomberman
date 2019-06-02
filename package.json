@@ -1,0 +1,19 @@
+{
+  "name": "bombastic4d",
+  "version": "0.0.1",
+  "description": "Halloooooo",
+  "main": "App.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab2.cip.ifi.lmu.de/banzhoff/sepjs-19ss-dd"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "webpack": "^4.32.2",
+    "webpack-cli": "^3.3.2"
+  }
+}
