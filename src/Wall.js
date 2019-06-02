@@ -1,5 +1,5 @@
 
-class Wall extends Element {
+export default class Wall extends Element {
 
     constructor(position, assets, strength = 1, destroyable = true) {
         super(position, assets);

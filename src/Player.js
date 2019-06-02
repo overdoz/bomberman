@@ -1,4 +1,6 @@
-import Element from './Element';
+"use strict";
+
+// import Element from './Element';
 
 export default class Player extends Element {
 
@@ -70,16 +72,16 @@ export default class Player extends Element {
         // TODO: A WALL IN FRONT OF THE PLAYER
         switch (direction) {
             case "NORTH":
-                this.position["x"] += 1;
+                this.position['x'] += 1;
                 break;
             case "SOUTH":
-                this.position["x"] -= 1;
+                this.position['x'] -= 1;
                 break;
             case "EAST":
-                this.position["y"] += 1;
+                this.position['y'] += 1;
                 break;
             case "WEST":
-                this.position["y"] -= 1;
+                this.position['y'] -= 1;
                 break;
         }
         throw new Error("Invalid Direction !!!");

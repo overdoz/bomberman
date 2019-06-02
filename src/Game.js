@@ -1,4 +1,6 @@
-import Player from './Player';
+"use strict";
+
+// import Player from './Player';
 
 export default class Game {
 
