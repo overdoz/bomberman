@@ -122,7 +122,8 @@ export default class Player extends Element {
             this.spriteSheet[this.direction].y,
             this.spriteSizeX,
             this.spriteSizeY,
-            this.x,
+            // +6 to center the image -> 27 width, 40 height
+            this.x + 6,
             this.y,
             this.spriteSizeX,
             this.spriteSizeY

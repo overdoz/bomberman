@@ -14,3 +14,18 @@ body {
     -moz-box-shadow: 10px 10px 76px 77px rgba(217,178,130,1);
     box-shadow: 10px 10px 76px 77px rgba(217,178,130,1);
 }
+
+.title {
+
+    position: absolute;
+    top: 0;
+    color: white;
+    box-shadow: #024873;
+    border: 4px solid white;
+    padding: 3px;
+    font-family: 'Allerta Stencil', sans-serif;
+
+    /*font-family: 'Kirang Haerang', cursive;*/
+
+
+}

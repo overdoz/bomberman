@@ -1,6 +1,7 @@
 "use strict";
 
 import Player from './Player.js';
+import Wall from './Wall.js';
 
 export default class Game {
 
@@ -21,7 +22,10 @@ export default class Game {
             this.players.push(new Player([3,3], 1.0, 14, 7))
         }*/
         // this.grid = new Grid(height, width);
+
+
         let gameOver = false;
+        new Wall(40, 40, 1, true, this.assets).draw(this.context);
 
         // this.player = new Player({x:1, y:1}, assets, 1, 14, 7);
 
@@ -43,8 +47,14 @@ export default class Game {
         this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
         this.players.map(player => {
             player.draw(this.context);
-            console.log("draw player");
+
         })
+        for (let i = 1; i < 12; i += 2) {
+            for (let j = 1; j < 12; j += 2) {
+                new Wall(i*40, j*40, 1, true, this.assets).draw(this.context);
+            }
+        }
+
     }
 
     startAnimating() {

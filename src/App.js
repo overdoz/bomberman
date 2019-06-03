@@ -36,10 +36,12 @@ export class AssetLoader {
 new AssetLoader()
     .loadAssets([
         { name: 'bomberman', url: '../images/bomberman.png' },
+        { name: 'wall', url: '../images/wall.png' },
     ])
     .then(assets => {
         let players = [];
         players.push(new Player(1, 1, assets, 1, 14, 7, 40));
+
         new Game("myCanvas", 12, 12, assets, players);
 
     });
