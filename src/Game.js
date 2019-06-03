@@ -31,11 +31,16 @@ export default class Game {
 
     // TODO: update function
     update() {
+      /*  this.players.map(player => {
+            player.update();
+            console.log("draw player");
+        })*/
 
     }
 
     // renders each player onto the map
     draw() {
+        this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
         this.players.map(player => {
             player.draw(this.context);
             console.log("draw player");
