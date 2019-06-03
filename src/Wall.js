@@ -9,8 +9,9 @@ export default class Wall extends Element {
     }
 
     destroy() {
-        if (this.destroyable = true) {
+        if (this.destroyable) {
             this.active = false;
         }
     }
+
 }

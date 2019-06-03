@@ -7,6 +7,7 @@ export default class Player extends Element {
 
 
     constructor(position, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7) {
+        // To do//
         super(/*position, assets*/);
         this.position = position;
         this.assets = assets;
@@ -20,7 +21,6 @@ export default class Player extends Element {
         this.direction = 'east';
         this.spriteSizeX = 27;
         this.spriteSizeY = 40;
-
         this.x = 1;
         this.y = 1;
         console.log(this.position)
