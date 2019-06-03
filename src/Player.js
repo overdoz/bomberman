@@ -5,7 +5,7 @@ import Element from './Element.js';
 export default class Player extends Element {
 
 
-
+ // constructor 
     constructor(x, y, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize) {
         super(/*position, assets*/);
         // this.position = {x: 1, y: 1}
