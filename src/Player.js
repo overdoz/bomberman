@@ -6,9 +6,10 @@ export default class Player extends Element {
 
 
 
-    constructor(position, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7) {
+    constructor(x, y, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize) {
         super(/*position, assets*/);
-        this.position = position;
+        // this.position = {x: 1, y: 1}
+        // this.position = position;
         this.assets = assets;
         this.health = health; // double
         this.numberOfBombs = numberOfBombs; // 14 at the beginning
@@ -20,30 +21,55 @@ export default class Player extends Element {
         this.direction = 'east';
         this.spriteSizeX = 27;
         this.spriteSizeY = 40;
+        this.gridSize = gridSize;
 
-        this.x = 1;
-        this.y = 1;
-        console.log(this.position)
+        this.x = x;
+        this.y = y;
+        // console.log(this.position)
 
         this.spriteSheet = {
-            north: {
+            south: {
                 x: 0 * this.spriteSizeX,
                 y: 0 * this.spriteSizeY
             },
-            east: {
+            west: {
                 x: 0 * this.spriteSizeX,
                 y: 1 * this.spriteSizeY
             },
-            west: {
+            north: {
                 x: 0 * this.spriteSizeX,
                 y: 2 * this.spriteSizeY
             },
-            south: {
+            east: {
                 x: 0 * this.spriteSizeX,
                 y: 3 * this.spriteSizeY
             }
         }
+        document.addEventListener('keyup', this.changeDirection.bind(this));
     }
+
+    changeDirection(e) {
+        switch (e.key) {
+            case 'ArrowLeft':
+                this.direction = 'west';
+                this.x -= this.gridSize;
+                break;
+            case 'ArrowRight':
+                this.direction = 'east';
+                this.x += this.gridSize;
+                break;
+            case 'ArrowUp':
+                this.direction = 'north';
+                this.y -= this.gridSize;
+                break;
+            case 'ArrowDown':
+                this.direction = 'south';
+                this.y += this.gridSize;
+                break;
+        }
+        // this.update(this.direction);
+    }
+
 
     /*getGridPositionX() {
         return super.getX();
@@ -74,7 +100,7 @@ export default class Player extends Element {
         // throws a bomb at the current position
         if (this.numberOfBombs > 0) {
             this.numberOfBombs--;
-            return new Bomb(this.position);
+            // return new Bomb(this.position);
         }
         return null;
     }
@@ -104,24 +130,25 @@ export default class Player extends Element {
         return this.health;
     }
 
-    move(direction) {
+    update() {
         // TODO: OUT OF CANVAS
         // TODO: A WALL IN FRONT OF THE PLAYER
-        switch (direction) {
-            case "NORTH":
-                this.position['x'] += 1;
+        switch (this.direction) {
+            case "east":
+                this.x += this.gridSize;
                 break;
-            case "SOUTH":
-                this.position['x'] -= 1;
+            case "west":
+                this.x -= this.gridSize;
                 break;
-            case "EAST":
-                this.position['y'] += 1;
+            case "south":
+                this.y += this.gridSize;
                 break;
-            case "WEST":
-                this.position['y'] -= 1;
+            case "north":
+                this.y -= this.gridSize;
                 break;
+
         }
-        throw new Error("Invalid Direction !!!");
+
     }
 
     buildWall() {
@@ -132,6 +159,7 @@ export default class Player extends Element {
             return null;
         }
     }
+
 
 }
 

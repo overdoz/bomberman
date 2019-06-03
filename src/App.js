@@ -39,7 +39,7 @@ new AssetLoader()
     ])
     .then(assets => {
         let players = [];
-        players.push(new Player({x:1, y:1}, assets, 1, 14, 7));
+        players.push(new Player(1, 1, assets, 1, 14, 7, 40));
         new Game("myCanvas", 12, 12, assets, players);
 
     });
