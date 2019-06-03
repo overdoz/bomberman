@@ -3,7 +3,6 @@
 import Game from "./Game.js";
 import Player from "./Player.js";
 
-console.log("Hello WOrld");
 
 export class AssetLoader {
     loadAsset(name, url) {
@@ -37,12 +36,12 @@ new AssetLoader()
     .loadAssets([
         { name: 'bomberman', url: '../images/bomberman.png' },
         { name: 'wall', url: '../images/wall.png' },
+        { name: 'bomb', url: '../images/bomb.png' },
     ])
     .then(assets => {
-        let players = [];
-        players.push(new Player(1, 1, assets, 1, 14, 7, 40));
 
-        new Game("myCanvas", 12, 12, assets, players);
+
+        new Game("myCanvas", 13, 13, assets);
 
     });
 
