@@ -28,18 +28,19 @@ export class AssetLoader {
     }
 }
 
-let players = [];
-players.push(new Player({x: 1, y: 2}, null));
-players.push(new Player({x: 3, y: 2}, null));
-players.push(new Player({x: 1, y: 7}, null));
+
+
+
+
 
 new AssetLoader()
     .loadAssets([
-        { name: 'chicken', url: '/chicken.png' },
+        { name: 'bomberman', url: '../images/bomberman.png' },
     ])
     .then(assets => {
-        // Assets are loaded at this point and saved in assets.
-//    console.log(assets);
+        let players = [];
+        players.push(new Player({x:1, y:1}, assets, 1, 14, 7));
+        new Game("myCanvas", 12, 12, assets, players);
+
     });
 
-let a = new Game(players);

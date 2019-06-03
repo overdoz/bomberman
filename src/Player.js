@@ -1,13 +1,15 @@
 "use strict";
 
-// import Element from './Element';
+import Element from './Element.js';
 
 export default class Player extends Element {
 
 
 
     constructor(position, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7) {
-        super(position, assets);
+        super(/*position, assets*/);
+        this.position = position;
+        this.assets = assets;
         this.health = health; // double
         this.numberOfBombs = numberOfBombs; // 14 at the beginning
         this.numberOfWalls = numberOfWalls; //  7 walls at the beginning
@@ -15,8 +17,32 @@ export default class Player extends Element {
         this.powerUps = null;
         this.timeLeftToBuildWall = 15;
         this.dead = false;
-        this.direction = 'EAST';
+        this.direction = 'east';
+        this.spriteSizeX = 27;
+        this.spriteSizeY = 40;
+
+        this.x = 1;
+        this.y = 1;
         console.log(this.position)
+
+        this.spriteSheet = {
+            north: {
+                x: 0 * this.spriteSizeX,
+                y: 0 * this.spriteSizeY
+            },
+            east: {
+                x: 0 * this.spriteSizeX,
+                y: 1 * this.spriteSizeY
+            },
+            west: {
+                x: 0 * this.spriteSizeX,
+                y: 2 * this.spriteSizeY
+            },
+            south: {
+                x: 0 * this.spriteSizeX,
+                y: 3 * this.spriteSizeY
+            }
+        }
     }
 
     /*getGridPositionX() {
@@ -59,6 +85,17 @@ export default class Player extends Element {
     }
     // TODO: RENDER FUNCTION
     draw(context) {
+        context.drawImage(
+            this.assets.bomberman,
+            this.spriteSheet[this.direction].x,
+            this.spriteSheet[this.direction].y,
+            this.spriteSizeX,
+            this.spriteSizeY,
+            this.x,
+            this.y,
+            this.spriteSizeX,
+            this.spriteSizeY
+        )
 
     }
 
