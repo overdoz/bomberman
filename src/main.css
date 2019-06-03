@@ -1,5 +1,5 @@
 body {
-    background-color: #CCC;
+    background-image: radial-gradient(#AAE5E7, #024873);
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -8,5 +8,9 @@ body {
 }
 
 #myCanvas {
-    border: 1px solid black;
+
+    background-image: radial-gradient(#F2DAAC, #D9B282);
+    -webkit-box-shadow: 10px 10px 76px 77px rgba(217,178,130,1);
+    -moz-box-shadow: 10px 10px 76px 77px rgba(217,178,130,1);
+    box-shadow: 10px 10px 76px 77px rgba(217,178,130,1);
 }

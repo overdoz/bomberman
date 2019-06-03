@@ -48,7 +48,7 @@ export default class Game {
     }
 
     startAnimating() {
-        this.frameTime = 1000 / 2;
+        this.frameTime = 1000 / 500;
         this.then = window.performance.now();
         this.animate(this.then);
     }
