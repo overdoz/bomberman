@@ -14,6 +14,13 @@ export default class Game {
         }
         // this.grid = new Grid(height, width);
         let gameOver = false;
+
+        this.startAnimating();
+    }
+
+    // TODO: update function
+    update() {
+
     }
 
     // renders each player onto the map
@@ -22,6 +29,26 @@ export default class Game {
             player.draw();
             console.log("draw player");
         })
+    }
+
+    startAnimating() {
+        this.frameTime = 1000 / 2;
+        this.then = window.performance.now();
+        this.animate(this.then);
+    }
+
+    animate(currentTime) {
+        window.requestAnimationFrame(this.animate.bind(this));
+
+        const now = currentTime;
+        const elapsed = now - this.then;
+
+        if (elapsed > this.frameTime) {
+            this.then = now;
+
+            this.update();
+            this.draw();
+        }
     }
 
 }
