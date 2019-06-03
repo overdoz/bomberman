@@ -5,7 +5,7 @@ import Player from "./Player.js";
 
 console.log("Hello WOrld");
 
-/*export class AssetLoader {
+export class AssetLoader {
     loadAsset(name, url) {
         return new Promise((resolve, reject) => {
             const image = new Image();
@@ -42,4 +42,4 @@ new AssetLoader()
 //    console.log(assets);
     });
 
-let a = new Game(players);*/
+let a = new Game(players);
