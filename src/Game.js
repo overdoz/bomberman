@@ -31,6 +31,8 @@ export default class Game {
         // this.player = new Player({x:1, y:1}, assets, 1, 14, 7);
         this.players = [];
         this.players.push(new Player(1, 1, this.assets, 1, 14, 7, this.gridSize, this.context, this.grid));
+        //Temporary:
+        this.grid.setPlayers(this.players);
 
         this.startAnimating();
     }
@@ -49,24 +51,15 @@ export default class Game {
         this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
         this.players.map(player => {
             player.draw(this.context);
-
-
         });
 
-        // draw walls
-        // for (let i = 1; i < 12; i += 2) {
-        //     for (let j = 1; j < 12; j += 2) {
-        //         new Wall(i*40, j*40, 1, true, this.assets).draw(this.context);
-        //     }
-        // };
         this.grid.walls.map(walls => {
             walls.draw(this.context);
         });
-
     }
 
     startAnimating() {
-        this.frameTime = 1000 / 500;
+        this.frameTime = 1000 / 1600;
         this.then = window.performance.now();
         this.animate(this.then);
     }

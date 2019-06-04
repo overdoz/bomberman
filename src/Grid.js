@@ -6,6 +6,7 @@ export default class Grid {
         this.width = width;
         this.height = height;
         this.walls = [];
+        this.players = [];
         this.wallAssets = wallAssets;
         this.generateRandomWalls(numberOfWalls);
     }
@@ -14,11 +15,20 @@ export default class Grid {
     draw() {
     }
 
+    /**
+     * At the start of the game, it generates walls at random
+     * positions all over the grid
+     * @param number
+     */
     generateRandomWalls(number) {
         for (let i = 0; i < number; i++) {
             let wall_x = this.random(this.width) * 40;
             let wall_y = this.random(this.height) * 40;
-            this.walls.push(new Wall({x:wall_x, y: wall_y}, 1, true, this.wallAssets));
+            if (this.findDuplicates(wall_x, wall_y)) {
+                i--;
+            } else {
+                this.walls.push(new Wall({x:wall_x, y: wall_y}, 1, true, this.wallAssets));
+            }
         }
     }
 
@@ -27,6 +37,13 @@ export default class Grid {
         return this.walls[index];
     }
 
+    /**
+     * Checks if there is a conflict at the players next step -
+     * Checks if there is a wall or out of canvas
+     * @param player_x
+     * @param player_y
+     * @returns {boolean}
+     */
     findPlayerWallConflict(player_x, player_y) {
         if (player_x + 1 >= this.width*40 || player_y + 1 >= this.height*40) {
             return true;
@@ -45,24 +62,63 @@ export default class Grid {
         return false;
     }
 
+    /**
+     * return a random integer between 0 and "limit"
+     * @param limit
+     * @returns {number}
+     */
     random(limit) {
         return Math.floor(Math.random() * limit);
     }
 
+    /**
+     * Checks the damage that a bomb does -- if
+     * there are any destructable walls within the distance
+     * of 60 (cm - mm ?) then it destroyes those Walls
+     * @param x
+     * @param y
+     */
     getDamage(x,y) {
-        console.log("getDamage one time");
-        console.log(this.walls.length);
         for (let i = 0; i < this.walls.length; i++) {
-            let distance = Math.floor(Math.sqrt(Math.pow(this.walls[i].getPositionX() - x, 2) + Math.pow(this.walls[i].getPositionY() - y, 2)));
+            // let distance = Math.floor(Math.sqrt(Math.pow(this.walls[i].getPositionX() - x, 2) + Math.pow(this.walls[i].getPositionY() - y, 2)));
+            let distance = this.distance(x,y,this.walls[i].getPositionX(), this.walls[i].getPositionY());
             if (distance < 60) {
                 console.log("Destroyed distance: " +  distance);
                 this.walls[i].destroy();
                 this.walls.splice(i,1);
             }
         }
-        console.log(this.walls.length);
+        // TODO: FIX that the player doesn't dies if inbetween there are walls !!!
+        for (let i = 0; i < this.players.length; i++) {
+            let distance = this.distance(x,y,this.players[i].getPositionX(), this.players[i].getPositionY());
+            console.log(x,y,this.players[i].getPositionX(), this.players[i].getPositionY());
+            if (distance < 60) {
+                this.players[i].setDead();
+            }
+        }
     }
 
+    distance(x,y,a,b) {
+        return Math.floor(Math.sqrt(Math.pow(a - x, 2) + Math.pow(b - y, 2)));
+    }
 
+    /**
+     * To make sure that there aren't together 2 Walls at the same position
+     * @param x
+     * @param y
+     * @returns {boolean}
+     */
+    findDuplicates(x,y) {
+        for (let i = 0; i < this.walls.length; i++) {
+            if (x === this.walls[i].getPositionX() && (y === this.walls[i].getPositionY())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    // Temporary
+    setPlayers(players) {
+        this.players = players;
+    }
 }

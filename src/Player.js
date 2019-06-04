@@ -77,6 +77,14 @@ export default class Player extends Element {
         document.addEventListener("keydown", this.setBomb.bind(this));
     }
 
+    /**
+     * Declares a player dead!
+     */
+    setDead() {
+        this.dead = true;
+    }
+
+
     /*
      * check if the pressed key is equal to "b"
      * if true and the amount of bombs is greater than 0
@@ -166,22 +174,32 @@ export default class Player extends Element {
      * draw() will also render our set of bombs
      */
     draw(context) {
-        context.drawImage(
-            this.assets.bomberman,
-            this.spriteSheet[this.direction].x,
-            this.spriteSheet[this.direction].y,
-            this.spriteSizeX,
-            this.spriteSizeY,
-            this.x + 6,
-            this.y,
-            this.spriteSizeX,
-            this.spriteSizeY
-        );
-        this.bombsSet.map(this.context);
+        if (!this.dead) {
+            context.drawImage(
+                this.assets.bomberman,
+                this.spriteSheet[this.direction].x,
+                this.spriteSheet[this.direction].y,
+                this.spriteSizeX,
+                this.spriteSizeY,
+                this.x + 6,
+                this.y,
+                this.spriteSizeX,
+                this.spriteSizeY
+            );
+            this.bombsSet.map(this.context);
+        }
     }
 
     getPosition() {
         return super.getPosition();
+    }
+
+    getPositionX() {
+        return this.x;
+    }
+
+    getPositionY() {
+        return this.y;
     }
 
 
