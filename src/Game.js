@@ -50,6 +50,7 @@ export default class Game {
         this.players.map(player => {
             player.draw(this.context);
 
+
         });
 
         // draw walls
@@ -58,9 +59,9 @@ export default class Game {
         //         new Wall(i*40, j*40, 1, true, this.assets).draw(this.context);
         //     }
         // };
-        for (let i = 0; i < this.grid.walls.length; i++) {
-            this.grid.getWall(i).draw(this.context);
-        }
+        this.grid.walls.map(walls => {
+            walls.draw(this.context);
+        });
 
     }
 

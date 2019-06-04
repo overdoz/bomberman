@@ -49,6 +49,20 @@ export default class Grid {
         return Math.floor(Math.random() * limit);
     }
 
+    getDamage(x,y) {
+        console.log("getDamage one time");
+        console.log(this.walls.length);
+        for (let i = 0; i < this.walls.length; i++) {
+            let distance = Math.floor(Math.sqrt(Math.pow(this.walls[i].getPositionX() - x, 2) + Math.pow(this.walls[i].getPositionY() - y, 2)));
+            if (distance < 60) {
+                console.log("Destroyed distance: " +  distance);
+                this.walls[i].destroy();
+                this.walls.splice(i,1);
+            }
+        }
+        console.log(this.walls.length);
+    }
+
 
 
 }

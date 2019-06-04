@@ -20,6 +20,18 @@ export default class Bomb extends Element {
 
     }
 
+    explode() {
+
+    }
+
+    getX() {
+        return this.x;
+    }
+
+    getY() {
+        return this.y;
+    }
+
     draw(context) {
         context.drawImage(
             this.assets.bomb,

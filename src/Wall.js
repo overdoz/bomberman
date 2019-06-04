@@ -44,4 +44,8 @@ export default class Wall extends Element {
 
     }
 
+    getDamage(damage) {
+
+    }
+
 }

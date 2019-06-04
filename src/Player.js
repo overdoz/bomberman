@@ -1,20 +1,21 @@
 "use strict";
 import Element from './Element.js';
 import Bomb from './Bomb.js';
+import Queue from './Queue.js';
 
 export default class Player extends Element {
 
     constructor(x, y, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize, context, grid) {
 
+
         super(/*position, assets*/);
         // this.position = {x: 1, y: 1}
-        // this.position = position;
-
         /*
          * current position
          * change x or y to move our player
          */
         this.x = x;
+        // this.position = position;
         this.y = y;
 
         //save grid to check for wall collisions
@@ -38,7 +39,7 @@ export default class Player extends Element {
         this.health = health; // double
         this.numberOfBombs = numberOfBombs; // 14 at the beginning
         this.numberOfWalls = numberOfWalls; //  7 walls at the beginning
-        this.bombsSet = [];
+        this.bombsSet = new Queue();
 
         this.maximumNumberOfBombs = this.numberOfBombs*2;
         this.powerUps = null;
@@ -84,10 +85,23 @@ export default class Player extends Element {
     setBomb(e) {
         if (e.key === "b") {
             if (this.numberOfBombs > 0) {
-                this.bombsSet.push(new Bomb(this.x, this.y, 1, 1, true, this.assets));
+                this.bombsSet.add(new Bomb(this.x, this.y, 1, 1, true, this.assets));
                 this.numberOfBombs--;
+                // TODO: Find a way to explode every bomb at its time
+                var that = this;
+                setTimeout(function () {
+                    that.explode();
+                }, 3000);
             }
         }
+    }
+
+    /**
+     * Bomb exploding and does damage
+     */
+    explode() {
+        let bomb = this.bombsSet.pop();
+        this.grid.getDamage(bomb.x, bomb.y);
     }
 
     /**
@@ -163,7 +177,7 @@ export default class Player extends Element {
             this.spriteSizeX,
             this.spriteSizeY
         );
-        this.bombsSet.map(bomb => bomb.draw(this.context));
+        this.bombsSet.map(this.context);
     }
 
     getPosition() {
@@ -195,7 +209,6 @@ export default class Player extends Element {
             case "north":
                 this.y -= this.gridSize;
                 break;
-
         }
 
     }
@@ -221,6 +234,7 @@ export default class Player extends Element {
             this.dead = true;
         }
     }
+
 
 }
 
