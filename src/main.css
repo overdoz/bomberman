@@ -8,9 +8,26 @@ body {
 }
 
 #myCanvas {
-
+    border-radius: 10px;
     background-image: radial-gradient(#F2DAAC, #D9B282);
     -webkit-box-shadow: 10px 10px 76px 77px rgba(217,178,130,1);
     -moz-box-shadow: 10px 10px 76px 77px rgba(217,178,130,1);
     box-shadow: 10px 10px 76px 77px rgba(217,178,130,1);
 }
+
+.title {
+    display: none;
+    /*background-color: rgb(151, 70, 32);*/
+    position: absolute;
+    top: 0;
+    color: rgb(122,72,51);
+    box-shadow: 0px 5px 20px #024873;
+    border: 4px solid rgb(122,72,51);
+    padding: 3px;
+    font-family: 'Allerta Stencil', sans-serif;
+
+    /*font-family: 'Kirang Haerang', cursive;*/
+
+
+}
+
