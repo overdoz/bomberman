@@ -2,7 +2,7 @@ import Element from './Element.js';
 
 export default class Wall extends Element {
 
-    constructor(x, y, strength = 1, destroyable = true, assets) {
+    constructor(position, strength = 1, destroyable = true, assets) {
         super();
         this.assets = assets;
         this.active = true;
@@ -11,8 +11,16 @@ export default class Wall extends Element {
 
         this.spriteSizeX = 32;
         this.spriteSizeY = 32;
-        this.x = x;
-        this.y = y;
+        this.x = position.x;
+        this.y = position.y;
+    }
+
+    getPositionX() {
+        return this.x;
+    }
+
+    getPositionY() {
+        return this.y;
     }
 
     destroy() {

@@ -4,7 +4,7 @@ import Bomb from './Bomb.js';
 
 export default class Player extends Element {
 
-    constructor(x, y, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize, context) {
+    constructor(x, y, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize, context, grid) {
 
         super(/*position, assets*/);
         // this.position = {x: 1, y: 1}
@@ -16,6 +16,9 @@ export default class Player extends Element {
          */
         this.x = x;
         this.y = y;
+
+        //save grid to check for wall collisions
+        this.grid = grid;
 
         /*
          * assets required to render player and bombs
@@ -62,14 +65,14 @@ export default class Player extends Element {
                 x: 0 * this.spriteSizeX,
                 y: 3 * this.spriteSizeY
             }
-        }
+        };
 
         /*
          * react to keypress
          * 1. move our player
          * 2. set bomb at position of our player
          */
-        document.addEventListener('keyup', this.changeDirection.bind(this));
+        document.addEventListener('keyup', this.conflictFind.bind(this));
         document.addEventListener("keydown", this.setBomb.bind(this));
     }
 
@@ -84,6 +87,36 @@ export default class Player extends Element {
                 this.bombsSet.push(new Bomb(this.x, this.y, 1, 1, true, this.assets));
                 this.numberOfBombs--;
             }
+        }
+    }
+
+    /**
+     * Check in Grid if there is any wall
+     * @param e
+     */
+    conflictFind(e) {
+        let x = this.x - 1;
+        let y = this.y - 1;
+        switch (e.key) {
+            case 'ArrowLeft':
+                this.direction = 'west';
+                x -= this.gridSize;
+                break;
+            case 'ArrowRight':
+                this.direction = 'east';
+                x += this.gridSize;
+                break;
+            case 'ArrowUp':
+                this.direction = 'north';
+                y -= this.gridSize;
+                break;
+            case 'ArrowDown':
+                this.direction = 'south';
+                y += this.gridSize;
+                break;
+        }
+        if (!this.grid.findPlayerWallConflict(x,y)) {
+            this.changeDirection(e);
         }
     }
 
@@ -131,7 +164,6 @@ export default class Player extends Element {
             this.spriteSizeY
         );
         this.bombsSet.map(bomb => bomb.draw(this.context));
-
     }
 
     getPosition() {

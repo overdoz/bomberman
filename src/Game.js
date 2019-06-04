@@ -1,7 +1,7 @@
 "use strict";
 
 import Player from './Player.js';
-import Wall from './Wall.js';
+import Grid from './Grid.js';
 
 export default class Game {
 
@@ -27,10 +27,10 @@ export default class Game {
 
 
 
+        this.grid = new Grid(this.width, this.height, 30, this.assets);
         // this.player = new Player({x:1, y:1}, assets, 1, 14, 7);
         this.players = [];
-        this.players.push(new Player(1, 1, this.assets, 1, 14, 7, this.gridSize, this.context));
-
+        this.players.push(new Player(1, 1, this.assets, 1, 14, 7, this.gridSize, this.context, this.grid));
 
         this.startAnimating();
     }
@@ -53,11 +53,14 @@ export default class Game {
         });
 
         // draw walls
-        for (let i = 1; i < 12; i += 2) {
-            for (let j = 1; j < 12; j += 2) {
-                new Wall(i*40, j*40, 1, true, this.assets).draw(this.context);
-            }
-        };
+        // for (let i = 1; i < 12; i += 2) {
+        //     for (let j = 1; j < 12; j += 2) {
+        //         new Wall(i*40, j*40, 1, true, this.assets).draw(this.context);
+        //     }
+        // };
+        for (let i = 0; i < this.grid.walls.length; i++) {
+            this.grid.getWall(i).draw(this.context);
+        }
 
     }
 
