@@ -44,6 +44,21 @@ export default class Wall extends Element {
 
     }
 
+    drawNewWall(context) {
+        context.drawImage(
+            this.assets.grid_option2,
+            0,
+            0,
+            this.spriteSizeX,
+            this.spriteSizeY,
+            this.x,
+            this.y,
+            80,
+            80,
+        )
+
+    }
+
     getDamage(damage) {
 
     }

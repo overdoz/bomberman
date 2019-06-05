@@ -39,7 +39,7 @@ export default class Player extends Element {
         this.health = health; // double
         this.numberOfBombs = numberOfBombs; // 14 at the beginning
         this.numberOfWalls = numberOfWalls; //  7 walls at the beginning
-        this.bombsSet = new Queue();
+        this.bombsSet = [];
 
         this.maximumNumberOfBombs = this.numberOfBombs*2;
         this.powerUps = null;
@@ -74,7 +74,8 @@ export default class Player extends Element {
          * 2. set bomb at position of our player
          */
         document.addEventListener('keyup', this.conflictFind.bind(this));
-        document.addEventListener("keydown", this.setBomb.bind(this));
+        document.addEventListener("keydown", this.pressedKey.bind(this));
+        // document.addEventListener("space", this.buildWall())
     }
 
     /**
@@ -90,25 +91,39 @@ export default class Player extends Element {
      * if true and the amount of bombs is greater than 0
      * => add a bomb to our array
      */
-    setBomb(e) {
-        if (e.key === "b") {
+    pressedKey(e) {
+        // throw a Bomb || ONLY A BOMB AT A TIME
+        if (e.key === "b" && this.bombsSet.length === 0) {
             if (this.numberOfBombs > 0) {
-                this.bombsSet.add(new Bomb(this.x, this.y, 1, 1, true, this.assets));
+                this.bombsSet.push(new Bomb(this.x, this.y, 1, 1, true, this.assets));
                 this.numberOfBombs--;
                 // TODO: Find a way to explode every bomb at its time
                 var that = this;
                 setTimeout(function () {
-                    that.explode();
-                }, 3000);
+                    that.makeFire();
+                }, 2000);
             }
+            // Build a Wall
+        } else if (e.key === " ") {
+            this.buildWall();
         }
     }
+
+    makeFire() {
+        Bomb.explode = true;
+        let that = this;
+        setTimeout(function () {
+            let bomb = that.bombsSet.shift();
+            that.explode(bomb);
+            Bomb.explode = false;
+        }, 500);
+    }
+
 
     /**
      * Bomb exploding and does damage
      */
-    explode() {
-        let bomb = this.bombsSet.pop();
+    explode(bomb) {
         this.grid.getDamage(bomb.x, bomb.y);
     }
 
@@ -186,9 +201,12 @@ export default class Player extends Element {
                 this.spriteSizeX,
                 this.spriteSizeY
             );
-            this.bombsSet.map(this.context);
+            this.bombsSet.map(bomb => {
+                bomb.draw(this.context)
+            });
         }
     }
+
 
     getPosition() {
         return super.getPosition();
@@ -232,13 +250,28 @@ export default class Player extends Element {
     }
 
     buildWall() {
-        if (this.timeLeftToBuildWall === 0) {
-            this.timeLeftToBuildWall = 15;
-            return new Wall(this.position)
-        } else {
-            return null;
+        var wall_x = this.x - 1;
+        var wall_y = this.y - 1;
+
+        switch(this.direction) {
+            case "north":
+                wall_y -= this.gridSize;
+                break;
+            case "south":
+                wall_y += this.gridSize;
+                break;
+            case "east":
+                wall_x += this.gridSize;
+                break;
+            case "west":
+                wall_x -= this.gridSize;
         }
+
+        this.grid.addWall(wall_x, wall_y);
     }
+
+
+
 
     // Reduces the Life Left of the current Player
     getDamage(damage) {
@@ -255,4 +288,30 @@ export default class Player extends Element {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

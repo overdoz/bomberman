@@ -12,6 +12,7 @@ export default class Bomb extends Element {
         this.radius = 2;        // init for 2 grid wide
         this.isFake = isFake;
         this.spriteSize = 28;
+        Bomb.explode = false;
     }
     //will be called when the bomb is bombing
     //width & height: center position of the fire
@@ -33,18 +34,32 @@ export default class Bomb extends Element {
     }
 
     draw(context) {
-        context.drawImage(
-            this.assets.bomb,
-            0,
-            0,
-            this.spriteSize,
-            this.spriteSize,
-            this.x,
-            this.y,
-            40,
-            40,
-        )
-
+        console.log(Bomb.explode);
+        if (!Bomb.explode) {
+            context.drawImage(
+                this.assets.bomb,
+                0,
+                0,
+                this.spriteSize,
+                this.spriteSize,
+                this.x,
+                this.y,
+                40,
+                40,
+            )
+        } else {
+            context.drawImage(
+                this.assets.fire,
+                0,
+                0,
+                this.spriteSize,
+                this.spriteSize,
+                this.x,
+                this.y,
+                40,
+                40,
+            )
+        }
     }
 
 }

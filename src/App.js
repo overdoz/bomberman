@@ -37,6 +37,8 @@ new AssetLoader()
         { name: 'bomberman', url: '../images/bomberman.png' },
         { name: 'wall', url: '../images/wall.png' },
         { name: 'bomb', url: '../images/bomb.png' },
+        { name: 'grid_option2', url: '../images/grid_option2.png'},
+        { name: 'fire', url: '../images/fire.png'},
     ])
     .then(assets => {
 

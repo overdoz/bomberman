@@ -56,6 +56,10 @@ export default class Game {
         this.grid.walls.map(walls => {
             walls.draw(this.context);
         });
+
+        this.grid.newWalls.map(newWalls => {
+            newWalls.drawNewWall(this.context);
+        });
     }
 
     startAnimating() {
@@ -79,13 +83,3 @@ export default class Game {
     }
 
 }
-
-
-//
-// console.log("before:");
-// console.log(game.players[0].getX(), game.players[0].getY());
-//
-// game.players[0].move('NORTH');
-//
-// console.log("after:");
-// console.log(game.players[0].getX(), game.players[0].getY());
