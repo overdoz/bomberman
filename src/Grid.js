@@ -2,14 +2,16 @@ import Wall from "./Wall.js";
 
 export default class Grid {
 
-    constructor(width, height, numberOfWalls, wallAssets) {
+    constructor(width, height, numberOfWalls, assets, game) {
+        this.game = game;
         this.width = width;
         this.height = height;
         this.walls = [];
         this.players = [];
         this.newWalls = [];
-        this.wallAssets = wallAssets;
-        this.generateRandomWalls(numberOfWalls);
+        this.assets = assets;
+        this.tileSize = 40;
+        // this.generateRandomWalls(numberOfWalls);
     }
 
     // Draw the Grid
@@ -21,45 +23,68 @@ export default class Grid {
      * positions all over the grid
      * @param number
      */
-    generateRandomWalls(number) {
+   /* generateRandomWalls(number) {
         for (let i = 0; i < number; i++) {
-            let wall_x = this.random(this.width) * 40;
-            let wall_y = this.random(this.height) * 40;
-            if (this.findDuplicates(wall_x, wall_y)) {
+            let randomCoordinate = {x: this.random(this.width) * this.tileSize, y: this.random(this.height) * this.tileSize};
+
+            if (this.findDuplicates(randomCoordinate)) {
                 i--;
             } else {
-                this.walls.push(new Wall({x:wall_x, y: wall_y}, 1, true, this.wallAssets));
+                this.walls.push(new Wall(randomCoordinate, 1, true, this.assets));
             }
         }
-    }
+    }*/
 
     getWall(index) {
         // TODO: Index out of bounds Error
         return this.walls[index];
     }
 
-    addWall(wall_x,wall_y) {
-        if (!this.findPlayerWallConflict(wall_x, wall_y)) {
-            this.newWalls.push(new Wall({x:wall_x, y: wall_y}, 1, true, this.wallAssets));
+    addWall(position) {
+        if (!this.doesPlayerTouchAWall(position)) {
+            this.walls.push(new Wall( {x: position.x, y: position.y}, 1, false, this.wallAssets));
         }
     }
 
     /**
      * Checks if there is a conflict at the players next step -
      * Checks if there is a wall or out of canvas
-     * @param player_x
-     * @param player_y
+     * @param position
      * @returns {boolean}
      */
-    findPlayerWallConflict(player_x, player_y) {
-        if (player_x + 1 >= this.width*40 || player_y + 1 >= this.height*40) {
+
+    /*isPlayerOutOfBounds(position) {
+        if (position.x + 1 >= this.width * this.tileSize || position.y + 1 >= this.height * this.tileSize) {
             return true;
-        } else if (player_x + 1 < 0 || player_y + 1 < 0) {
+        } else if (position.x + 1 < 0 || position.y + 1 < 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }*/
+
+    /*doesPlayerTouchAWall(position) {
+        for (let i = 0; i < this.walls.length; i++) {
+            if (this.walls[i].position.x === position.x) {
+                if (this.walls[i].position.y === position.y) {
+                    // there is conflict = true
+                    return true;
+                }
+            }
+        }
+        return false;
+    }*/
+
+
+    /*findPlayerWallConflict(position) {
+        if (position.x + 1 >= this.width * this.tileSize || position.y + 1 >= this.height * this.tileSize) {
+            return true;
+        } else if (position.x + 1 < 0 || position.y + 1 < 0) {
             return true;
         }
         for (let i = 0; i < this.walls.length; i++) {
-            if (this.walls[i].getPositionX() === player_x) {
-                if (this.walls[i].getPositionY() === player_y) {
+            if (this.walls[i].position.x === position.x) {
+                if (this.walls[i].position.y === position.y) {
                     // there is conflict = true
                     return true;
                 }
@@ -68,8 +93,8 @@ export default class Grid {
         // There is no conflict with the already generated walls
         // now search to find if there is a conflict with the Walls
         // that the players created
-        return this.findPlayerNewWallConflict(player_x, player_y);
-    }
+        return this.findPlayerNewWallConflict(position);
+    }*/
 
     /**
      * Searches to find if the player has conflict with one of the walls
@@ -78,17 +103,17 @@ export default class Grid {
      * @param player_y
      * @returns {boolean}
      */
-    findPlayerNewWallConflict(player_x, player_y) {
+/*    findPlayerNewWallConflict(position) {
         for (let i = 0; i < this.newWalls.length; i++) {
-            if (this.newWalls[i].getPositionX() === player_x) {
-                if (this.newWalls[i].getPositionY() === player_y) {
+            if (this.newWalls[i].position.x === position.x) {
+                if (this.newWalls[i].position.y === position.y) {
                     // there is conflict = true
                     return true;
                 }
             }
         }
         return false;
-    }
+    }*/
 
     /**
      * return a random integer between 0 and "limit"
@@ -109,27 +134,19 @@ export default class Grid {
     getDamage(x,y) {
         for (let i = 0; i < this.walls.length; i++) {
             // let distance = Math.floor(Math.sqrt(Math.pow(this.walls[i].getPositionX() - x, 2) + Math.pow(this.walls[i].getPositionY() - y, 2)));
-            let distance = this.distance(x,y,this.walls[i].getPositionX(), this.walls[i].getPositionY());
-            if (distance < 60) {
+            let distance = this.distance(x,y,this.walls[i].position.x, this.walls[i].position.y);
+            if (distance < 60 && this.walls[i].destroyable === true) {
                 console.log("Destroyed distance: " +  distance);
                 this.walls[i].destroy();
                 this.walls.splice(i,1);
             }
         }
 
-        for (let i = 0; i < this.newWalls.length; i++) {
-            // let distance = Math.floor(Math.sqrt(Math.pow(this.walls[i].getPositionX() - x, 2) + Math.pow(this.walls[i].getPositionY() - y, 2)));
-            let distance = this.distance(x,y,this.newWalls[i].getPositionX(), this.newWalls[i].getPositionY());
-            if (distance < 60) {
-                console.log("Destroyed distance: " +  distance);
-                this.newWalls[i].destroy();
-                this.newWalls.splice(i,1);
-            }
-        }
+
 
         // TODO: FIX that the player doesn't dies if inbetween there are walls !!!
         for (let i = 0; i < this.players.length; i++) {
-            let distance = this.distance(x,y,this.players[i].getPositionX(), this.players[i].getPositionY());
+            let distance = this.distance(x,y,this.players[i].position.x, this.players[i].position.y);
             // console.log(x,y,this.players[i].getPositionX(), this.players[i].getPositionY());
             if (distance < 60) {
                 this.players[i].setDead();
@@ -143,18 +160,17 @@ export default class Grid {
 
     /**
      * To make sure that there aren't together 2 Walls at the same position
-     * @param x
-     * @param y
      * @returns {boolean}
+     * @param position
      */
-    findDuplicates(x,y) {
+    /*findDuplicates(position) {
         for (let i = 0; i < this.walls.length; i++) {
-            if (x === this.walls[i].getPositionX() && (y === this.walls[i].getPositionY())) {
+            if (position.x === this.walls[i].position.x && (position.y === this.walls[i].position.y)) {
                 return true;
             }
         }
         return false;
-    }
+    }*/
 
     // Temporary
     setPlayers(players) {

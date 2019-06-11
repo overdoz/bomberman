@@ -1,7 +1,7 @@
 "use strict";
 
 import Player from './Player.js';
-import Grid from './Grid.js';
+import Wall from './Wall.js';
 
 export default class Game {
 
@@ -17,23 +17,20 @@ export default class Game {
         this.gridSize = this.canvas.width / width;
 
         // TODO: initialize each player inside constructor or inside App.js?
-        /*for (let i = 0; i < players.length; i++) {
-            this.players.push(new Player([3,3], 1.0, 14, 7))
-        }*/
-        // this.grid = new Grid(height, width);
 
 
         let gameOver = false;
 
-
-
-        this.grid = new Grid(this.width, this.height, 30, this.assets);
-        // this.player = new Player({x:1, y:1}, assets, 1, 14, 7);
+        this.bombs = [];
         this.players = [];
-        this.players.push(new Player(1, 1, this.assets, 1, 14, 7, this.gridSize, this.context, this.grid));
-        //Temporary:
-        this.grid.setPlayers(this.players);
+        this.walls = [];
 
+
+
+        this.players.push(new Player({x: 0, y: 0}, this.assets, 1, 14, 7, this.gridSize, this.context, this));
+
+
+        this.generateRandomWalls(30);
         this.startAnimating();
     }
 
@@ -49,17 +46,18 @@ export default class Game {
     // renders each player into the map
     draw() {
         this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
-        this.players.map(player => {
+        this.players.forEach(player => {
             player.draw(this.context);
         });
 
-        this.grid.walls.map(walls => {
-            walls.draw(this.context);
+        this.walls.forEach(wall => {
+            wall.draw(this.context);
         });
 
-        this.grid.newWalls.map(newWalls => {
-            newWalls.drawNewWall(this.context);
-        });
+        this.bombs.forEach(bomb => {
+            bomb.draw(this.context);
+        })
+
     }
 
     startAnimating() {
@@ -81,5 +79,29 @@ export default class Game {
             this.draw();
         }
     }
+
+    generateRandomWalls(number) {
+        let random = (limit) => {return Math.floor(Math.random() * limit)}
+        for (let i = 0; i < number; i++) {
+            let randomCoordinate = {x: random(this.width), y: random(this.height)};
+
+            if (this.findDuplicates(randomCoordinate)) {
+                i--;
+            } else {
+                this.walls.push(new Wall(randomCoordinate, 1, false, this.assets, this.gridSize));
+            }
+        }
+    }
+
+    findDuplicates(position) {
+        for (let i = 0; i < this.walls.length; i++) {
+            if (position.x === this.walls[i].position.x && (position.y === this.walls[i].position.y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
 }

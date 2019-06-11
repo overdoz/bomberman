@@ -1,27 +1,17 @@
 "use strict";
 import Element from './Element.js';
 import Bomb from './Bomb.js';
-import Queue from './Queue.js';
+import Wall from './Wall.js';
 
 export default class Player extends Element {
 
-    constructor(x, y, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize, context, grid) {
+    constructor(position, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize, context, game) {
 
+        super(position, assets);
 
-        super(/*position, assets*/);
-        // this.position = {x: 1, y: 1}
-        /*
-         * current position
-         * change x or y to move our player
-         */
-        this.x = x;
-        // this.position = position;
-        this.y = y;
+        this.game = game;
 
-        //save grid to check for wall collisions
-        this.grid = grid;
-
-        /*
+        /**
          * assets required to render player and bombs
          * individual dimensions of our sprites
          * display each sprite with grid size measurements on the given context
@@ -33,7 +23,7 @@ export default class Player extends Element {
         this.context = context;
 
 
-        /*
+        /**
          * amount of live, bombs and walls
          */
         this.health = health; // double
@@ -68,14 +58,8 @@ export default class Player extends Element {
             }
         };
 
-        /*
-         * react to keypress
-         * 1. move our player
-         * 2. set bomb at position of our player
-         */
-        document.addEventListener('keyup', this.conflictFind.bind(this));
-        document.addEventListener("keydown", this.pressedKey.bind(this));
-        // document.addEventListener("space", this.buildWall())
+        document.addEventListener("keydown", this.triggerEvent.bind(this));
+
     }
 
     /**
@@ -86,104 +70,48 @@ export default class Player extends Element {
     }
 
 
-    /*
-     * check if the pressed key is equal to "b"
-     * if true and the amount of bombs is greater than 0
-     * => add a bomb to our array
-     */
-    pressedKey(e) {
-        // throw a Bomb || ONLY A BOMB AT A TIME
-        if (e.key === "b" && this.bombsSet.length === 0) {
-            if (this.numberOfBombs > 0) {
-                this.bombsSet.push(new Bomb(this.x, this.y, 1, 1, true, this.assets));
-                this.numberOfBombs--;
-                // TODO: Find a way to explode every bomb at its time
-                var that = this;
-                setTimeout(function () {
-                    that.makeFire();
-                }, 2000);
-            }
-            // Build a Wall
-        } else if (e.key === " ") {
-            this.buildWall();
-        }
-    }
-
-    makeFire() {
-        Bomb.explode = true;
-        let that = this;
-        setTimeout(function () {
-            let bomb = that.bombsSet.shift();
-            that.explode(bomb);
-            Bomb.explode = false;
-        }, 500);
-    }
-
-
-    /**
-     * Bomb exploding and does damage
-     */
-    explode(bomb) {
-        this.grid.getDamage(bomb.x, bomb.y);
-    }
 
     /**
      * Check in Grid if there is any wall
      * @param e
      */
-    conflictFind(e) {
-        let x = this.x - 1;
-        let y = this.y - 1;
+    triggerEvent(e) {
         switch (e.key) {
             case 'ArrowLeft':
                 this.direction = 'west';
-                x -= this.gridSize;
+                this.update();
                 break;
             case 'ArrowRight':
                 this.direction = 'east';
-                x += this.gridSize;
+                this.update();
                 break;
             case 'ArrowUp':
                 this.direction = 'north';
-                y -= this.gridSize;
+                this.update();
                 break;
             case 'ArrowDown':
                 this.direction = 'south';
-                y += this.gridSize;
+                this.update();
+                break;
+            case "b":
+                if (this.numberOfBombs > 0) {
+                    let tempPosition = {x: this.position.x, y: this.position.y};
+                    this.game.bombs.push(new Bomb(tempPosition, 1, 1, this.assets, this.gridSize, this.game));
+                    this.numberOfBombs--;
+                    // TODO: Find a way to explode every bomb at its time
+                };
+                break;
+            case " ":
+                this.buildWall();
                 break;
         }
-        if (!this.grid.findPlayerWallConflict(x,y)) {
-            this.changeDirection(e);
-        }
-    }
 
-    /*
-     * change the direction of our avatar
-     * and move it one grid size on the x or y axis
-     */
-    changeDirection(e) {
-        switch (e.key) {
-            case 'ArrowLeft':
-                this.direction = 'west';
-                this.x -= this.gridSize;
-                break;
-            case 'ArrowRight':
-                this.direction = 'east';
-                this.x += this.gridSize;
-                break;
-            case 'ArrowUp':
-                this.direction = 'north';
-                this.y -= this.gridSize;
-                break;
-            case 'ArrowDown':
-                this.direction = 'south';
-                this.y += this.gridSize;
-                break;
-        }
+
     }
 
 
-    /*
+
+    /**
      * renders the avatar
      * note, that we added 6px to our x axis to center the image
      * draw() will also render our set of bombs
@@ -196,78 +124,97 @@ export default class Player extends Element {
                 this.spriteSheet[this.direction].y,
                 this.spriteSizeX,
                 this.spriteSizeY,
-                this.x + 6,
-                this.y,
+                this.position.x * this.gridSize + 6,
+                this.position.y * this.gridSize,
                 this.spriteSizeX,
                 this.spriteSizeY
             );
-            this.bombsSet.map(bomb => {
-                bomb.draw(this.context)
-            });
+
         }
     }
 
-
-    getPosition() {
-        return super.getPosition();
-    }
-
-    getPositionX() {
-        return this.x;
-    }
-
-    getPositionY() {
-        return this.y;
-    }
-
-
-    getNumberOfBombs() {
-        return this.numberOfBombs;
-    }
-
-    getHealth() {
-        return this.health;
-    }
-
+    /**
+     * change the direction of our avatar
+     * and move it one grid size on the x or y axis
+     */
     update() {
-        // TODO: OUT OF CANVAS
-        // TODO: A WALL IN FRONT OF THE PLAYER
         switch (this.direction) {
             case "east":
-                this.x += this.gridSize;
+                let east = {x: this.position.x + 1, y: this.position.y};
+                if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
+                    this.position.x += 1;
+                }
                 break;
             case "west":
-                this.x -= this.gridSize;
+                let west = {x: this.position.x - 1, y: this.position.y};
+                if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
+                    this.position.x -= 1;
+                }
                 break;
             case "south":
-                this.y += this.gridSize;
+                let south = {x: this.position.x, y: this.position.y + 1};
+                if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
+                    this.position.y += 1;
+                }
                 break;
             case "north":
-                this.y -= this.gridSize;
+                let north = {x: this.position.x, y: this.position.y - 1};
+                if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
+                    this.position.y -= 1;
+                }
                 break;
         }
 
     }
 
     buildWall() {
-        var wall_x = this.x - 1;
-        var wall_y = this.y - 1;
-
-        switch(this.direction) {
-            case "north":
-                wall_y -= this.gridSize;
-                break;
-            case "south":
-                wall_y += this.gridSize;
-                break;
+        switch (this.direction) {
             case "east":
-                wall_x += this.gridSize;
+                let east = {x: this.position.x + 1, y: this.position.y};
+                if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
+                    this.game.walls.push(new Wall(east, 1, true, this.assets, this.gridSize));
+                }
                 break;
             case "west":
-                wall_x -= this.gridSize;
+                let west = {x: this.position.x - 1, y: this.position.y};
+                if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
+                    this.game.walls.push(new Wall(west, 1, true, this.assets, this.gridSize));
+                }
+                break;
+            case "south":
+                let south = {x: this.position.x, y: this.position.y + 1};
+                if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
+                    this.game.walls.push(new Wall(south, 1, true, this.assets, this.gridSize));
+                }
+                break;
+            case "north":
+                let north = {x: this.position.x, y: this.position.y - 1};
+                if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
+                    this.game.walls.push(new Wall(north, 1, true, this.assets, this.gridSize));
+                }
+                break;
         }
+    }
 
-        this.grid.addWall(wall_x, wall_y);
+    doesPlayerTouchAWall(position) {
+        for (let i = 0; i < this.game.walls.length; i++) {
+            if (this.game.walls[i].position.x === position.x && this.game.walls[i].position.y === position.y) {
+                console.log(i);
+                return true;
+            }
+        }
+        return false;
+
+
+
+    }
+
+    isPlayerOutOfBounds(position) {
+        if (position.x > this.game.width - 1 || position.y > this.game.height - 1 || position.x < 0 || position.y < 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

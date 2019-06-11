@@ -20,10 +20,10 @@ export default class Queue {
         }
     }
 
-    map = function(context) {
+   /* map = function(context) {
         for (let i = 0; i < this.arr.length; i++) {
             this.arr[i].draw(context);
         }
-    }
+    }*/
 
 }
