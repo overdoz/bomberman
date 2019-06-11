@@ -19,7 +19,7 @@ export default class Game {
         // TODO: initialize each player inside constructor or inside App.js?
 
 
-        let gameOver = false;
+        // let gameOver = false;
 
         this.bombs = [];
         this.players = [];
@@ -27,7 +27,7 @@ export default class Game {
 
 
 
-        this.players.push(new Player({x: 0, y: 0}, this.assets, 1, 14, 7, this.gridSize, this.context, this));
+        this.players.push(new Player({x: 0, y: 0}, this.assets, 1, 14, 7, this.gridSize, this));
 
 
         this.generateRandomWalls(30);
@@ -46,6 +46,7 @@ export default class Game {
     // renders each player into the map
     draw() {
         this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
+
         this.players.forEach(player => {
             player.draw(this.context);
         });
@@ -81,14 +82,22 @@ export default class Game {
     }
 
     generateRandomWalls(number) {
-        let random = (limit) => {return Math.floor(Math.random() * limit)}
+        // create grid of indestructible walls
+        for (let i = 1; i < this.width; i += 2) {
+            for (let j = 1; j < this.height; j += 2) {
+                this.walls.push(new Wall({x: i, y: j}, 1, false, this.assets, this.gridSize));
+            }
+        }
+
+        // create random destructible walls
+        let random = (limit) => {return Math.floor(Math.random() * limit)};
         for (let i = 0; i < number; i++) {
             let randomCoordinate = {x: random(this.width), y: random(this.height)};
 
             if (this.findDuplicates(randomCoordinate)) {
                 i--;
             } else {
-                this.walls.push(new Wall(randomCoordinate, 1, false, this.assets, this.gridSize));
+                this.walls.push(new Wall(randomCoordinate, 1, true, this.assets, this.gridSize));
             }
         }
     }

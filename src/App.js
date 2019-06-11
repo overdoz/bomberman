@@ -1,7 +1,6 @@
 "use strict";
 
 import Game from "./Game.js";
-import Player from "./Player.js";
 
 
 export class AssetLoader {
@@ -41,9 +40,8 @@ new AssetLoader()
         { name: 'fire', url: '../images/fire.png'},
     ])
     .then(assets => {
-
-
         new Game("myCanvas", 13, 13, assets);
-
-    });
+    }).catch(err => {
+        window.location.href = "http://stackoverflow.com/search?q=[js]+" + err;
+})
 
