@@ -45,41 +45,44 @@ export default class Bomb extends Element {
             return bomb.ID
         }).indexOf(this.ID);
 
-        console.log(this.ID)
-        let x = this.game.bombs.splice(index, 1);
+        // delete bomb at index
+        let v = this.game.bombs.splice(index, 1);
 
-        console.log(x)
+        let x = this.position.x;
+        let y = this.position.y;
+
         let positions = [
-            {x: this.position.x ,       y: this.position.y},
-            {x: this.position.x + 1,    y: this.position.y},
-            {x: this.position.x,        y: this.position.y + 1},
-            {x: this.position.x + 1,    y: this.position.y + 1},
-            {x: this.position.x - 1,    y: this.position.y},
-            {x: this.position.x,        y: this.position.y - 1},
-            {x: this.position.x - 1,    y: this.position.y - 1},
-            {x: this.position.x - 1,    y: this.position.y + 1},
-            {x: this.position.x + 1,    y: this.position.y - 1},
+            {x: x ,     y: y},
+            {x: x+1,    y: y},
+            {x: x,      y: y+1},
+            {x: x+1,    y: y+1},
+            {x: x-1,    y: y},
+            {x: x,      y: y-1},
+            {x: x-1,    y: y-1},
+            {x: x-1,    y: y+1},
+            {x: x+1,    y: y-1},
             ];
 
-        for (let i = 0; i < this.game.players; i++) {
-            console.log(this.game.players[i])
-            for (let j = 0; j < positions.length; j++) {
-                console.log(positions[j])
-                if (this.game.players[i].x === positions[j].x && this.game.players[i].y === positions[j].y) {
-                    console.log("delete player");
-                    x = this.game.players.splice(i, 1);
-                }
-            }
-        }
 
-        for (let i = 0; i < this.game.walls; i++) {
-            for (let j = 0; j < positions.length; j++) {
-                if (this.game.walls[i].x === positions[j].x && this.game.walls[i].y === positions[j].y && (this.game.walls[i].destroyable === true)) {
-                    console.log("delete wall");
-                    x = this.game.walls.splice(i, 1);
+        // delete affected players
+        this.game.players.forEach((value, index) => {
+            positions.forEach(position => {
+                if (value.position.x === position.x && value.position.y === position.y) {
+                    v = this.game.players.splice(index, 1);
                 }
-            }
-        }
+            })
+        });
+
+        // delete affected walls
+        this.game.walls.forEach((value, index) => {
+            positions.forEach(position => {
+                if (value.position.x === position.x && value.position.y === position.y && value.destroyable === true) {
+                    v = this.game.walls.splice(index, 1);
+                }
+            })
+        });
+
+
     }
 
 
