@@ -5,7 +5,7 @@ import Wall from './Wall.js';
 
 export default class Player extends Element {
 
-    constructor(position, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize, context, game) {
+    constructor(position, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize, game) {
 
         super(position, assets);
 
@@ -17,10 +17,12 @@ export default class Player extends Element {
          * display each sprite with grid size measurements on the given context
          */
         this.assets = assets;
-        this.spriteSizeX = 27;
-        this.spriteSizeY = 40;
+        this.spriteSize = {
+            x: 27,
+            y: 40,
+        };
+
         this.gridSize = gridSize;
-        this.context = context;
 
 
         /**
@@ -28,33 +30,31 @@ export default class Player extends Element {
          */
         this.health = health; // double
         this.numberOfBombs = numberOfBombs; // 14 at the beginning
-        this.numberOfWalls = numberOfWalls; //  7 walls at the beginning
-        this.bombsSet = [];
+        // this.numberOfWalls = numberOfWalls; //  7 walls at the beginning
 
-        this.maximumNumberOfBombs = this.numberOfBombs*2;
-        this.powerUps = null;
-        this.timeLeftToBuildWall = 15; // move this logic inside setBomb() ???
+
+        // this.maximumNumberOfBombs = this.numberOfBombs*2;
+        // this.powerUps = null;
+        // this.timeLeftToBuildWall = 15; // move this logic inside setBomb() ???
         this.dead = false;
         this.direction = 'east';
 
-
-
         this.spriteSheet = {
             south: {
-                x: 0 * this.spriteSizeX,
-                y: 0 * this.spriteSizeY
+                x: 0,
+                y: 0
             },
             west: {
-                x: 0 * this.spriteSizeX,
-                y: 1 * this.spriteSizeY
+                x: 0,
+                y: this.spriteSize.y
             },
             north: {
-                x: 0 * this.spriteSizeX,
-                y: 2 * this.spriteSizeY
+                x: 0,
+                y: 2 * this.spriteSize.y
             },
             east: {
-                x: 0 * this.spriteSizeX,
-                y: 3 * this.spriteSizeY
+                x: 0,
+                y: 3 * this.spriteSize.y
             }
         };
 
@@ -62,45 +62,46 @@ export default class Player extends Element {
 
     }
 
-    /**
-     * Declares a player dead!
-     */
-    setDead() {
-        this.dead = true;
-    }
 
 
-
-    /**
-     * Check in Grid if there is any wall
-     * @param e
-     */
     triggerEvent(e) {
         switch (e.key) {
             case 'ArrowLeft':
-                this.direction = 'west';
-                this.update();
+                if (this.direction === 'west') {
+                    this.update();
+                } else {
+                    this.direction = 'west';
+                }
                 break;
+
             case 'ArrowRight':
-                this.direction = 'east';
-                this.update();
+                if (this.direction === 'east') {
+                    this.update();
+                } else {
+                    this.direction = 'east';
+                }
                 break;
+
             case 'ArrowUp':
-                this.direction = 'north';
-                this.update();
+                if (this.direction === 'north') {
+                    this.update();
+                } else {
+                    this.direction = 'north';
+                }
                 break;
+
             case 'ArrowDown':
-                this.direction = 'south';
-                this.update();
+                if (this.direction === 'south') {
+                    this.update();
+                } else {
+                    this.direction = 'south';
+                }
                 break;
+
             case "b":
-                if (this.numberOfBombs > 0) {
-                    let tempPosition = {x: this.position.x, y: this.position.y};
-                    this.game.bombs.push(new Bomb(tempPosition, 1, 1, this.assets, this.gridSize, this.game));
-                    this.numberOfBombs--;
-                    // TODO: Find a way to explode every bomb at its time
-                };
+                this.setBomb();
                 break;
+
             case " ":
                 this.buildWall();
                 break;
@@ -119,15 +120,15 @@ export default class Player extends Element {
     draw(context) {
         if (!this.dead) {
             context.drawImage(
-                this.assets.bomberman,
+                this.assets['bomberman'],
                 this.spriteSheet[this.direction].x,
                 this.spriteSheet[this.direction].y,
-                this.spriteSizeX,
-                this.spriteSizeY,
+                this.spriteSize.x,
+                this.spriteSize.y,
                 this.position.x * this.gridSize + 6,
                 this.position.y * this.gridSize,
-                this.spriteSizeX,
-                this.spriteSizeY
+                this.spriteSize.x,
+                this.spriteSize.y,
             );
 
         }
@@ -145,18 +146,21 @@ export default class Player extends Element {
                     this.position.x += 1;
                 }
                 break;
+
             case "west":
                 let west = {x: this.position.x - 1, y: this.position.y};
                 if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
                     this.position.x -= 1;
                 }
                 break;
+
             case "south":
                 let south = {x: this.position.x, y: this.position.y + 1};
                 if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
                     this.position.y += 1;
                 }
                 break;
+
             case "north":
                 let north = {x: this.position.x, y: this.position.y - 1};
                 if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
@@ -175,18 +179,21 @@ export default class Player extends Element {
                     this.game.walls.push(new Wall(east, 1, true, this.assets, this.gridSize));
                 }
                 break;
+
             case "west":
                 let west = {x: this.position.x - 1, y: this.position.y};
                 if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
                     this.game.walls.push(new Wall(west, 1, true, this.assets, this.gridSize));
                 }
                 break;
+
             case "south":
                 let south = {x: this.position.x, y: this.position.y + 1};
                 if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
                     this.game.walls.push(new Wall(south, 1, true, this.assets, this.gridSize));
                 }
                 break;
+
             case "north":
                 let north = {x: this.position.x, y: this.position.y - 1};
                 if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
@@ -196,25 +203,26 @@ export default class Player extends Element {
         }
     }
 
+    setBomb() {
+        if (this.numberOfBombs > 0) {
+            let tempPosition = {x: this.position.x, y: this.position.y};
+            this.game.bombs.push(new Bomb(tempPosition, 1, 1, this.assets, this.gridSize, this.game));
+            this.numberOfBombs--;
+            // TODO: Find a way to explode every bomb at its time
+        }
+    }
+
     doesPlayerTouchAWall(position) {
         for (let i = 0; i < this.game.walls.length; i++) {
             if (this.game.walls[i].position.x === position.x && this.game.walls[i].position.y === position.y) {
-                console.log(i);
                 return true;
             }
         }
         return false;
-
-
-
     }
 
     isPlayerOutOfBounds(position) {
-        if (position.x > this.game.width - 1 || position.y > this.game.height - 1 || position.x < 0 || position.y < 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return position.x > this.game.width - 1 || position.y > this.game.height - 1 || position.x < 0 || position.y < 0;
     }
 
 

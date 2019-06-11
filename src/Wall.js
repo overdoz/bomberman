@@ -2,11 +2,11 @@ import Element from './Element.js';
 
 export default class Wall extends Element {
 
-    constructor(position, strength = 1, destroyable = true, assets, gridSize) {
+    constructor(position, strength = 1, isDestructible = true, assets, gridSize) {
         super(position, assets);
 
-        this.destroyable = destroyable;
-        this.strength = strength;
+        this.isDestructible = isDestructible;
+        // this.strength = strength;
 
         this.spriteSize = {
             destroyable: {
@@ -23,16 +23,11 @@ export default class Wall extends Element {
     }
 
 
-    destroy() {
-        if (this.destroyable) {
-            this.active = false;
-        }
-    }
 
     draw(context) {
-        if (this.destroyable === true) {
+        if (this.isDestructible === true) {
             context.drawImage(
-                this.assets.wall,
+                this.assets['wall'],
                 0,
                 0,
                 this.spriteSize.destroyable.x,
@@ -44,7 +39,7 @@ export default class Wall extends Element {
             )
         } else {
             context.drawImage(
-                this.assets.grid_option2,
+                this.assets['grid_option2'],
                 0,
                 0,
                 this.spriteSize.notDestroyable.x,
@@ -58,9 +53,5 @@ export default class Wall extends Element {
 
     }
 
-
-    getDamage(damage) {
-
-    }
 
 }
