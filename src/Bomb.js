@@ -1,7 +1,5 @@
 import Element from './Element.js';
 
-// Test push
-
 export default class Bomb extends Element {
 
     constructor(position, timeToExplode = 5, radius, assets, gridSize, game) {
@@ -42,6 +40,22 @@ export default class Bomb extends Element {
         }, 500);
     }
 
+    getSurroundingPositions() {
+        let x = this.position.x;
+        let y = this.position.y;
+        return [
+            {x: x ,     y: y},
+            {x: x+1,    y: y},
+            {x: x,      y: y+1},
+            {x: x+1,    y: y+1},
+            {x: x-1,    y: y},
+            {x: x,      y: y-1},
+            {x: x-1,    y: y-1},
+            {x: x-1,    y: y+1},
+            {x: x+1,    y: y-1},
+        ];
+    }
+
     /**
      * destroySurrounding() iterates through this.games.bombs and deletes this particular bomb with the given ID
      * after detonation it scans all surrounding players and destructible walls, which are affected
@@ -55,26 +69,10 @@ export default class Bomb extends Element {
         // delete bomb at index
         let v = this.game.bombs.splice(index, 1);
 
-        let x = this.position.x;
-        let y = this.position.y;
-
-        // all surrounding positions
-        let positions = [
-            {x: x ,     y: y},
-            {x: x+1,    y: y},
-            {x: x,      y: y+1},
-            {x: x+1,    y: y+1},
-            {x: x-1,    y: y},
-            {x: x,      y: y-1},
-            {x: x-1,    y: y-1},
-            {x: x-1,    y: y+1},
-            {x: x+1,    y: y-1},
-            ];
-
 
         // delete affected players
         this.game.players.forEach((value, index) => {
-            positions.forEach(position => {
+            this.getSurroundingPositions().forEach(position => {
                 console.log(this.game.walls);
                 if (value.position.x === position.x && value.position.y === position.y) {
                     v = this.game.players.splice(index, 1);
@@ -86,7 +84,7 @@ export default class Bomb extends Element {
         // delete affected walls
         let indexes = [];
         this.game.walls.forEach((value, index) => {
-            positions.forEach(position => {
+            this.getSurroundingPositions().forEach(position => {
                 if (value.position.x === position.x && value.position.y === position.y && value.isDestructible === true) {
                     // v = this.game.walls.splice(index, 1, null);
                     indexes.push(index);
@@ -95,9 +93,6 @@ export default class Bomb extends Element {
         });
         // IMPORTANT! Because .splice() shortens the array, we safe all indexes, which have to be deleted inside of 'let indexes'
         indexes.sort((a, b) => {return b-a}).forEach((index) => {this.game.walls.splice(index, 1)});
-
-
-
     }
 
     // display bomb or fire image
@@ -115,19 +110,24 @@ export default class Bomb extends Element {
                 this.gridSize,
             )
         } else {
-            context.drawImage(
-                this.assets['fire'],
-                0,
-                0,
-                this.spriteSize.fire.x,
-                this.spriteSize.fire.y,
-                this.position.x * this.gridSize,
-                this.position.y * this.gridSize,
-                this.gridSize,
-                this.gridSize,
-            )
+            // draw surrounding fire
+            this.getSurroundingPositions().forEach(position => {
+                context.drawImage(
+                    this.assets['fire'],
+                    0,
+                    0,
+                    this.spriteSize.fire.x,
+                    this.spriteSize.fire.y,
+                    position.x * this.gridSize,
+                    position.y * this.gridSize,
+                    this.gridSize,
+                    this.gridSize,
+                );
+            })
+
         }
     }
+
 
 }
 
