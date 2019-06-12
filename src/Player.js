@@ -146,28 +146,28 @@ export default class Player extends Element {
             case "east":
                 let east = {x: this.position.x + 1, y: this.position.y};
                 if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
-                    this.position.x += 1;
+                    this.position = east;
                 }
                 break;
 
             case "west":
                 let west = {x: this.position.x - 1, y: this.position.y};
                 if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
-                    this.position.x -= 1;
+                    this.position = west;
                 }
                 break;
 
             case "south":
                 let south = {x: this.position.x, y: this.position.y + 1};
                 if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
-                    this.position.y += 1;
+                    this.position = south;
                 }
                 break;
 
             case "north":
                 let north = {x: this.position.x, y: this.position.y - 1};
                 if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
-                    this.position.y -= 1;
+                    this.position = north;
                 }
                 break;
         }

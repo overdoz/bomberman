@@ -2,18 +2,18 @@ import Element from './Element.js';
 
 export default class Wall extends Element {
 
-    constructor(position, strength = 1, isDestructible = true, assets, gridSize) {
+    constructor(position, strength, isDestructible, assets, gridSize) {
         super(position, assets);
 
         this.isDestructible = isDestructible;
         // this.strength = strength;
 
         this.spriteSize = {
-            destroyable: {
+            destructible: {
                 x: 32,
                 y: 32,
             },
-            notDestroyable: {
+            indestructible: {
                 x: 15,
                 y: 16,
             }
@@ -30,8 +30,8 @@ export default class Wall extends Element {
                 this.assets['wall'],
                 0,
                 0,
-                this.spriteSize.destroyable.x,
-                this.spriteSize.destroyable.y,
+                this.spriteSize.destructible.x,
+                this.spriteSize.destructible.y,
                 this.position.x * this.gridSize,
                 this.position.y * this.gridSize,
                 this.gridSize,
@@ -42,8 +42,8 @@ export default class Wall extends Element {
                 this.assets['grid_option2'],
                 0,
                 0,
-                this.spriteSize.notDestroyable.x,
-                this.spriteSize.notDestroyable.y,
+                this.spriteSize.indestructible.x,
+                this.spriteSize.indestructible.y,
                 this.position.x * this.gridSize,
                 this.position.y * this.gridSize,
                 this.gridSize,
