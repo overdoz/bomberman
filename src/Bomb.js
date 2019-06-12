@@ -14,7 +14,7 @@ export default class Bomb extends Element {
         this.isExploded = false;
 
         // this.timeToExplode = timeToExplode; // init for 5 seconds
-        this.radius = 2;        // init for 2 grid wide
+        this.radius = 2;
 
         this.spriteSize = {
             bomb: {

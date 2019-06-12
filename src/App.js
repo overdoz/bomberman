@@ -28,9 +28,6 @@ export class AssetLoader {
 
 
 
-
-
-
 new AssetLoader()
     .loadAssets([
         { name: 'bomberman', url: '../images/bomberman.png' },

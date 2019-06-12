@@ -87,7 +87,7 @@ export default class Game {
      * generate a grid of indestructible walls and destructible walls at random positions
      * @param number - max amount of indestructible walls to create
      */
-    generateRandomWalls(number) {
+    generateRandomWalls(amount) {
         // create grid of indestructible walls
         for (let i = 1; i < this.width; i += 2) {
             for (let j = 1; j < this.height; j += 2) {
@@ -97,23 +97,46 @@ export default class Game {
 
         // create random destructible walls
         let random = (limit) => {return Math.floor(Math.random() * limit)};
-        for (let i = 0; i < number; i++) {
-            let randomCoordinate = {x: random(this.width), y: random(this.height)};
+        for (let i = 0; i < amount; i++) {
+            let atRandomPosition = {x: random(this.width), y: random(this.height)};
 
-            if (this.findDuplicates(randomCoordinate)) {
+            if (this.isAlreadyExisting(atRandomPosition)) {
                 i--;
             } else {
-                this.walls.push(new Wall(randomCoordinate, 1, true, this.assets, this.gridSize));
+                this.walls.push(new Wall(atRandomPosition, 1, true, this.assets, this.gridSize));
             }
         }
     }
 
-    findDuplicates(position) {
+    isAlreadyExisting(position) {
         for (let i = 0; i < this.walls.length; i++) {
             if (position.x === this.walls[i].position.x && (position.y === this.walls[i].position.y)) {
                 return true;
             }
         }
+
+        // don't render walls at each corner within 3 blocks
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                switch (true) {
+                    case ((position.x === i) && (position.y === j)):
+                        return true;
+                    case ((position.x === (this.width-1-i)) && (position.y === (this.height-1-j))):
+                        return true;
+                    case ((position.x === i) && (position.y === (this.height-1-j))):
+                        return true;
+                    case ((position.x === (this.width-1-i)) && (position.y === j)):
+                        return true;
+                }
+                /*if (    (   (position.x === i)                            &&      (position.y === j)  )      ||
+                    (   (   position.x === (this.width - 1  - i)    )          &&      (position.y === (this.height - 1 - j) )) ||
+                    (   (   position.x === i)                             &&      (position.y  ===     (this.height - 1 - j) )  ) ||
+                    (   (   position.x === (this.width - 1 - i))              &&      (position.y === j ))
+                ) {
+                    return true;
+                }*/
+            }
+        };
         return false;
     }
 
