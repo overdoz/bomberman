@@ -43,7 +43,9 @@ export default class Game {
 
     }
 
-    // renders each player into the map
+    /**
+     * render method to display all elements on the game board
+     */
     draw() {
         this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
 
@@ -62,7 +64,7 @@ export default class Game {
     }
 
     startAnimating() {
-        this.frameTime = 1000 / 1600;
+        this.frameTime = 1000 / 60;
         this.then = window.performance.now();
         this.animate(this.then);
     }
@@ -81,6 +83,10 @@ export default class Game {
         }
     }
 
+    /**
+     * generate a grid of indestructible walls and destructible walls at random positions
+     * @param number - max amount of indestructible walls to create
+     */
     generateRandomWalls(number) {
         // create grid of indestructible walls
         for (let i = 1; i < this.width; i += 2) {

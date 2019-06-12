@@ -5,7 +5,7 @@ import Wall from './Wall.js';
 
 export default class Player extends Element {
 
-    constructor(position, assets, health = 1, numberOfBombs = 14, numberOfWalls = 7, gridSize, game) {
+    constructor(position, assets, health, amountBombs, amountWalls, gridSize, game) {
 
         super(position, assets);
 
@@ -29,8 +29,8 @@ export default class Player extends Element {
          * amount of live, bombs and walls
          */
         this.health = health; // double
-        this.numberOfBombs = numberOfBombs; // 14 at the beginning
-        // this.numberOfWalls = numberOfWalls; //  7 walls at the beginning
+        this.amountBombs = amountBombs;
+        this.amountWalls = amountWalls;
 
 
         // this.maximumNumberOfBombs = this.numberOfBombs*2;
@@ -59,6 +59,9 @@ export default class Player extends Element {
         };
 
         document.addEventListener("keydown", this.triggerEvent.bind(this));
+
+        document.getElementById("amountBombs").innerHTML = this.amountBombs;
+        document.getElementById("amountWalls").innerHTML = this.amountWalls;
 
     }
 
@@ -172,42 +175,49 @@ export default class Player extends Element {
     }
 
     buildWall() {
-        switch (this.direction) {
-            case "east":
-                let east = {x: this.position.x + 1, y: this.position.y};
-                if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
-                    this.game.walls.push(new Wall(east, 1, true, this.assets, this.gridSize));
-                }
-                break;
+        if (this.amountWalls > 0) {
+            switch (this.direction) {
+                case "east":
+                    let east = {x: this.position.x + 1, y: this.position.y};
+                    if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
+                        this.game.walls.push(new Wall(east, 1, true, this.assets, this.gridSize));
+                    }
+                    break;
 
-            case "west":
-                let west = {x: this.position.x - 1, y: this.position.y};
-                if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
-                    this.game.walls.push(new Wall(west, 1, true, this.assets, this.gridSize));
-                }
-                break;
+                case "west":
+                    let west = {x: this.position.x - 1, y: this.position.y};
+                    if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
+                        this.game.walls.push(new Wall(west, 1, true, this.assets, this.gridSize));
+                    }
+                    break;
 
-            case "south":
-                let south = {x: this.position.x, y: this.position.y + 1};
-                if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
-                    this.game.walls.push(new Wall(south, 1, true, this.assets, this.gridSize));
-                }
-                break;
+                case "south":
+                    let south = {x: this.position.x, y: this.position.y + 1};
+                    if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
+                        this.game.walls.push(new Wall(south, 1, true, this.assets, this.gridSize));
+                    }
+                    break;
 
-            case "north":
-                let north = {x: this.position.x, y: this.position.y - 1};
-                if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
-                    this.game.walls.push(new Wall(north, 1, true, this.assets, this.gridSize));
-                }
-                break;
+                case "north":
+                    let north = {x: this.position.x, y: this.position.y - 1};
+                    if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
+                        this.game.walls.push(new Wall(north, 1, true, this.assets, this.gridSize));
+                    }
+                    break;
+            }
+            this.amountWalls--;
+            document.getElementById("amountWalls").innerHTML = this.amountWalls;
         }
     }
 
     setBomb() {
-        if (this.numberOfBombs > 0) {
+        if (this.amountBombs > 0) {
             let tempPosition = {x: this.position.x, y: this.position.y};
             this.game.bombs.push(new Bomb(tempPosition, 1, 1, this.assets, this.gridSize, this.game));
-            this.numberOfBombs--;
+            this.amountBombs--;
+
+            // HTML manipulation
+            document.getElementById("amountBombs").innerHTML = this.amountBombs;
             // TODO: Find a way to explode every bomb at its time
         }
     }

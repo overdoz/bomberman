@@ -9,6 +9,7 @@ export default class Bomb extends Element {
 
         // unique ID function from stackoverflow
         this.ID = '_' + Math.random().toString(36).substr(2, 9);
+
         this.gridSize = gridSize;
         this.isExploded = false;
 
@@ -26,7 +27,7 @@ export default class Bomb extends Element {
             }
         };
 
-        // bomb destroys itself after created
+        // bomb destroys itself after being created
         setTimeout(() => {
             this.animateExplosion();
         }, 1000)
@@ -35,11 +36,17 @@ export default class Bomb extends Element {
     animateExplosion() {
         this.isExploded = true;
         setTimeout(() => {
-            this.deleteBomb();
+            this.destroySurrounding();
         }, 500);
     }
 
-    deleteBomb() {
+    /**
+     * destroySurrounding() iterates through this.games.bombs and deletes this particular bomb with the given ID
+     * after detonation it scans all surrounding players and destructible walls, which are affected
+     *
+     * let position determines the surrounding positions
+     */
+    destroySurrounding() {
         // index of the bomb to be deleted
         let index = this.game.bombs.map(bomb => {return bomb.ID}).indexOf(this.ID);
 
@@ -54,18 +61,19 @@ export default class Bomb extends Element {
             {x: x ,     y: y},
             {x: x+1,    y: y},
             {x: x,      y: y+1},
-            // {x: x+1,    y: y+1},
+            {x: x+1,    y: y+1},
             {x: x-1,    y: y},
             {x: x,      y: y-1},
-            // {x: x-1,    y: y-1},
-            // {x: x-1,    y: y+1},
-            // {x: x+1,    y: y-1},
+            {x: x-1,    y: y-1},
+            {x: x-1,    y: y+1},
+            {x: x+1,    y: y-1},
             ];
 
 
         // delete affected players
         this.game.players.forEach((value, index) => {
             positions.forEach(position => {
+                console.log(this.game.walls);
                 if (value.position.x === position.x && value.position.y === position.y) {
                     v = this.game.players.splice(index, 1);
                 }
@@ -74,18 +82,23 @@ export default class Bomb extends Element {
 
         // TODO: not all walls are getting destroyed :( I guess, each time an element is deleted, ell upcoming indexes also change
         // delete affected walls
+        let indexes = [];
         this.game.walls.forEach((value, index) => {
             positions.forEach(position => {
                 if (value.position.x === position.x && value.position.y === position.y && value.isDestructible === true) {
-                    v = this.game.walls.splice(index, 1);
+                    // v = this.game.walls.splice(index, 1, null);
+                    indexes.push(index);
                 }
             })
         });
+        // IMPORTANT! Because .splice() shortens the array, we safe all indexes, which have to be deleted inside of 'let indexes'
+        indexes.sort((a, b) => {return b-a}).forEach((index) => {this.game.walls.splice(index, 1)});
+
 
 
     }
-    
 
+    // display bomb or fire image
     draw(context) {
         if (!this.isExploded) {
             context.drawImage(
