@@ -1,5 +1,7 @@
 import Element from './Element.js';
 
+// Test push
+
 export default class Bomb extends Element {
 
     constructor(position, timeToExplode = 5, radius, assets, gridSize, game) {
