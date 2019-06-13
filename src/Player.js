@@ -2,7 +2,7 @@
 import Element from './Element.js';
 import Bomb from './Bomb.js';
 import Wall from './Wall.js';
-import Bomberman from '../images/bomberman.png';
+
 
 export default class Player extends Element {
 

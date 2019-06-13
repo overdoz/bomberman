@@ -73,7 +73,6 @@ export default class Bomb extends Element {
         // delete affected players
         this.game.players.forEach((value, index) => {
             this.getSurroundingPositions().forEach(position => {
-                console.log(this.game.walls);
                 if (value.position.x === position.x && value.position.y === position.y) {
                     v = this.game.players.splice(index, 1);
                 }
