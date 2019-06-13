@@ -75,6 +75,8 @@ export default class Bomb extends Element {
             this.getSurroundingPositions().forEach(position => {
                 if (value.position.x === position.x && value.position.y === position.y) {
                     v = this.game.players.splice(index, 1);
+                    //TODO: The f*** player doesn't die!!!
+                    v.setDead();
                 }
             })
         });

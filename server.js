@@ -8,7 +8,11 @@ app.get('/',function (req,res) {
     res.sendFile(__dirname + '/dist/index.html');
 });
 
-app.use('/',express.static(__dirname + '/'));
+// app.use('/',express.static(__dirname + 'dist/main.js'));
+
+app.use(express.static(__dirname + '/dist'));
+app.use(express.static(__dirname + '/images'));
+
 
 server.listen(9000, function() {
     console.log("Server is now listening at the PORT: 9000");
@@ -22,8 +26,12 @@ server.on('upgrade', (req, socket) => {
     }
 });
 
+
 io.on('connection', function(socket){
+
     console.log('A user is connected');
+
+
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });

@@ -66,52 +66,60 @@ export default class Player extends Element {
 
     }
 
+    isDead() {
+        return this.dead;
+    }
+
+    setDead() {
+        this.dead = true;
+    }
+
 
 
     triggerEvent(e) {
-        switch (e.key) {
-            case 'ArrowLeft':
-                if (this.direction === 'west') {
-                    this.update();
-                } else {
-                    this.direction = 'west';
-                }
-                break;
+        if (!this.dead) {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    if (this.direction === 'west') {
+                        this.update();
+                    } else {
+                        this.direction = 'west';
+                    }
+                    break;
 
-            case 'ArrowRight':
-                if (this.direction === 'east') {
-                    this.update();
-                } else {
-                    this.direction = 'east';
-                }
-                break;
+                case 'ArrowRight':
+                    if (this.direction === 'east') {
+                        this.update();
+                    } else {
+                        this.direction = 'east';
+                    }
+                    break;
 
-            case 'ArrowUp':
-                if (this.direction === 'north') {
-                    this.update();
-                } else {
-                    this.direction = 'north';
-                }
-                break;
+                case 'ArrowUp':
+                    if (this.direction === 'north') {
+                        this.update();
+                    } else {
+                        this.direction = 'north';
+                    }
+                    break;
 
-            case 'ArrowDown':
-                if (this.direction === 'south') {
-                    this.update();
-                } else {
-                    this.direction = 'south';
-                }
-                break;
+                case 'ArrowDown':
+                    if (this.direction === 'south') {
+                        this.update();
+                    } else {
+                        this.direction = 'south';
+                    }
+                    break;
 
-            case "b":
-                this.setBomb();
-                break;
+                case "b":
+                    this.setBomb();
+                    break;
 
-            case " ":
-                this.buildWall();
-                break;
+                case " ":
+                    this.buildWall();
+                    break;
+            }
         }
-
-
     }
 
 
@@ -122,7 +130,6 @@ export default class Player extends Element {
      * draw() will also render our set of bombs
      */
     draw(context) {
-        if (!this.dead) {
             context.drawImage(
                 this.assets['bomberman'],
                 this.spriteSheet[this.direction].x,
@@ -135,7 +142,6 @@ export default class Player extends Element {
                 this.spriteSize.y,
             );
 
-        }
     }
 
     /**
@@ -143,36 +149,36 @@ export default class Player extends Element {
      * and move it one grid size on the x or y axis
      */
     update() {
-        switch (this.direction) {
-            case "east":
-                let east = {x: this.position.x + 1, y: this.position.y};
-                if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
-                    this.position = east;
-                }
-                break;
 
-            case "west":
-                let west = {x: this.position.x - 1, y: this.position.y};
-                if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
-                    this.position = west;
-                }
-                break;
+            switch (this.direction) {
+                case "east":
+                    let east = {x: this.position.x + 1, y: this.position.y};
+                    if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
+                        this.position = east;
+                    }
+                    break;
 
-            case "south":
-                let south = {x: this.position.x, y: this.position.y + 1};
-                if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
-                    this.position = south;
-                }
-                break;
+                case "west":
+                    let west = {x: this.position.x - 1, y: this.position.y};
+                    if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
+                        this.position = west;
+                    }
+                    break;
 
-            case "north":
-                let north = {x: this.position.x, y: this.position.y - 1};
-                if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
-                    this.position = north;
-                }
-                break;
-        }
+                case "south":
+                    let south = {x: this.position.x, y: this.position.y + 1};
+                    if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
+                        this.position = south;
+                    }
+                    break;
 
+                case "north":
+                    let north = {x: this.position.x, y: this.position.y - 1};
+                    if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
+                        this.position = north;
+                    }
+                    break;
+            }
     }
 
     buildWall() {
