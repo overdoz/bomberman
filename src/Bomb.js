@@ -2,7 +2,7 @@ import Element from './Element.js';
 
 export default class Bomb extends Element {
 
-    constructor(position, timeToExplode = 5, radius, assets, gridSize, game) {
+    constructor(position, timeToExplode = 5000, radius, assets, gridSize, game) {
         super(position, assets);
 
         this.game = game;
@@ -13,7 +13,7 @@ export default class Bomb extends Element {
         this.gridSize = gridSize;
         this.isExploded = false;
 
-        // this.timeToExplode = timeToExplode; // init for 5 seconds
+        this.timeToExplode = timeToExplode; // init for 5 seconds
         this.radius = 2;
 
         this.spriteSize = {
@@ -30,7 +30,7 @@ export default class Bomb extends Element {
         // bomb destroys itself after being created
         setTimeout(() => {
             this.animateExplosion();
-        }, 1000)
+        }, this.timeToExplode)
     }
 
     animateExplosion() {

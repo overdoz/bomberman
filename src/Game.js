@@ -2,6 +2,7 @@
 
 import Player from './Player.js';
 import Wall from './Wall.js';
+import Bomb from "./Bomb.js";
 
 export default class Game {
 
@@ -12,6 +13,8 @@ export default class Game {
 
         this.width = width;
         this.height = height;
+
+        this.frameCount = 0;
 
 
         this.gridSize = this.canvas.width / width;
@@ -27,7 +30,7 @@ export default class Game {
 
 
 
-        this.players.push(new Player({x: 0, y: 0}, this.assets, 1, 14, 7, this.gridSize, this));
+        this.players.push(new Player({x: 0, y: 0}, this.assets, 1, 14, 77, this.gridSize, this));
 
 
         this.generateRandomWalls(30);
@@ -36,10 +39,15 @@ export default class Game {
 
     // TODO: update function
     update() {
-      /*  this.players.map(player => {
-            player.update();
-            console.log("draw player");
+        /*this.players.map(player => {
+            player.update(this.frameCount);
+
         })*/
+        let random = (limit) => {return Math.floor(Math.random() * limit)};
+        let atRandomPosition = {x: random(this.width), y: random(this.height)};
+        if (/*this.frameCount % 200 === 0*/ false) {
+            this.bombs.push(new Bomb(atRandomPosition, 5000, 1, this.assets, this.gridSize, this));
+        }
 
     }
 
@@ -64,7 +72,7 @@ export default class Game {
     }
 
     startAnimating() {
-        this.frameTime = 1000 / 60;
+        this.frameTime = 1000 / 30;
         this.then = window.performance.now();
         this.animate(this.then);
     }
@@ -81,6 +89,7 @@ export default class Game {
             this.update();
             this.draw();
         }
+        this.frameCount++;
     }
 
     /**
@@ -110,7 +119,7 @@ export default class Game {
 
     isAlreadyExisting(position) {
         for (let i = 0; i < this.walls.length; i++) {
-            if (position.x === this.walls[i].position.x && (position.y === this.walls[i].position.y)) {
+            if (position.x === this.walls[i].position.x && position.y === this.walls[i].position.y) {
                 return true;
             }
         }

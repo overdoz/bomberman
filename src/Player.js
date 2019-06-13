@@ -2,6 +2,7 @@
 import Element from './Element.js';
 import Bomb from './Bomb.js';
 import Wall from './Wall.js';
+import Bomberman from '../images/bomberman.png';
 
 export default class Player extends Element {
 
@@ -213,7 +214,7 @@ export default class Player extends Element {
     setBomb() {
         if (this.amountBombs > 0) {
             let tempPosition = {x: this.position.x, y: this.position.y};
-            this.game.bombs.push(new Bomb(tempPosition, 1, 1, this.assets, this.gridSize, this.game));
+            this.game.bombs.push(new Bomb(tempPosition, 1500, 1, this.assets, this.gridSize, this.game));
             this.amountBombs--;
 
             // HTML manipulation
