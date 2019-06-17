@@ -50,6 +50,7 @@ new AssetLoader()
         { name: 'fire', url: '../images/fire.png' },
     ])
     .then(assets => {
+        let players = []
         new Game("myCanvas", 13, 13, assets);
     }).catch(err => {
         window.location.href = "http://stackoverflow.com/search?q=[js]+" + err;

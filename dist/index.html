@@ -6,6 +6,10 @@
     <title>Bombastic 4D</title>
     <link href="https://fonts.googleapis.com/css?family=Asap:700|Carter+One|Fugaz+One&display=swap" rel="stylesheet">
     <script src="main.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io('http://localhost:9000');
+    </script>
     <!--<script type="module" src="./App.js"></script>
     <script type="module" src="./Element.js"></script>
     <script type="module" src="./Game.js"></script>
@@ -15,12 +19,12 @@
 <body style="margin:0">
     <div id="inventory">
         <div id="bombs">
-            <img src="../images/bomb_icon.png" alt="bomb" />
+            <img src="./bomb_icon.png" alt="bomb" />
             <p id="amountBombs"></p>
         </div>
 
         <div id="walls">
-            <img src="../images/wall.png" alt="bomb" />
+            <img src="./wall.png" alt="bomb" />
             <p id="amountWalls"></p>
         </div>
 
