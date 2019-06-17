@@ -39,17 +39,44 @@ export default class Game {
 
     // TODO: update function
     update() {
-        /*this.players.map(player => {
-            player.update(this.frameCount);
+        /**
+         * update player in the game board
+         */
+        this.players.forEach(player => {
+            if(this.frameCount % player.moveSpeed === 0) {
+                switch (player.direction) {
+                    case "east":
+                        let east = {x: player.position.x + 1, y: player.position.y};
+                        if (!player.isPlayerOutOfBounds(east) && !player.doesPlayerTouchAWall(east)) {
+                            player.position = east;
+                        }
+                        break;
 
-        })*/
-        let random = (limit) => {return Math.floor(Math.random() * limit)};
-        let atRandomPosition = {x: random(this.width), y: random(this.height)};
-        if (/*this.frameCount % 200 === 0*/ false) {
-            this.bombs.push(new Bomb(atRandomPosition, 5000, 1, this.assets, this.gridSize, this));
-        }
+                    case "west":
+                        let west = {x: player.position.x - 1, y: player.position.y};
+                        if (!player.isPlayerOutOfBounds(west) && !player.doesPlayerTouchAWall(west)) {
+                            player.position = west;
+                        }
+                        break;
 
-    }
+                    case "south":
+                        let south = {x: player.position.x, y: player.position.y + 1};
+                        if (!player.isPlayerOutOfBounds(south) && !player.doesPlayerTouchAWall(south)) {
+                            player.position = south;
+                        }
+                        break;
+
+                    case "north":
+                        let north = {x: player.position.x, y: player.position.y - 1};
+                        if (!player.isPlayerOutOfBounds(north) && !player.doesPlayerTouchAWall(north)) {
+                            player.position = north;
+                        }
+                }
+            }
+
+        });
+
+}
 
     /**
      * render method to display all elements on the game board
@@ -72,7 +99,7 @@ export default class Game {
     }
 
     startAnimating() {
-        this.frameTime = 1000 / 30;
+        this.frameTime = 1000 / 10;
         this.then = window.performance.now();
         this.animate(this.then);
     }

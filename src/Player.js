@@ -6,7 +6,7 @@ import Wall from './Wall.js';
 
 export default class Player extends Element {
 
-    constructor(position, assets, health, amountBombs, amountWalls, gridSize, game) {
+    constructor(position, assets, health, moveSpeed, amountBombs, amountWalls, gridSize, game) {
 
         super(position, assets);
 
@@ -32,6 +32,10 @@ export default class Player extends Element {
         this.health = health; // double
         this.amountBombs = amountBombs;
         this.amountWalls = amountWalls;
+        /**
+         * move speed of a player
+         */
+        this.moveSpeed = 10; //double
 
 
         // this.maximumNumberOfBombs = this.numberOfBombs*2;
@@ -149,7 +153,7 @@ export default class Player extends Element {
      * and move it one grid size on the x or y axis
      */
     update() {
-
+        if(this.game.frameCount % this.moveSpeed === 0) {
             switch (this.direction) {
                 case "east":
                     let east = {x: this.position.x + 1, y: this.position.y};
@@ -179,6 +183,7 @@ export default class Player extends Element {
                     }
                     break;
             }
+        }
     }
 
     buildWall() {

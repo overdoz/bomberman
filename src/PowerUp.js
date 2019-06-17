@@ -9,7 +9,7 @@ class PowerUp extends Element {
     }
     // move in 1.5 times quicker, can get power up for only one time
    speedPlus(){
-        this.player.frameTime = 1000/3;
+        this.player.moveSpeed += 15;
    }
    // bomb in 1.5 radius wide, limit in radius 5
    bombRadiusPlus(){
