@@ -35,7 +35,7 @@ export default class Player extends Element {
         /**
          * move speed of a player
          */
-        this.moveSpeed = 10; //double
+        this.moveSpeed = 30; //double
 
 
         // this.maximumNumberOfBombs = this.numberOfBombs*2;
