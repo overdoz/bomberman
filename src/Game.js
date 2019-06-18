@@ -3,10 +3,13 @@
 import Player from './Player.js';
 import Wall from './Wall.js';
 import Bomb from "./Bomb.js";
+import Client from "./App.js";
 
 export default class Game {
 
     constructor(canvas, width=13, height=13, assets) {
+        this.client = new Client();
+
         this.canvas = document.getElementById(canvas);
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
@@ -147,6 +150,15 @@ export default class Game {
             }
         };
         return false;
+    }
+
+    notifyClient(event) {
+        console.log("enters norifyClient");
+        switch (event.id) {
+            case 'direction':
+                console.log("enters switch");
+                this.client.move(event.direction);
+        }
     }
 
 

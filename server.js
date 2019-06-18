@@ -1,17 +1,23 @@
+
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server,{});
 
+var players = [];
+var dir = '/src/start.html';
+
 
 app.get('/',function (req,res) {
-    res.sendFile(__dirname + '/dist/index.html');
+    // console.log("HTTP GET/");
+    res.sendFile(__dirname + dir);
 });
 
 // app.use('/',express.static(__dirname + 'dist/main.js'));
 
 app.use(express.static(__dirname + '/dist'));
 app.use(express.static(__dirname + '/images'));
+app.use(express.static(__dirname + '/src'));
 
 
 server.listen(9000, function() {
@@ -26,30 +32,43 @@ server.on('upgrade', (req, socket) => {
     }
 });
 
+server.on('start game', (e) => {
+    console.log("Start game !!!");
+    players.forEach(player => {
+        player.sendFile(__dirname + '/dist/index.html');
+    })
+});
+
 
 io.on('connection', function(socket){
-
+    players.push(socket);
     console.log('A user is connected');
 
+    socket.on('disconnect', function() {
+        players.splice(socket,1);
+    });
 
-    socket.on('disconnect', function(){
-        console.log('user disconnected');
+    socket.on('start', function() {
+        if (players.length >= 1) {
+            dir = '/dist/index.html';
+            console.log("game starts!!!");
+            socket.broadcast.emit("start");
+            socket.emit("start");
+    }
+
     });
-    socket.on("send message", function(sent_msg, callback) {
-        sent_msg = "[ " + "an active user" + " ]: " + sent_msg;
-        io.sockets.emit("update messages", sent_msg);
-        callback();
-    });
-    socket.on("update messages", function(msg){
-        var final_message = $("<p />").text(msg);
-        $("#history").append(final_message);
-    });
+
+    socket.on('move', function(direction) {
+        console.log("the fucking player moved " + direction.direction);
+        socket.broadcast.emit('move', direction);
+    })
+
 
 });
 
 
 
-io.on('send message', function(message) {
-    console.log(message);
-});
+// io.on('send message', function(message) {
+//     console.log(message);
+// });
 

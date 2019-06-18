@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "Halloooooo",
   "private": true,
-
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack"
@@ -19,7 +18,8 @@
     "lodash": "^4.17.11",
     "shortid": "^2.2.14",
     "socket.io": "^2.2.0",
-    "uniqid": "^5.0.3"
+    "uniqid": "^5.0.3",
+    "socket.io-client": "latest"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",

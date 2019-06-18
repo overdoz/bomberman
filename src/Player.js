@@ -66,9 +66,6 @@ export default class Player extends Element {
 
     }
 
-    isDead() {
-        return this.dead;
-    }
 
     setDead() {
         this.dead = true;
@@ -77,9 +74,15 @@ export default class Player extends Element {
 
 
     triggerEvent(e) {
+
+        this.game.notifyClient({id:'direction', direction:data});
+        console.log("sending data... ");
+
         if (!this.dead) {
+            let data = e.key;
             switch (e.key) {
                 case 'ArrowLeft':
+                    data = 'west';
                     if (this.direction === 'west') {
                         this.update();
                     } else {
@@ -88,6 +91,7 @@ export default class Player extends Element {
                     break;
 
                 case 'ArrowRight':
+                    data = 'east';
                     if (this.direction === 'east') {
                         this.update();
                     } else {
@@ -96,6 +100,7 @@ export default class Player extends Element {
                     break;
 
                 case 'ArrowUp':
+                    data = 'north';
                     if (this.direction === 'north') {
                         this.update();
                     } else {
@@ -104,6 +109,7 @@ export default class Player extends Element {
                     break;
 
                 case 'ArrowDown':
+                    data = 'south';
                     if (this.direction === 'south') {
                         this.update();
                     } else {

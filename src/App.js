@@ -1,13 +1,7 @@
 "use strict";
 
 import Game from "./Game.js";
-/*import _ from 'lodash';
-import './main.css';
-import Bomberman from '../images/bomberman.png';
-import DestructibleWall from '../images/wall.png';
-import Bomb from '../images/bomb.png';
-import IndestructibleWall from '../images/grid_option2.png';
-import Fire from '../images/fire.png';*/
+import io from 'socket.io-client';
 
 export class AssetLoader {
     loadAsset(name, url) {
@@ -50,9 +44,20 @@ new AssetLoader()
         { name: 'fire', url: '../images/fire.png' },
     ])
     .then(assets => {
-        let players = []
+        let players = [];
         new Game("myCanvas", 13, 13, assets);
+        console.log("in App.js a new Game ");
     }).catch(err => {
         window.location.href = "http://stackoverflow.com/search?q=[js]+" + err;
-})
+});
 
+
+export default class Client{
+    constructor() {
+        this.socket = io('http://localhost:9000');
+    }
+
+    move(direction) {
+        this.socket.emit('move', {direction: direction});
+    }
+}

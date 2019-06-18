@@ -12,6 +12,19 @@
 
 </head>
 <body style="margin:0">
+
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+    var socket = io.connect();
+    socket.on('move', function(data) {
+        console.log("something just came frome the server: " + data);
+    })
+
+</script>
+
+
     <div id="inventory">
         <div id="bombs">
             <img src="../images/bomb_icon.png" alt="bomb" />
