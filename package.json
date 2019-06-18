@@ -18,8 +18,8 @@
     "lodash": "^4.17.11",
     "shortid": "^2.2.14",
     "socket.io": "^2.2.0",
-    "uniqid": "^5.0.3",
-    "socket.io-client": "latest"
+    "socket.io-client": "^2.2.0",
+    "uniqid": "^5.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",

@@ -33,10 +33,11 @@ export default class Game {
 
 
 
-        this.players.push(new Player({x: 0, y: 0}, this.assets, 1, 14, 77, this.gridSize, this));
+        this.players.push(new Player({x: 0, y: 0}, this.assets, 1, 14, 77, this.gridSize, this, false));
+        this.players.push(new Player({x: this.width - 1, y: this.height - 1}, this.assets, 1, 14, 77, this.gridSize, this, true));
 
-
-        this.generateRandomWalls(30);
+        // WALALALLJ
+        // this.generateRandomWalls(30);
         this.startAnimating();
     }
 
@@ -47,7 +48,7 @@ export default class Game {
 
         })*/
         let random = (limit) => {return Math.floor(Math.random() * limit)};
-        let atRandomPosition = {x: random(this.width), y: random(this.height)};
+        let atRandomPosition = {x: random(this.width - 2), y: random(this.height - 2)};
         if (/*this.frameCount % 200 === 0*/ false) {
             this.bombs.push(new Bomb(atRandomPosition, 5000, 1, this.assets, this.gridSize, this));
         }
@@ -153,12 +154,15 @@ export default class Game {
     }
 
     notifyClient(event) {
-        console.log("enters norifyClient");
         switch (event.id) {
             case 'direction':
-                console.log("enters switch");
                 this.client.move(event.direction);
+                console.log("Player 1 sends successful the new direction to the server");
         }
+    }
+
+    enemyMoved(direction) {
+        this.players[1].enemyMoved({key:direction});
     }
 
 

@@ -6,11 +6,12 @@ import Wall from './Wall.js';
 
 export default class Player extends Element {
 
-    constructor(position, assets, health, amountBombs, amountWalls, gridSize, game) {
+    constructor(position, assets, health, amountBombs, amountWalls, gridSize, game, enemy) {
 
         super(position, assets);
 
         this.game = game;
+        this.enemy = enemy;
 
         /**
          * assets required to render player and bombs
@@ -38,7 +39,11 @@ export default class Player extends Element {
         // this.powerUps = null;
         // this.timeLeftToBuildWall = 15; // move this logic inside setBomb() ???
         this.dead = false;
-        this.direction = 'east';
+        if (enemy) {
+            this.direction = 'west';
+        } else {
+            this.direction = 'east';
+        }
 
         this.spriteSheet = {
             south: {
@@ -59,11 +64,12 @@ export default class Player extends Element {
             }
         };
 
-        document.addEventListener("keydown", this.triggerEvent.bind(this));
+        if (!enemy) {
+            document.addEventListener("keydown", this.triggerEvent.bind(this));
 
-        document.getElementById("amountBombs").innerHTML = this.amountBombs;
-        document.getElementById("amountWalls").innerHTML = this.amountWalls;
-
+            document.getElementById("amountBombs").innerHTML = this.amountBombs;
+            document.getElementById("amountWalls").innerHTML = this.amountWalls;
+        }
     }
 
 
@@ -75,14 +81,11 @@ export default class Player extends Element {
 
     triggerEvent(e) {
 
-        this.game.notifyClient({id:'direction', direction:data});
-        console.log("sending data... ");
-
         if (!this.dead) {
             let data = e.key;
             switch (e.key) {
                 case 'ArrowLeft':
-                    data = 'west';
+                    data = 'ArrowRight';
                     if (this.direction === 'west') {
                         this.update();
                     } else {
@@ -91,7 +94,7 @@ export default class Player extends Element {
                     break;
 
                 case 'ArrowRight':
-                    data = 'east';
+                    data = 'ArrowLeft';
                     if (this.direction === 'east') {
                         this.update();
                     } else {
@@ -100,7 +103,7 @@ export default class Player extends Element {
                     break;
 
                 case 'ArrowUp':
-                    data = 'north';
+                    data = 'ArrowDown';
                     if (this.direction === 'north') {
                         this.update();
                     } else {
@@ -109,7 +112,7 @@ export default class Player extends Element {
                     break;
 
                 case 'ArrowDown':
-                    data = 'south';
+                    data = 'ArrowUp';
                     if (this.direction === 'south') {
                         this.update();
                     } else {
@@ -125,6 +128,53 @@ export default class Player extends Element {
                     this.buildWall();
                     break;
             }
+            this.game.notifyClient({id:'direction', direction:data});
+            // console.log("sending data... ");
+            // this.game.enemyMoved(data);
+        }
+    }
+
+    enemyMoved(e) {
+        switch (e.key) {
+            case 'ArrowLeft':
+                if (this.direction === 'west') {
+                    this.update();
+                } else {
+                    this.direction = 'west';
+                }
+                break;
+
+            case 'ArrowRight':
+                if (this.direction === 'east') {
+                    this.update();
+                } else {
+                    this.direction = 'east';
+                }
+                break;
+
+            case 'ArrowUp':
+                if (this.direction === 'north') {
+                    this.update();
+                } else {
+                    this.direction = 'north';
+                }
+                break;
+
+            case 'ArrowDown':
+                if (this.direction === 'south') {
+                    this.update();
+                } else {
+                    this.direction = 'south';
+                }
+                break;
+
+            case "b":
+                this.setBomb();
+                break;
+
+            case " ":
+                this.buildWall();
+                break;
         }
     }
 

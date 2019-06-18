@@ -8,12 +8,14 @@ var players = [];
 var dir = '/src/start.html';
 
 
+
 app.get('/',function (req,res) {
     // console.log("HTTP GET/");
     res.sendFile(__dirname + dir);
 });
 
 // app.use('/',express.static(__dirname + 'dist/main.js'));
+app.use(express.static('.'));
 
 app.use(express.static(__dirname + '/dist'));
 app.use(express.static(__dirname + '/images'));
@@ -59,8 +61,9 @@ io.on('connection', function(socket){
     });
 
     socket.on('move', function(direction) {
-        console.log("the fucking player moved " + direction.direction);
         socket.broadcast.emit('move', direction);
+        // socket.emit('move', direction);
+        console.log("server receives successfully the position of the new player");
     })
 
 
