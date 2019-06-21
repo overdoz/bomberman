@@ -3,16 +3,22 @@
 import Player from './Player.js';
 import Wall from './Wall.js';
 import Bomb from "./Bomb.js";
-import Client from "./App.js";
+import io from 'socket.io-client';
+
 
 export default class Game {
 
-    constructor(canvas, width=13, height=13, assets) {
-        this.client = new Client();
+    constructor(canvas, width=13, height=13, assets, id) {
+
 
         this.canvas = document.getElementById(canvas);
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
+
+        this.position = null;
+        this.direction = null;
+
+        this.id = id;
 
         this.width = width;
         this.height = height;
@@ -33,26 +39,74 @@ export default class Game {
 
 
 
-        this.players.push(new Player({x: 0, y: 0}, this.assets, 1, 14, 77, this.gridSize, this, false));
-        this.players.push(new Player({x: this.width - 1, y: this.height - 1}, this.assets, 1, 14, 77, this.gridSize, this, true));
 
-        // WALALALLJ
-        // this.generateRandomWalls(30);
         this.startAnimating();
+
+
+
+
+
+
+
+
     }
 
     // TODO: update function
     update() {
-        /*this.players.map(player => {
-            player.update(this.frameCount);
 
-        })*/
-        let random = (limit) => {return Math.floor(Math.random() * limit)};
-        let atRandomPosition = {x: random(this.width - 2), y: random(this.height - 2)};
-        if (/*this.frameCount % 200 === 0*/ false) {
-            this.bombs.push(new Bomb(atRandomPosition, 5000, 1, this.assets, this.gridSize, this));
+    }
+
+    /**
+     *
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     */
+    pushPlayer(data) {
+        //console.log(this.players);
+        let position = {x: data.x, y: data.y};
+        let doesnotcontain = true;
+
+        //console.log(this.players);
+        this.players.forEach(player => {
+            if (player.id === data.id) {
+                doesnotcontain = false;
+            } else {
+                doesnotcontain = doesnotcontain && true;
+            }
+        });
+        if (doesnotcontain) {
+            this.players.push(new Player(position, this.assets, 1, 10, 10, this.gridSize, this, data.id, data.direction));
+        } else {
+            return;
         }
 
+
+    }
+
+    movePlayer(data) {
+        this.players.forEach(player => {
+            if (player.id === data.id) {
+                player.triggerEvent(data);
+            }
+        });
+    }
+
+    playerMoved(data) {
+        console.log(data);
+        this.players.forEach(player => {
+            if (player.id === data.id) {
+                player.position.x = data.x;
+                player.position.y = data.y;
+                player.direction = data.direction;
+            }
+        });
+    }
+
+    changeDirection(data) {
+        this.players.forEach(player => {
+            if (player.id === data.id) {
+                player.direction = data.direction;
+            }
+        })
     }
 
     /**
@@ -72,6 +126,7 @@ export default class Game {
         this.bombs.forEach(bomb => {
             bomb.draw(this.context);
         })
+        //console.log(this.players);
 
     }
 
@@ -96,74 +151,7 @@ export default class Game {
         this.frameCount++;
     }
 
-    /**
-     * generate a grid of indestructible walls and destructible walls at random positions
-     * @param number - max amount of indestructible walls to create
-     */
-    generateRandomWalls(amount) {
-        // create grid of indestructible walls
-        for (let i = 1; i < this.width; i += 2) {
-            for (let j = 1; j < this.height; j += 2) {
-                this.walls.push(new Wall({x: i, y: j}, 1, false, this.assets, this.gridSize));
-            }
-        }
 
-        // create random destructible walls
-        let random = (limit) => {return Math.floor(Math.random() * limit)};
-        for (let i = 0; i < amount; i++) {
-            let atRandomPosition = {x: random(this.width), y: random(this.height)};
-
-            if (this.isAlreadyExisting(atRandomPosition)) {
-                i--;
-            } else {
-                this.walls.push(new Wall(atRandomPosition, 1, true, this.assets, this.gridSize));
-            }
-        }
-    }
-
-    isAlreadyExisting(position) {
-        for (let i = 0; i < this.walls.length; i++) {
-            if (position.x === this.walls[i].position.x && position.y === this.walls[i].position.y) {
-                return true;
-            }
-        }
-
-        // don't render walls at each corner within 3 blocks
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                switch (true) {
-                    case ((position.x === i) && (position.y === j)):
-                        return true;
-                    case ((position.x === (this.width-1-i)) && (position.y === (this.height-1-j))):
-                        return true;
-                    case ((position.x === i) && (position.y === (this.height-1-j))):
-                        return true;
-                    case ((position.x === (this.width-1-i)) && (position.y === j)):
-                        return true;
-                }
-                /*if (    (   (position.x === i)                            &&      (position.y === j)  )      ||
-                    (   (   position.x === (this.width - 1  - i)    )          &&      (position.y === (this.height - 1 - j) )) ||
-                    (   (   position.x === i)                             &&      (position.y  ===     (this.height - 1 - j) )  ) ||
-                    (   (   position.x === (this.width - 1 - i))              &&      (position.y === j ))
-                ) {
-                    return true;
-                }*/
-            }
-        };
-        return false;
-    }
-
-    notifyClient(event) {
-        switch (event.id) {
-            case 'direction':
-                this.client.move(event.direction);
-                console.log("Player 1 sends successful the new direction to the server");
-        }
-    }
-
-    enemyMoved(direction) {
-        this.players[1].enemyMoved({key:direction});
-    }
 
 
 

@@ -71,3 +71,10 @@ p {
     font-size: 40px;
 }
 
+#loginForm {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 20px;
+}
+

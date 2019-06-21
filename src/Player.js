@@ -2,16 +2,19 @@
 import Element from './Element.js';
 import Bomb from './Bomb.js';
 import Wall from './Wall.js';
+import io from "socket.io-client";
 
 
 export default class Player extends Element {
 
-    constructor(position, assets, health, amountBombs, amountWalls, gridSize, game, enemy) {
+    constructor(position, assets, health, amountBombs, amountWalls, gridSize, game, id, direction) {
 
         super(position, assets);
 
         this.game = game;
-        this.enemy = enemy;
+        this.id = id;
+
+        this.direction = direction;
 
         /**
          * assets required to render player and bombs
@@ -39,11 +42,6 @@ export default class Player extends Element {
         // this.powerUps = null;
         // this.timeLeftToBuildWall = 15; // move this logic inside setBomb() ???
         this.dead = false;
-        if (enemy) {
-            this.direction = 'west';
-        } else {
-            this.direction = 'east';
-        }
 
         this.spriteSheet = {
             south: {
@@ -64,12 +62,19 @@ export default class Player extends Element {
             }
         };
 
-        if (!enemy) {
-            document.addEventListener("keydown", this.triggerEvent.bind(this));
+        this.game.position = this.position;
+        this.game.direction = this.direction;
+
+        this.socket = io.connect('http://localhost:9000');
+
+        // document.addEventListener("keydown", this.triggerEvent.bind(this));
+
+        //this.socket = io.connect('http://localhost:9000');
+
 
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
             document.getElementById("amountWalls").innerHTML = this.amountWalls;
-        }
+
     }
 
 
@@ -77,47 +82,45 @@ export default class Player extends Element {
         this.dead = true;
     }
 
-
-
     triggerEvent(e) {
 
         if (!this.dead) {
-            let data = e.key;
+
             switch (e.key) {
                 case 'ArrowLeft':
-                    data = 'ArrowRight';
                     if (this.direction === 'west') {
                         this.update();
                     } else {
                         this.direction = 'west';
                     }
+                    //this.socket.emit('changeDirection', {id: this.id, direction: 'west'});
                     break;
 
                 case 'ArrowRight':
-                    data = 'ArrowLeft';
                     if (this.direction === 'east') {
                         this.update();
                     } else {
                         this.direction = 'east';
                     }
+                    //this.socket.emit('changeDirection', {id: this.id, direction: 'east'});
                     break;
 
                 case 'ArrowUp':
-                    data = 'ArrowDown';
                     if (this.direction === 'north') {
                         this.update();
                     } else {
                         this.direction = 'north';
                     }
+                    //this.socket.emit('changeDirection', {id: this.id, direction: 'north'});
                     break;
 
                 case 'ArrowDown':
-                    data = 'ArrowUp';
                     if (this.direction === 'south') {
                         this.update();
                     } else {
                         this.direction = 'south';
                     }
+                    //this.socket.emit('changeDirection', {id: this.id, direction: 'south'});
                     break;
 
                 case "b":
@@ -128,55 +131,15 @@ export default class Player extends Element {
                     this.buildWall();
                     break;
             }
-            this.game.notifyClient({id:'direction', direction:data});
-            // console.log("sending data... ");
-            // this.game.enemyMoved(data);
-        }
+
+        };
+        this.game.position = this.position;
+        this.game.direction = this.direction;
+        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+
     }
 
-    enemyMoved(e) {
-        switch (e.key) {
-            case 'ArrowLeft':
-                if (this.direction === 'west') {
-                    this.update();
-                } else {
-                    this.direction = 'west';
-                }
-                break;
 
-            case 'ArrowRight':
-                if (this.direction === 'east') {
-                    this.update();
-                } else {
-                    this.direction = 'east';
-                }
-                break;
-
-            case 'ArrowUp':
-                if (this.direction === 'north') {
-                    this.update();
-                } else {
-                    this.direction = 'north';
-                }
-                break;
-
-            case 'ArrowDown':
-                if (this.direction === 'south') {
-                    this.update();
-                } else {
-                    this.direction = 'south';
-                }
-                break;
-
-            case "b":
-                this.setBomb();
-                break;
-
-            case " ":
-                this.buildWall();
-                break;
-        }
-    }
 
 
 
@@ -234,7 +197,9 @@ export default class Player extends Element {
                         this.position = north;
                     }
                     break;
-            }
+            };
+            console.log(('draw player'));
+            this.socket.emit('playerMoved', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
     }
 
     buildWall() {

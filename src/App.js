@@ -1,15 +1,12 @@
 "use strict";
 
 import Game from "./Game.js";
-// import io from '../node_modules library root/socket.io-client/dist/';
+import Wall from "./Wall.js";
+
 import io from 'socket.io-client';
 import _ from 'lodash';
 import './main.css';
-import Bomberman from '../images/bomberman.png';
-import DestructibleWall from '../images/wall.png';
-import Bomb from '../images/bomb.png';
-import IndestructibleWall from '../images/grid_option2.png';
-import Fire from '../images/fire.png';
+
 
 export class AssetLoader {
     loadAsset(name, url) {
@@ -34,16 +31,11 @@ export class AssetLoader {
     }
 }
 
-var game;
+
+
+
 
 new AssetLoader()
-    /*.loadAssets([
-        { name: 'bomberman', url: Bomberman },
-        { name: 'wall', url: DestructibleWall },
-        { name: 'bomb', url: Bomb },
-        { name: 'grid_option2', url: IndestructibleWall },
-        { name: 'fire', url: Fire },
-    ])*/
     .loadAssets([
         { name: 'bomberman', url: '../images/bomberman.png' },
         { name: 'wall', url: '../images/wall.png' },
@@ -53,29 +45,67 @@ new AssetLoader()
         {name: 'enemy', url: '../images/bomberman_boy.png' },
     ])
     .then(assets => {
-        let players = [];
-        game = new Game("myCanvas", 13, 13, assets);
-        console.log("in App.js a new Game ");
+        let game = null;
+        let socket = io.connect('http://localhost:9000');
+
+
+        let id = '';
+        document.querySelector("#login").addEventListener("click", function(event) {
+            console.log(document.querySelector("#lname").value);
+            event.preventDefault();
+            id = document.querySelector("#lname").value;
+            game = new Game("myCanvas", 13, 13, assets, id);
+            socket.emit('loginPlayer', { id: id });
+
+            socket.on('createWalls', function (data) {
+                let arr = data;
+                arr.forEach(d => {
+                    let pos = {x: d.x, y: d.y};
+                    game.walls.push(new Wall(pos, 1, d.isDestructible, assets, 40));
+                });
+            });
+
+            socket.on('createNewPlayer', function (data) {
+                game.pushPlayer(data);
+            });
+
+            socket.on('changeDirection', function (data) {
+                game.changeDirection(data)
+            });
+
+            socket.on('movePlayer', function (data) {
+                game.movePlayer(data)
+            });
+
+            socket.on('playerMoved', function (data) {
+                game.playerMoved(data);
+            })
+
+            document.addEventListener("keydown", (e) => {
+                game.movePlayer({id: id, key: e.key})
+
+            });
+
+        }, false);
+
+
+
+
+
+
+
+
+
+
+
     }).catch(err => {
         window.location.href = "http://stackoverflow.com/search?q=[js]+" + err;
 });
 
 
-export default class Client{
-    constructor() {
-        this.socket = io('http://localhost:9000');
-        this.socket.on("move", function(direction) {
-            console.log("Client receives that the enemy moved:  " + direction.direction);
-            game.enemyMoved(direction.direction);
-        });
-    }
-
-    move(direction) {
-        this.socket.emit('move', {direction: direction});
-    }
 
 
 
 
 
-}
+
