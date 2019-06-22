@@ -204,36 +204,39 @@ export default class Player extends Element {
 
     buildWall() {
         if (this.amountWalls > 0) {
+            let coords = null;
             switch (this.direction) {
                 case "east":
-                    let east = {x: this.position.x + 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
-                        this.game.walls.push(new Wall(east, 1, true, this.assets, this.gridSize));
+                    coords = {x: this.position.x + 1, y: this.position.y};
+                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords) && !this.doesPlayerCrossPlayer(coords)) {
+                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
                     }
                     break;
 
                 case "west":
-                    let west = {x: this.position.x - 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
-                        this.game.walls.push(new Wall(west, 1, true, this.assets, this.gridSize));
+                    coords = {x: this.position.x - 1, y: this.position.y};
+                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords) && !this.doesPlayerCrossPlayer(coords)) {
+                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
                     }
                     break;
 
                 case "south":
-                    let south = {x: this.position.x, y: this.position.y + 1};
-                    if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
-                        this.game.walls.push(new Wall(south, 1, true, this.assets, this.gridSize));
+                    coords = {x: this.position.x, y: this.position.y + 1};
+                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords) && !this.doesPlayerCrossPlayer(coords)) {
+                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
                     }
                     break;
 
                 case "north":
-                    let north = {x: this.position.x, y: this.position.y - 1};
-                    if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
-                        this.game.walls.push(new Wall(north, 1, true, this.assets, this.gridSize));
+                    coords = {x: this.position.x, y: this.position.y - 1};
+                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords) && !this.doesPlayerCrossPlayer(coords)) {
+                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
                     }
                     break;
             }
             this.amountWalls--;
+            this.socket.emit('setWall', coords); // TODO: emit wall;
+
             document.getElementById("amountWalls").innerHTML = this.amountWalls;
         }
     }
@@ -247,12 +250,23 @@ export default class Player extends Element {
             // HTML manipulation
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
             // TODO: Find a way to explode every bomb at its time
+            this.socket.emit('setBomb', tempPosition);
+
         }
     }
 
     doesPlayerTouchAWall(position) {
         for (let i = 0; i < this.game.walls.length; i++) {
             if (this.game.walls[i].position.x === position.x && this.game.walls[i].position.y === position.y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    doesPlayerCrossPlayer(position) {
+        for (let i = 0; i < this.game.players.length; i++) {
+            if (this.game.players[i].position.x === position.x && this.game.players[i].position.y === position.y) {
                 return true;
             }
         }

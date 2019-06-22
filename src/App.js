@@ -54,7 +54,9 @@ new AssetLoader()
             console.log(document.querySelector("#lname").value);
             event.preventDefault();
             id = document.querySelector("#lname").value;
+
             game = new Game("myCanvas", 13, 13, assets, id);
+
             socket.emit('loginPlayer', { id: id });
 
             socket.on('createWalls', function (data) {
@@ -79,6 +81,14 @@ new AssetLoader()
 
             socket.on('playerMoved', function (data) {
                 game.playerMoved(data);
+            });
+
+            socket.on('getBomb', function (data) {
+                game.getBomb(data);
+            });
+
+            socket.on('getWall', function (data) {
+                game.getWall(data);
             })
 
             document.addEventListener("keydown", (e) => {

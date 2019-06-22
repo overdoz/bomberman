@@ -146,6 +146,14 @@ io.on('connection', function(socket){
     });
 
 
+    socket.on('setBomb', function(data) {
+        socket.broadcast.emit('getBomb', data);
+    });
+
+    socket.on('setWall', function(data) {
+        socket.broadcast.emit('getWall', data);
+    });
+
 });
 
 

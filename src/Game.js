@@ -109,6 +109,18 @@ export default class Game {
         })
     }
 
+    getBomb(data) {
+
+        this.bombs.push(new Bomb(data, 1500, 1, this.assets, this.gridSize, this));
+
+
+    }
+
+    getWall(data) {
+        this.walls.push(new Wall(data, 1, true, this.assets, this.gridSize));
+        // TODO: fix bug whenever you set a wall
+    }
+
     /**
      * render method to display all elements on the game board
      */
