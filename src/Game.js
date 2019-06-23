@@ -13,8 +13,8 @@ export default class Game {
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
 
-        this.position = null;
-        this.direction = null;
+        // this.position = null;
+        // this.direction = null;
 
         this.id = id;
 
@@ -65,8 +65,7 @@ export default class Game {
         } else {
             return;
         }
-
-
+        console.log(this.players)
     }
 
     /**
@@ -86,6 +85,7 @@ export default class Game {
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
      */
     playerMoved(data) {
+        console.log(data)
         this.players.forEach(player => {
             if (player.id === data.id) {
                 player.position.x = data.x;

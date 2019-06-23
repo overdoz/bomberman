@@ -73,9 +73,9 @@ export default class Player extends Element {
     }
 
     triggerEvent(e) {
+        // console.log("We are now into the trigger zone...");
 
         if (!this.dead) {
-
             switch (e.key) {
                 case 'ArrowLeft':
                     if (this.direction === 'west') {
@@ -160,33 +160,33 @@ export default class Player extends Element {
      * and move it one grid size on the x or y axis
      */
     update() {
-
+            let coords = null;
             switch (this.direction) {
                 case "east":
-                    let east = {x: this.position.x + 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
-                        this.position = east;
+                    coords = {x: this.position.x + 1, y: this.position.y};
+                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords)) {
+                        this.position.x = this.position.x + 1;
                     }
                     break;
 
                 case "west":
-                    let west = {x: this.position.x - 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
-                        this.position = west;
+                    coords = {x: this.position.x - 1, y: this.position.y};
+                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords)) {
+                        this.position.x = this.position.x - 1;
                     }
                     break;
 
                 case "south":
-                    let south = {x: this.position.x, y: this.position.y + 1};
-                    if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
-                        this.position = south;
+                    coords = {x: this.position.x, y: this.position.y + 1};
+                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords)) {
+                        this.position.y += 1;
                     }
                     break;
 
                 case "north":
-                    let north = {x: this.position.x, y: this.position.y - 1};
-                    if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
-                        this.position = north;
+                    coords = {x: this.position.x, y: this.position.y - 1};
+                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords)) {
+                        this.position.y -= 1;
                     }
                     break;
             };
