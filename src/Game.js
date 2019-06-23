@@ -15,8 +15,8 @@ export default class Game {
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
 
-        this.position = null;
-        this.direction = null;
+        // this.position = null;
+        // this.direction = null;
 
         this.id = id;
 
@@ -69,20 +69,18 @@ export default class Game {
         this.players.forEach(player => {
             if (player.id === data.id) {
                 doesnotcontain = false;
-            } else {
-                doesnotcontain = doesnotcontain && true;
             }
         });
+
         if (doesnotcontain) {
             this.players.push(new Player(position, this.assets, 1, 10, 10, this.gridSize, this, data.id, data.direction));
         } else {
             return;
         }
-
-
     }
 
-    movePlayer(data) {
+
+    event(data) {
         this.players.forEach(player => {
             if (player.id === data.id) {
                 player.triggerEvent(data);
@@ -90,15 +88,26 @@ export default class Game {
         });
     }
 
-    playerMoved(data) {
-        console.log(data);
+    movePlayer(data) {
+        console.log("in Game now.. :");
         this.players.forEach(player => {
             if (player.id === data.id) {
-                player.position.x = data.x;
-                player.position.y = data.y;
-                player.direction = data.direction;
+                console.log("hat geklappptptptptptpp");
+                player.triggerEvent(data);
             }
         });
+    }
+
+    playerMoved(data) {
+            console.log("--------------------------------------------");
+            console.log(data);
+            this.players.forEach(player => {
+             if (player.id === data.id) {
+                  player.position.x = data.x;
+                  player.position.y = data.y;
+                  player.direction = data.direction;
+             }
+         });
     }
 
     changeDirection(data) {

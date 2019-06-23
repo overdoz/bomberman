@@ -135,23 +135,28 @@ io.on('connection', function(socket){
     });
 
 
-    socket.on('changeDirection', function(data) {
-        socket.broadcast.emit('changeDirection', data);
-    });
+    // socket.on('changeDirection', function(data) {
+    //     socket.broadcast.emit('changeDirection', data);
+    // });
+    //
+    //
+    //
+    // socket.on('playerMoved', function(data) {
+    //     socket.broadcast.emit('playerMoved', data);
+    // });
+    //
+    //
+    // socket.on('setBomb', function(data) {
+    //     socket.broadcast.emit('getBomb', data);
+    // });
+    //
+    // socket.on('setWall', function(data) {
+    //     socket.broadcast.emit('getWall', data);
+    // });
 
-
-
-    socket.on('playerMoved', function(data) {
-        socket.broadcast.emit('playerMoved', data);
-    });
-
-
-    socket.on('setBomb', function(data) {
-        socket.broadcast.emit('getBomb', data);
-    });
-
-    socket.on('setWall', function(data) {
-        socket.broadcast.emit('getWall', data);
+    socket.on('event', function(data) {
+        console.log("server receives an event");
+       socket.broadcast.emit('event', data);
     });
 
 });

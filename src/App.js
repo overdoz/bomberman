@@ -46,7 +46,9 @@ new AssetLoader()
     ])
     .then(assets => {
         let game = null;
-        let socket = io.connect('http://localhost:9000');
+        // let socket = io.connect('http://localhost:9000');
+        let socket = io.connect('http://b664c451.ngrok.io');
+
 
 
         let id = '';
@@ -71,41 +73,40 @@ new AssetLoader()
                 game.pushPlayer(data);
             });
 
-            socket.on('changeDirection', function (data) {
-                game.changeDirection(data)
-            });
+            // socket.on('changeDirection', function (data) {
+            //     game.changeDirection(data)
+            // });
+            //
+            // socket.on('movePlayer', function (data) {
+            //     game.movePlayer(data)
+            // });
+            //
+            // socket.on('playerMoved', function (data) {
+            //     game.playerMoved(data);
+            // });
+            //
+            // socket.on('getBomb', function (data) {
+            //     game.getBomb(data);
+            // });
+            //
+            // socket.on('getWall', function (data) {
+            //     game.getWall(data);
+            // });
 
-            socket.on('movePlayer', function (data) {
-                game.movePlayer(data)
+            socket.on('event', function(data) {
+               console.log("in App: received an event");
+                // game.event(data);
+                game.movePlayer(data);
             });
-
-            socket.on('playerMoved', function (data) {
-                game.playerMoved(data);
-            });
-
-            socket.on('getBomb', function (data) {
-                game.getBomb(data);
-            });
-
-            socket.on('getWall', function (data) {
-                game.getWall(data);
-            })
 
             document.addEventListener("keydown", (e) => {
-                game.movePlayer({id: id, key: e.key})
-
+                console.log("about to send something to server...");
+                game.movePlayer({id: id, key: e.key});
+                socket.emit('event', {id:id, key:e.key});
+                console.log("sent something to server!!!");
             });
 
         }, false);
-
-
-
-
-
-
-
-
-
 
 
     }).catch(err => {

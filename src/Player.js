@@ -65,11 +65,11 @@ export default class Player extends Element {
         this.game.position = this.position;
         this.game.direction = this.direction;
 
-        this.socket = io.connect('http://localhost:9000');
+        // this.socket = io.connect('http://localhost:9000');
 
         // document.addEventListener("keydown", this.triggerEvent.bind(this));
 
-        //this.socket = io.connect('http://localhost:9000');
+        // this.socket = io.connect('http://d2c56663.ngrok.io');
 
 
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
@@ -83,9 +83,10 @@ export default class Player extends Element {
     }
 
     triggerEvent(e) {
+        console.log("We are now into the trigger zone...");
 
         if (!this.dead) {
-
+        console.log("Direction " + this.direction + " key  e = " + e.key);
             switch (e.key) {
                 case 'ArrowLeft':
                     if (this.direction === 'west') {
@@ -97,6 +98,7 @@ export default class Player extends Element {
                     break;
 
                 case 'ArrowRight':
+                    console.log("BENEI MESSSSAAA");
                     if (this.direction === 'east') {
                         this.update();
                     } else {
@@ -133,9 +135,9 @@ export default class Player extends Element {
             }
 
         };
-        this.game.position = this.position;
-        this.game.direction = this.direction;
-        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+        // this.game.position = this.position;
+        // this.game.direction = this.direction;
+        // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
 
     }
 
@@ -168,38 +170,42 @@ export default class Player extends Element {
      * and move it one grid size on the x or y axis
      */
     update() {
-
+        console.log("enters update");
             switch (this.direction) {
                 case "east":
                     let east = {x: this.position.x + 1, y: this.position.y};
                     if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
-                        this.position = east;
+                        // this.position = east;
+                        this.position.x = this.position.x + 1;
                     }
                     break;
 
                 case "west":
                     let west = {x: this.position.x - 1, y: this.position.y};
                     if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
-                        this.position = west;
+                        // this.position = west;
+                        this.position.x = this.position.x - 1;
                     }
                     break;
 
                 case "south":
                     let south = {x: this.position.x, y: this.position.y + 1};
                     if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
-                        this.position = south;
+                        // this.position = south;
+                        this.position.y += 1;
                     }
                     break;
 
                 case "north":
                     let north = {x: this.position.x, y: this.position.y - 1};
                     if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
-                        this.position = north;
+                        // this.position = north;
+                        this.position.y -= 1;
                     }
                     break;
             };
             console.log(('draw player'));
-            this.socket.emit('playerMoved', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
+            // this.socket.emit('playerMoved', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
     }
 
     buildWall() {
@@ -235,7 +241,7 @@ export default class Player extends Element {
                     break;
             }
             this.amountWalls--;
-            this.socket.emit('setWall', coords); // TODO: emit wall;
+            // this.socket.emit('setWall', coords); // TODO: emit wall;
 
             document.getElementById("amountWalls").innerHTML = this.amountWalls;
         }
@@ -250,7 +256,7 @@ export default class Player extends Element {
             // HTML manipulation
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
             // TODO: Find a way to explode every bomb at its time
-            this.socket.emit('setBomb', tempPosition);
+            // this.socket.emit('setBomb', tempPosition);
 
         }
     }
