@@ -86,8 +86,9 @@ export default class Game {
     playerMoved(data) {
         this.players.forEach(player => {
             if (player.id === data.id) {
-                console.log("hat geklappptptptptptpp");
-                player.triggerEvent(data);
+                player.position.x = data.x;
+                player.position.y = data.y;
+                player.direction = data.direction;
             }
         });
     }
