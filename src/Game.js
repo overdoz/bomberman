@@ -85,7 +85,6 @@ export default class Game {
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
      */
     playerMoved(data) {
-        console.log(data)
         this.players.forEach(player => {
             if (player.id === data.id) {
                 player.position.x = data.x;

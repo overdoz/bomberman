@@ -128,8 +128,9 @@ export default class Bomb extends Element {
                     this.gridSize,
                     this.gridSize,
                 );
+                context.globalCompositeOperation='destination-over';
+
             });
-            context.globalCompositeOperation='destination-over';
 
         }
     }

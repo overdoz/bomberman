@@ -164,29 +164,29 @@ export default class Player extends Element {
             switch (this.direction) {
                 case "east":
                     coords = {x: this.position.x + 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords)) {
-                        this.position.x = this.position.x + 1;
+                    if (this.isPositionColliding(coords)) {
+                        this.position.x++;
                     }
                     break;
 
                 case "west":
                     coords = {x: this.position.x - 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords)) {
-                        this.position.x = this.position.x - 1;
+                    if (this.isPositionColliding(coords)) {
+                        this.position.x++;
                     }
                     break;
 
                 case "south":
                     coords = {x: this.position.x, y: this.position.y + 1};
-                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords)) {
-                        this.position.y += 1;
+                    if (this.isPositionColliding(coords)) {
+                        this.position.y++;
                     }
                     break;
 
                 case "north":
                     coords = {x: this.position.x, y: this.position.y - 1};
-                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords)) {
-                        this.position.y -= 1;
+                    if (this.isPositionColliding(coords)) {
+                        this.position.y++;
                     }
                     break;
             };
@@ -203,28 +203,28 @@ export default class Player extends Element {
             switch (this.direction) {
                 case "east":
                     coords = {x: this.position.x + 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords) && !this.doesPlayerCrossPlayer(coords)) {
+                    if (this.isPositionColliding(coords)) {
                         this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
                     }
                     break;
 
                 case "west":
                     coords = {x: this.position.x - 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords) && !this.doesPlayerCrossPlayer(coords)) {
+                    if (this.isPositionColliding(coords)) {
                         this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
                     }
                     break;
 
                 case "south":
                     coords = {x: this.position.x, y: this.position.y + 1};
-                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords) && !this.doesPlayerCrossPlayer(coords)) {
+                    if (this.isPositionColliding(coords)) {
                         this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
                     }
                     break;
 
                 case "north":
                     coords = {x: this.position.x, y: this.position.y - 1};
-                    if (!this.isPlayerOutOfBounds(coords) && !this.doesPlayerTouchAWall(coords) && !this.doesPlayerCrossPlayer(coords)) {
+                    if (this.isPositionColliding(coords)) {
                         this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
                     }
                     break;
@@ -257,22 +257,26 @@ export default class Player extends Element {
         }
     }
 
+    isPositionColliding(position) {
+        return !this.doesPlayerCrossPlayer(position) && this.doesPlayerTouchAWall(position) && this.isPlayerOutOfBounds(position);
+    }
+
     doesPlayerTouchAWall(position) {
-        for (let i = 0; i < this.game.walls.length; i++) {
-            if (this.game.walls[i].position.x === position.x && this.game.walls[i].position.y === position.y) {
+        this.game.walls.forEach(wall => {
+            if (wall.position.x === position.x && wall.position.y === position.y) {
                 return true;
             }
-        }
+        });
         return false;
     }
 
     // TODO: doesn't work yet
     doesPlayerCrossPlayer(position) {
-        for (let i = 0; i < this.game.players.length; i++) {
-            if (this.game.players[i].position.x === position.x && this.game.players[i].position.y === position.y) {
+        this.game.players.forEach(player => {
+            if (player.position.x === position.x && player.position.y === position.y) {
                 return true;
             }
-        }
+        });
         return false;
     }
 
