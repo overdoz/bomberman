@@ -46,8 +46,8 @@ new AssetLoader()
     ])
     .then(assets => {
         let game = null;
-        // let socket = io.connect('http://localhost:9000');
-        let socket = io.connect('http://b664c451.ngrok.io');
+        let socket = io.connect('http://localhost:9000');
+        // let socket = io.connect('http://24c9c4b2.ngrok.io');
 
 
 

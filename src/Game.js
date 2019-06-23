@@ -73,7 +73,7 @@ export default class Game {
         });
 
         if (doesnotcontain) {
-            this.players.push(new Player(position, this.assets, 1, 10, 10, this.gridSize, this, data.id, data.direction));
+            this.players.push(new Player(position, this.assets, 1, 100, 100, this.gridSize, this, data.id, data.direction));
         } else {
             return;
         }
