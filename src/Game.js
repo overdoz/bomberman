@@ -3,8 +3,6 @@
 import Player from './Player.js';
 import Wall from './Wall.js';
 import Bomb from "./Bomb.js";
-import io from 'socket.io-client';
-
 
 export default class Game {
 
@@ -28,8 +26,6 @@ export default class Game {
 
         this.gridSize = this.canvas.width / width;
 
-        // TODO: initialize each player inside constructor or inside App.js?
-
 
         // let gameOver = false;
 
@@ -41,14 +37,6 @@ export default class Game {
 
 
         this.startAnimating();
-
-
-
-
-
-
-
-
     }
 
     // TODO: update function
@@ -57,23 +45,22 @@ export default class Game {
     }
 
     /**
-     *
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
      */
     pushPlayer(data) {
-        //console.log(this.players);
-        let position = {x: data.x, y: data.y};
-        let doesnotcontain = true;
 
-        //console.log(this.players);
+        let position = {x: data.x, y: data.y};
+        let doesContain = false;
+
+        // checks if there's already a player with this ID
         this.players.forEach(player => {
             if (player.id === data.id) {
-                doesnotcontain = false;
-            } else {
-                doesnotcontain = doesnotcontain && true;
+                doesContain = true;
             }
         });
-        if (doesnotcontain) {
+
+        // If there is no player with this particular ID, create new Player
+        if (!doesContain) {
             this.players.push(new Player(position, this.assets, 1, 10, 10, this.gridSize, this, data.id, data.direction));
         } else {
             return;
@@ -82,6 +69,10 @@ export default class Game {
 
     }
 
+    /**
+     * move own player
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     */
     movePlayer(data) {
         this.players.forEach(player => {
             if (player.id === data.id) {
@@ -90,8 +81,11 @@ export default class Game {
         });
     }
 
+    /**
+     * receive movement from enemy players
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     */
     playerMoved(data) {
-        console.log(data);
         this.players.forEach(player => {
             if (player.id === data.id) {
                 player.position.x = data.x;
@@ -101,6 +95,10 @@ export default class Game {
         });
     }
 
+    /**
+     * receive direction change from enemy players
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     */
     changeDirection(data) {
         this.players.forEach(player => {
             if (player.id === data.id) {
@@ -109,16 +107,20 @@ export default class Game {
         })
     }
 
-    getBomb(data) {
-
-        this.bombs.push(new Bomb(data, 1500, 1, this.assets, this.gridSize, this));
-
-
+    /**
+     * receive bombs from enemy players
+     * @param position = {x: 0, y: 0}
+     */
+    getBomb(position) {
+        this.bombs.push(new Bomb(position, 1500, 1, this.assets, this.gridSize, this));
     }
 
-    getWall(data) {
-        this.walls.push(new Wall(data, 1, true, this.assets, this.gridSize));
-        // TODO: fix bug whenever you set a wall
+    /**
+     * receive walls from enemy players
+     * @param position = {x: 0, y: 0}
+     */
+    getWall(position) {
+        this.walls.push(new Wall(position, 1, true, this.assets, this.gridSize, position.id));
     }
 
     /**
@@ -137,10 +139,10 @@ export default class Game {
 
         this.bombs.forEach(bomb => {
             bomb.draw(this.context);
-        })
-        //console.log(this.players);
+        });
 
     }
+
 
     startAnimating() {
         this.frameTime = 1000 / 30;

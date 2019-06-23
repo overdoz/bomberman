@@ -60,10 +60,9 @@ new AssetLoader()
             socket.emit('loginPlayer', { id: id });
 
             socket.on('createWalls', function (data) {
-                let arr = data;
-                arr.forEach(d => {
+                data.forEach(d => {
                     let pos = {x: d.x, y: d.y};
-                    game.walls.push(new Wall(pos, 1, d.isDestructible, assets, 40));
+                    game.walls.push(new Wall(pos, 1, d.isDestructible, assets, 40, d.id));
                 });
             });
 
@@ -73,10 +72,6 @@ new AssetLoader()
 
             socket.on('changeDirection', function (data) {
                 game.changeDirection(data)
-            });
-
-            socket.on('movePlayer', function (data) {
-                game.movePlayer(data)
             });
 
             socket.on('playerMoved', function (data) {

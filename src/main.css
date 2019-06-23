@@ -78,3 +78,12 @@ p {
     margin: 20px;
 }
 
+input {
+    border: 2px solid #024873;
+    font-family: 'Carter One', cursive;
+    font-size: 1.1em;
+    border-radius: 4px;
+    height: 40px;
+    margin-top: 15px;
+
+}

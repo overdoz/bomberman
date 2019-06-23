@@ -37,10 +37,6 @@ export default class Player extends Element {
         this.amountBombs = amountBombs;
         this.amountWalls = amountWalls;
 
-
-        // this.maximumNumberOfBombs = this.numberOfBombs*2;
-        // this.powerUps = null;
-        // this.timeLeftToBuildWall = 15; // move this logic inside setBomb() ???
         this.dead = false;
 
         this.spriteSheet = {
@@ -62,18 +58,12 @@ export default class Player extends Element {
             }
         };
 
-        this.game.position = this.position;
-        this.game.direction = this.direction;
 
         this.socket = io.connect('http://localhost:9000');
 
-        // document.addEventListener("keydown", this.triggerEvent.bind(this));
 
-        //this.socket = io.connect('http://localhost:9000');
-
-
-            document.getElementById("amountBombs").innerHTML = this.amountBombs;
-            document.getElementById("amountWalls").innerHTML = this.amountWalls;
+        document.getElementById("amountBombs").innerHTML = this.amountBombs;
+        document.getElementById("amountWalls").innerHTML = this.amountWalls;
 
     }
 
@@ -93,7 +83,6 @@ export default class Player extends Element {
                     } else {
                         this.direction = 'west';
                     }
-                    //this.socket.emit('changeDirection', {id: this.id, direction: 'west'});
                     break;
 
                 case 'ArrowRight':
@@ -102,7 +91,6 @@ export default class Player extends Element {
                     } else {
                         this.direction = 'east';
                     }
-                    //this.socket.emit('changeDirection', {id: this.id, direction: 'east'});
                     break;
 
                 case 'ArrowUp':
@@ -111,7 +99,6 @@ export default class Player extends Element {
                     } else {
                         this.direction = 'north';
                     }
-                    //this.socket.emit('changeDirection', {id: this.id, direction: 'north'});
                     break;
 
                 case 'ArrowDown':
@@ -120,7 +107,6 @@ export default class Player extends Element {
                     } else {
                         this.direction = 'south';
                     }
-                    //this.socket.emit('changeDirection', {id: this.id, direction: 'south'});
                     break;
 
                 case "b":
@@ -133,8 +119,8 @@ export default class Player extends Element {
             }
 
         };
-        this.game.position = this.position;
-        this.game.direction = this.direction;
+
+
         this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
 
     }
@@ -160,6 +146,12 @@ export default class Player extends Element {
                 this.spriteSize.x,
                 this.spriteSize.y,
             );
+
+            // Display nickname at the top of each player
+            context.font = "10px Arial";
+            context.fillText(this.id, this.position.x * this.gridSize + 20, this.position.y * this.gridSize - 5);
+            context.textAlign = "center";
+            context.globalCompositeOperation='destination-over';
 
     }
 
@@ -198,10 +190,13 @@ export default class Player extends Element {
                     }
                     break;
             };
-            console.log(('draw player'));
-            this.socket.emit('playerMoved', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
+            this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
     }
 
+    /**
+     * buildWall() determines if you're allowed to set a wall at this position (let coords).
+     * Set wall at this position, if there isn't a Player or Wall.
+     */
     buildWall() {
         if (this.amountWalls > 0) {
             let coords = null;
@@ -235,12 +230,18 @@ export default class Player extends Element {
                     break;
             }
             this.amountWalls--;
-            this.socket.emit('setWall', coords); // TODO: emit wall;
+
+            coords['id'] = '_' + Math.random().toString(36).substr(2, 9);
+
+            this.socket.emit('setWall', coords);
 
             document.getElementById("amountWalls").innerHTML = this.amountWalls;
         }
     }
 
+    /**
+     * set Bomb at your current position
+     */
     setBomb() {
         if (this.amountBombs > 0) {
             let tempPosition = {x: this.position.x, y: this.position.y};
@@ -250,6 +251,7 @@ export default class Player extends Element {
             // HTML manipulation
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
             // TODO: Find a way to explode every bomb at its time
+
             this.socket.emit('setBomb', tempPosition);
 
         }
@@ -264,6 +266,7 @@ export default class Player extends Element {
         return false;
     }
 
+    // TODO: doesn't work yet
     doesPlayerCrossPlayer(position) {
         for (let i = 0; i < this.game.players.length; i++) {
             if (this.game.players[i].position.x === position.x && this.game.players[i].position.y === position.y) {
@@ -278,20 +281,6 @@ export default class Player extends Element {
     }
 
 
-
-
-    // Reduces the Life Left of the current Player
-    getDamage(damage) {
-        // damage must always be a negative double
-        if (damage < 0) {
-            throw new Error("Damage must be a negative double number!");
-        }
-        this.health -= damage;
-        // Player is dead
-        if (this.health <= 0) {
-            this.dead = true;
-        }
-    }
 
 
 }

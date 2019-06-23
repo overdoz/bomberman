@@ -27,19 +27,14 @@ server.listen(9000, function() {
     console.log("Server is now listening at the PORT: 9000");
 });
 
-/*server.on('upgrade', (req, socket) => {
-// Make sure that we only handle WebSocket upgrade requests
-    if (req.headers['upgrade'] !== 'websocket') {
-        socket.end('HTTP/1.1 400 Bad Request');
-        return;
-    }
-});*/
 
 const generateRandomWalls = (amount) => {
+
     // create grid of indestructible walls
     for (let i = 1; i < GAME_WIDTH; i += 2) {
         for (let j = 1; j < GAME_HEIGHT; j += 2) {
-            positionWalls.push({x: i, y: j, isDestructible: false});
+            let randomID = '_' + Math.random().toString(36).substr(2, 9);
+            positionWalls.push({id: randomID, x: i, y: j, isDestructible: false});
         }
     }
 
@@ -51,7 +46,8 @@ const generateRandomWalls = (amount) => {
         if (isAlreadyExisting(atRandomPosition)) {
             i--;
         } else {
-            positionWalls.push({x: atRandomPosition.x, y: atRandomPosition.y, isDestructible: true});
+            let randomID = '_' + Math.random().toString(36).substr(2, 9);
+            positionWalls.push({id: randomID, x: atRandomPosition.x, y: atRandomPosition.y, isDestructible: true});
         }
     }
 }
@@ -96,20 +92,18 @@ io.on('connection', function(socket){
                 socket.emit('createWalls', [...positionWalls]);
 
                 socket.broadcast.emit('createNewPlayer', playerDetails);
-
                 break;
+
             case 1:
                 playerDetails = {id: data.id, x: GAME_WIDTH - 1, y: 0, direction: 'south'}
                 positionPlayers.push(playerDetails);
                 socket.emit('createNewPlayer', playerDetails);
                 socket.emit('createNewPlayer', positionPlayers[0]);
 
-
                 socket.emit('createWalls', [...positionWalls]);
                 socket.broadcast.emit('createNewPlayer', playerDetails);
-
-
                 break;
+
             case 2:
                 playerDetails = {id: data.id, x: GAME_WIDTH - 1, y: GAME_HEIGHT - 1, direction: 'west'}
                 positionPlayers.push(playerDetails);
@@ -117,18 +111,22 @@ io.on('connection', function(socket){
                 socket.emit('createNewPlayer', positionPlayers[0]);
                 socket.emit('createNewPlayer', positionPlayers[1]);
 
-
                 socket.emit('createWalls', [...positionWalls]);
                 socket.broadcast.emit('createNewPlayer', playerDetails);
-
-
                 break;
+
             case 3:
                 playerDetails = {id: data.id, x: 0, y: GAME_HEIGHT - 1, direction: 'north'}
                 positionPlayers.push(playerDetails);
                 socket.emit('createNewPlayer', playerDetails);
+                socket.emit('createNewPlayer', positionPlayers[0]);
+                socket.emit('createNewPlayer', positionPlayers[1]);
+                socket.emit('createNewPlayer', positionPlayers[2]);
+
+                socket.emit('createWalls', [...positionWalls]);
                 socket.broadcast.emit('createNewPlayer', playerDetails);
                 break;
+
             default:
                 return;
         }
@@ -139,12 +137,16 @@ io.on('connection', function(socket){
         socket.broadcast.emit('changeDirection', data);
     });
 
-
-
-    socket.on('playerMoved', function(data) {
+    socket.on('movePlayer', function(data) {
         socket.broadcast.emit('playerMoved', data);
-    });
+        positionPlayers.forEach(player => {
+            if (player.id === data.id) {
+                player.x = data.x;
+                player.y = data.y;
+            }
+        })
 
+    });
 
     socket.on('setBomb', function(data) {
         socket.broadcast.emit('getBomb', data);
@@ -153,6 +155,21 @@ io.on('connection', function(socket){
     socket.on('setWall', function(data) {
         socket.broadcast.emit('getWall', data);
     });
+
+    socket.on('deletePlayer', function (data) {
+        // index of the player to be deleted
+        let index = positionPlayers.map(player => {return player.id}).indexOf(data.id);
+
+        // delete player at index
+        let v = positionPlayers.splice(index, 1);
+    });
+
+    socket.on('deleteWall', function (data) {
+        let index = positionWalls.map(wall => {return wall.id}).indexOf(data.id);
+
+        let v = positionWalls.splice(index, 1);
+        console.log(v);
+    })
 
 });
 
