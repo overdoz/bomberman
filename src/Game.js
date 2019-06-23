@@ -13,8 +13,8 @@ export default class Game {
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
 
-        this.position = null;
-        this.direction = null;
+        // this.position = null;
+        // this.direction = null;
 
         this.id = id;
 
@@ -65,8 +65,6 @@ export default class Game {
         } else {
             return;
         }
-
-
     }
 
     /**
@@ -88,9 +86,8 @@ export default class Game {
     playerMoved(data) {
         this.players.forEach(player => {
             if (player.id === data.id) {
-                player.position.x = data.x;
-                player.position.y = data.y;
-                player.direction = data.direction;
+                console.log("hat geklappptptptptptpp");
+                player.triggerEvent(data);
             }
         });
     }

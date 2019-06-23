@@ -8,7 +8,6 @@ const io = require('socket.io')(server,{});
 
 
 let positionPlayers = [];
-let positionBombs = [];
 let positionWalls = [];
 var dir = '/index.html';
 
