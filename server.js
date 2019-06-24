@@ -9,7 +9,7 @@ const io = require('socket.io')(server,{});
 
 let positionPlayers = [];
 let positionWalls = [];
-var dir = '/index.html';
+let dir = '/index.html';
 
 
 
@@ -162,7 +162,7 @@ io.on('connection', function(socket){
         let index = positionPlayers.map(player => {return player.id}).indexOf(data.id);
 
         // delete player at index
-        let v = positionPlayers.splice(index, 1);
+        let player = positionPlayers.splice(index, 1);
     });
 
     socket.on('deleteWall', function (data) {
@@ -170,7 +170,7 @@ io.on('connection', function(socket){
         let index = positionWalls.map(wall => {return wall.id}).indexOf(data.id);
 
         // delete wall at index
-        let v = positionWalls.splice(index, 1);
+        let wall = positionWalls.splice(index, 1);
     })
 
 });

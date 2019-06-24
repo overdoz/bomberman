@@ -61,7 +61,7 @@ export default class Game {
 
         // If there is no player with this particular ID, create new Player
         if (!doesContain) {
-            this.players.push(new Player(position, this.assets, 1, 10, 10, this.gridSize, this, data.id, data.direction));
+            this.players.push(new Player(position, this.assets, 1, 99, 99, this.gridSize, this, data.id, data.direction));
         } else {
             return;
         }

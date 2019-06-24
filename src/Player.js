@@ -73,8 +73,6 @@ export default class Player extends Element {
     }
 
     triggerEvent(e) {
-        // console.log("We are now into the trigger zone...");
-
         if (!this.dead) {
             switch (e.key) {
                 case 'ArrowLeft':
@@ -164,32 +162,33 @@ export default class Player extends Element {
             switch (this.direction) {
                 case "east":
                     coords = {x: this.position.x + 1, y: this.position.y};
-                    if (this.isPositionColliding(coords)) {
+                    if (!this.doesPlayerTouchAWall(coords) && !this.isPlayerOutOfBounds(coords)) {
                         this.position.x++;
                     }
                     break;
 
                 case "west":
                     coords = {x: this.position.x - 1, y: this.position.y};
-                    if (this.isPositionColliding(coords)) {
-                        this.position.x++;
+                    if (!this.doesPlayerTouchAWall(coords) && !this.isPlayerOutOfBounds(coords)) {
+                        this.position.x--;
                     }
                     break;
 
                 case "south":
                     coords = {x: this.position.x, y: this.position.y + 1};
-                    if (this.isPositionColliding(coords)) {
+                    if (!this.doesPlayerTouchAWall(coords) && !this.isPlayerOutOfBounds(coords)) {
                         this.position.y++;
                     }
                     break;
 
                 case "north":
                     coords = {x: this.position.x, y: this.position.y - 1};
-                    if (this.isPositionColliding(coords)) {
-                        this.position.y++;
+                    if (!this.doesPlayerTouchAWall(coords) && !this.isPlayerOutOfBounds(coords)) {
+                        this.position.y--;
                     }
                     break;
             };
+            console.log(this.position)
             this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
     }
 
@@ -200,32 +199,41 @@ export default class Player extends Element {
     buildWall() {
         if (this.amountWalls > 0) {
             let coords = null;
+            let randomID = null;
             switch (this.direction) {
                 case "east":
                     coords = {x: this.position.x + 1, y: this.position.y};
+                    randomID = '_' + Math.random().toString(36).substr(2, 9);
+
                     if (this.isPositionColliding(coords)) {
-                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
+                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize, randomID));
                     }
                     break;
 
                 case "west":
                     coords = {x: this.position.x - 1, y: this.position.y};
+                    randomID = '_' + Math.random().toString(36).substr(2, 9);
+
                     if (this.isPositionColliding(coords)) {
-                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
+                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize, randomID));
                     }
                     break;
 
                 case "south":
                     coords = {x: this.position.x, y: this.position.y + 1};
+
+                    randomID = '_' + Math.random().toString(36).substr(2, 9);
                     if (this.isPositionColliding(coords)) {
-                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
+                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize, randomID));
                     }
                     break;
 
                 case "north":
                     coords = {x: this.position.x, y: this.position.y - 1};
+
+                    randomID = '_' + Math.random().toString(36).substr(2, 9);
                     if (this.isPositionColliding(coords)) {
-                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize));
+                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize, randomID));
                     }
                     break;
             }
@@ -258,12 +266,14 @@ export default class Player extends Element {
     }
 
     isPositionColliding(position) {
-        return !this.doesPlayerCrossPlayer(position) && this.doesPlayerTouchAWall(position) && this.isPlayerOutOfBounds(position);
+        return !this.doesPlayerCrossPlayer(position) && !this.doesPlayerTouchAWall(position) && !this.isPlayerOutOfBounds(position);
     }
 
     doesPlayerTouchAWall(position) {
         this.game.walls.forEach(wall => {
             if (wall.position.x === position.x && wall.position.y === position.y) {
+                console.log(wall.position);
+
                 return true;
             }
         });
@@ -274,6 +284,8 @@ export default class Player extends Element {
     doesPlayerCrossPlayer(position) {
         this.game.players.forEach(player => {
             if (player.position.x === position.x && player.position.y === position.y) {
+                console.log(player.position);
+
                 return true;
             }
         });
