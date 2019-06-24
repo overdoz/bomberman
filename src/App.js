@@ -68,6 +68,7 @@ new AssetLoader()
             });
 
             socket.on('createNewPlayer', function (data) {
+                console.log(data);
                 game.pushPlayer(data);
             });
 

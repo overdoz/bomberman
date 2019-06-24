@@ -30,8 +30,8 @@ server.listen(9000, function() {
 const generateRandomWalls = (amount) => {
 
     // create grid of indestructible walls
-    for (let i = 1; i < GAME_WIDTH; i += 2) {
-        for (let j = 1; j < GAME_HEIGHT; j += 2) {
+    for (let i = 1; i < GAME_WIDTH-1; i += 2) {
+        for (let j = 1; j < GAME_HEIGHT-1; j += 2) {
             let randomID = '_' + Math.random().toString(36).substr(2, 9);
             positionWalls.push({id: randomID, x: i, y: j, isDestructible: false});
         }
@@ -83,52 +83,36 @@ io.on('connection', function(socket){
 
     socket.on('loginPlayer', function (data) {
 
+        // determines where to place each incoming player
         let playerDetails = {id: data.id, x: 0, y: 0, direction: 'east'}
         switch (positionPlayers.length) {
             case 0:
-                positionPlayers.push(playerDetails);
-                socket.emit('createNewPlayer', playerDetails);
-
-                socket.emit('createWalls', [...positionWalls]);
-                socket.broadcast.emit('createNewPlayer', playerDetails);
                 break;
 
             case 1:
                 playerDetails = {id: data.id, x: GAME_WIDTH - 1, y: 0, direction: 'south'}
-                positionPlayers.push(playerDetails);
-                socket.emit('createNewPlayer', playerDetails);
-                socket.emit('createNewPlayer', positionPlayers[0]);
-
-                socket.emit('createWalls', [...positionWalls]);
-                socket.broadcast.emit('createNewPlayer', playerDetails);
                 break;
 
             case 2:
                 playerDetails = {id: data.id, x: GAME_WIDTH - 1, y: GAME_HEIGHT - 1, direction: 'west'}
-                positionPlayers.push(playerDetails);
-                socket.emit('createNewPlayer', playerDetails);
-                socket.emit('createNewPlayer', positionPlayers[0]);
-                socket.emit('createNewPlayer', positionPlayers[1]);
-
-                socket.emit('createWalls', [...positionWalls]);
-                socket.broadcast.emit('createNewPlayer', playerDetails);
                 break;
 
             case 3:
                 playerDetails = {id: data.id, x: 0, y: GAME_HEIGHT - 1, direction: 'north'}
-                positionPlayers.push(playerDetails);
-                socket.emit('createNewPlayer', playerDetails);
-                socket.emit('createNewPlayer', positionPlayers[0]);
-                socket.emit('createNewPlayer', positionPlayers[1]);
-                socket.emit('createNewPlayer', positionPlayers[2]);
-
-                socket.emit('createWalls', [...positionWalls]);
-                socket.broadcast.emit('createNewPlayer', playerDetails);
                 break;
 
             default:
-                return;
+                break;
         };
+        positionPlayers.push(playerDetails);
+        socket.emit('createNewPlayer', playerDetails);
+        if (positionPlayers.length > 0) {
+            for (let i = 0; i < positionPlayers.length; i++) {
+                socket.emit('createNewPlayer', positionPlayers[i]);
+                socket.broadcast.emit('createNewPlayer', playerDetails);
+            }
+        }
+        socket.emit('createWalls', [...positionWalls]);
         console.log(positionPlayers);
     });
 

@@ -73,8 +73,7 @@ export default class Player extends Element {
     }
 
     triggerEvent(e) {
-        let x = this.position.x;
-        let y = this.position.y;
+
         if (!this.dead) {
             switch (e.key) {
                 case 'ArrowLeft':
@@ -122,9 +121,6 @@ export default class Player extends Element {
                     break;
             }
 
-            //TODO: this causes a glitch... why?!?!?!?
-            // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
-
         };
     }
 
@@ -152,7 +148,7 @@ export default class Player extends Element {
 
             // Display nickname at the top of each player
             context.font = "10px Arial";
-            context.fillText(this.id, this.position.x * this.gridSize + 20, this.position.y * this.gridSize - 5);
+            context.fillText(this.id, this.position.x * this.gridSize + this.gridSize / 2, this.position.y * this.gridSize - 5);
             context.textAlign = "center";
             context.globalCompositeOperation='destination-over';
 
@@ -163,11 +159,11 @@ export default class Player extends Element {
      * and move it one grid size on the x or y axis
      */
     update() {
-            let withNextStep = this.getNextPosition();
+            let nextPosition = this.getNextPosition();
 
-            if (this.isPositionColliding(withNextStep)) {
-                this.position.x = withNextStep.x;
-                this.position.y = withNextStep.y;
+            if (this.isPositionColliding(nextPosition)) {
+                this.position.x = nextPosition.x;
+                this.position.y = nextPosition.y;
             }
             this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
 
@@ -180,23 +176,23 @@ export default class Player extends Element {
     buildWall() {
         if (this.amountWalls > 0) {
 
-            let withNextStep = this.getNextPosition();
-            console.log('build wall at: ', withNextStep);
+            let nextPosition = this.getNextPosition();
+            console.log('build wall at: ', nextPosition);
             console.log('current position: ', this.position);
             let randomID = '';
 
-            if (this.isPositionColliding(withNextStep)) {
+            if (this.isPositionColliding(nextPosition)) {
 
                 // generate randomID for easier removement
                 randomID = '_' + Math.random().toString(36).substr(2, 9);
 
                 // data to be send to server
-                let data = {x: withNextStep.x, y: withNextStep.y, id: randomID};
+                let data = {x: nextPosition.x, y: nextPosition.y, id: randomID};
                 console.log(data);
 
                 // push wall at into our wall array
                 // this.game.getWall(data);
-                this.game.walls.push(new Wall(withNextStep, 1, true, this.assets, this.gridSize, randomID));
+                this.game.walls.push(new Wall(nextPosition, 1, true, this.assets, this.gridSize, randomID));
 
                 // TODO: player spawns at bottom right corner when building a wall
 
@@ -272,9 +268,6 @@ export default class Player extends Element {
 
         }
     }
-
-
-
 }
 
 

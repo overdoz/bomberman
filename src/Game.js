@@ -13,8 +13,6 @@ export default class Game {
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
 
-        // this.position = null;
-        // this.direction = null;
 
         this.id = id;
 
@@ -50,19 +48,24 @@ export default class Game {
     pushPlayer(data) {
 
         let position = {x: data.x, y: data.y};
-      /*  let doesContain = false;
+        let doesContain = false;
 
         // checks if there's already a player with this ID
         this.players.forEach(player => {
             if (player.id === data.id) {
                 doesContain = true;
             }
-        });*/
-        this.players.push(new Player(position, this.assets, 1, 99, 99, this.gridSize, this, data.id, data.direction));
+        });
+
+
 
         // If there is no player with this particular ID, create new Player
-        //if (!doesContain) {
-        // }
+        if (!doesContain) {
+            this.players.push(new Player(position, this.assets, 1, 99, 99, this.gridSize, this, data.id, data.direction));
+            // this.creatHTMLnode(data);
+
+        }
+
     }
 
     /**
