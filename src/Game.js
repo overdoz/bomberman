@@ -65,7 +65,6 @@ export default class Game {
         } else {
             return;
         }
-        console.log(this.players)
     }
 
     /**
