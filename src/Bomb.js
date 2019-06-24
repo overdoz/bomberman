@@ -76,8 +76,8 @@ export default class Bomb extends Element {
             this.getSurroundingPositions().forEach(position => {
                 if (player.position.x === position.x && player.position.y === position.y) {
                     let deletedPlayer = this.game.players.splice(index, 1);
-
-                    this.socket.emit('deletePlayer', {id: deletedPlayer.id});
+                    console.log(deletedPlayer)
+                    // this.socket.emit('deletePlayer', {id: deletedPlayer.id});
 
                 }
             })
@@ -91,13 +91,18 @@ export default class Bomb extends Element {
                     // v = this.game.walls.splice(index, 1, null);
                     indexes.push(index);
 
-                    this.socket.emit('deleteWall', {id: wall.id});
-
                 }
             })
         });
         // IMPORTANT! Because .splice() shortens the array, we safe all indexes, which have to be deleted inside of 'let indexes'
-        indexes.sort((a, b) => {return b-a}).forEach((index) => {this.game.walls.splice(index, 1)});
+        indexes.sort((a, b) => {return b-a}).forEach((index) => {
+            let wall = this.game.walls.splice(index, 1)
+            console.log(wall)
+
+            // this.socket.emit('deleteWall', {id: wall.id});
+
+
+        });
     }
 
     // display bomb or fire image

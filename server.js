@@ -128,14 +128,20 @@ io.on('connection', function(socket){
 
             default:
                 return;
-        }
+        };
+        console.log(positionPlayers);
     });
 
     /**
      * @param data = {id: this.id, direction: this.direction}
      */
     socket.on('changeDirection', function(data) {
-        socket.broadcast.emit('changeDirection', data);
+        socket.broadcast.emit('directionChanged', data);
+        positionPlayers.forEach(player => {
+            if (player.id === data.id) {
+                player.direction = data.direction;
+            }
+        });
     });
 
    socket.on('reset', function (data) {
@@ -154,7 +160,6 @@ io.on('connection', function(socket){
                 player.direction = data.direction;
             }
         });
-        console.log('[server] position changed: ',data);
 
     });
 
@@ -177,11 +182,13 @@ io.on('connection', function(socket){
      * @param data = {id: 'playerID''}
      */
     socket.on('deletePlayer', function (data) {
-        // index of the player to be deleted
+        /*// index of the player to be deleted
         let index = positionPlayers.map(player => {return player.id}).indexOf(data.id);
 
         // delete player at index
         let player = positionPlayers.splice(index, 1);
+        console.log('player to delete: ', player);*/
+
     });
 
     /**
@@ -193,6 +200,7 @@ io.on('connection', function(socket){
 
         // delete wall at index
         let wall = positionWalls.splice(index, 1);
+        console.log('wall to delete: ', wall);
     })
 
 });

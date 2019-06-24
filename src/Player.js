@@ -82,6 +82,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'west';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -90,6 +91,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'east';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -98,6 +100,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'north';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -106,6 +109,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'south';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -117,7 +121,9 @@ export default class Player extends Element {
                     this.buildWall();
                     break;
             }
-            this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+
+            //TODO: this causes a glitch... why?!?!?!?
+            // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
 
         };
     }
@@ -197,7 +203,7 @@ export default class Player extends Element {
 
                 this.amountWalls--;
                 this.socket.emit('setWall', data);
-                console.log('position after wall was set: ', this.position);
+                console.log(this.game.players);
 
                 document.getElementById("amountWalls").innerHTML = this.amountWalls;
 

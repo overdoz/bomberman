@@ -71,7 +71,7 @@ new AssetLoader()
                 game.pushPlayer(data);
             });
 
-            socket.on('changeDirection', function (data) {
+            socket.on('directionChanged', function (data) {
                 game.changeDirection(data)
             });
 
