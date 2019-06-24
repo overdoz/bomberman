@@ -173,6 +173,41 @@ export default class Game {
         // this.frameCount++;
     }
 
+    creatHTMLnode(data) {
+        if (this.players.length > 1) {
+            let enemyInventory = document.getElementById('inventoryEnemy');
+            let container = document.createElement("div");
+            container.id = 'bombs';
+
+            let id = document.createElement("p");
+            id.innerText = data.id;
+
+            let img = document.createElement("img");
+            img.id = data.id + 'BombImg';
+            img.src = "dist/bomb_icon.png";
+
+            let p = document.createElement("p");
+            p.id = data.id + 'BombText'
+            p.innerText = '99';
+
+            let img2 = document.createElement("img");
+            img2.id = data.id + 'WallImg';
+            img2.src = "dist/wall.png";
+
+            let p2 = document.createElement("p");
+            p2.id = data.id + 'WallText'
+            p2.innerText = '99';
+
+            container.appendChild(id);
+            container.appendChild(img);
+            container.appendChild(p);
+            container.appendChild(img2);
+            container.appendChild(p2);
+            enemyInventory.appendChild(container);
+
+        }
+    }
+
 
 
 
