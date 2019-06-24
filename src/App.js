@@ -46,20 +46,26 @@ new AssetLoader()
     ])
     .then(assets => {
         let game = null;
-        let socket = io.connect('http://localhost:9000');
 
+        let socket = io.connect('http://localhost:9000');
 
         let id = '';
 
         document.querySelector("#login").addEventListener("click", function(event) {
 
+            // prevent refresh of the current screen
             event.preventDefault();
+
+            // select input node of DOM by its ID
             id = document.querySelector("#lname").value;
 
+            // initialize game
             game = new Game("myCanvas", 13, 13, assets, id);
 
+            // send notification to server to create your player
             socket.emit('loginPlayer', { id: id });
 
+            // after logging in your player, the server will send you all generated walls
             socket.on('createWalls', function (data) {
                 data.forEach(d => {
                     let pos = {x: d.x, y: d.y};
@@ -67,27 +73,35 @@ new AssetLoader()
                 });
             });
 
+            // server.js will this method each time a new player is created
+            //TODO: this method is being called twice (see browser console) - WHY?!?!
             socket.on('createNewPlayer', function (data) {
                 console.log(data);
                 game.pushPlayer(data);
             });
 
+            // receive direction changes
             socket.on('directionChanged', function (data) {
                 game.changeDirection(data)
             });
 
+            // receive enemy player movements
             socket.on('playerMoved', function (data) {
                 game.playerMoved(data);
             });
 
+            // receive bombs set by enemies
             socket.on('getBomb', function (data) {
                 game.getBomb(data);
             });
 
+            // receive walls set by enemies
             socket.on('getWall', function (data) {
                 game.getWall(data);
-            })
+            });
 
+            // your personal player ID is stored inside App.js and Game.js
+            // so eventListeners will only affect your player
             document.addEventListener("keydown", (e) => {
                 game.movePlayer({id: id, key: e.key})
 

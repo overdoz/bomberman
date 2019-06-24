@@ -72,6 +72,12 @@ export default class Player extends Element {
         this.dead = true;
     }
 
+    /**
+     * is being called in App.js every time the user presses a key
+     * calls the movePlayer() method in Game.js
+     * TODO: maybe move the method from App.js into Game.js
+     * @param e = {id: '9fh3j4', key: 'ArrowLeft'}
+     */
     triggerEvent(e) {
 
         if (!this.dead) {
@@ -120,7 +126,6 @@ export default class Player extends Element {
                     this.buildWall();
                     break;
             }
-
         };
     }
 
@@ -134,6 +139,8 @@ export default class Player extends Element {
      * draw() will also render our set of bombs
      */
     draw(context) {
+
+            // the +6 centers the image in this particular case
             context.drawImage(
                 this.assets['bomberman'],
                 this.spriteSheet[this.direction].x,
@@ -159,13 +166,18 @@ export default class Player extends Element {
      * and move it one grid size on the x or y axis
      */
     update() {
+
+            // initialize next move
             let nextPosition = this.getNextPosition();
 
+            // if next position is not blocked by an object
             if (this.isPositionColliding(nextPosition)) {
                 this.position.x = nextPosition.x;
                 this.position.y = nextPosition.y;
+
+                // if successful, send movement to server
+                this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
             }
-            this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
 
     }
 
@@ -174,33 +186,32 @@ export default class Player extends Element {
      * Set wall at this position, if there isn't a Player or Wall.
      */
     buildWall() {
+
         if (this.amountWalls > 0) {
 
+            // initialize next position
             let nextPosition = this.getNextPosition();
-            console.log('build wall at: ', nextPosition);
-            console.log('current position: ', this.position);
+
             let randomID = '';
 
+            // if next position is not blocked by an object
             if (this.isPositionColliding(nextPosition)) {
 
-                // generate randomID for easier removement
+                // generate randomID for easier removal
                 randomID = '_' + Math.random().toString(36).substr(2, 9);
 
                 // data to be send to server
                 let data = {x: nextPosition.x, y: nextPosition.y, id: randomID};
-                console.log(data);
 
                 // push wall at into our wall array
-                // this.game.getWall(data);
+                // TODO: Can't we just socket.broadcast.emit to skip the server?
                 this.game.walls.push(new Wall(nextPosition, 1, true, this.assets, this.gridSize, randomID));
 
-                // TODO: player spawns at bottom right corner when building a wall
-
-
                 this.amountWalls--;
-                this.socket.emit('setWall', data);
-                console.log(this.game.players);
 
+                this.socket.emit('setWall', data);
+
+                // display the amount of walls you have currently have
                 document.getElementById("amountWalls").innerHTML = this.amountWalls;
 
             }
@@ -211,25 +222,38 @@ export default class Player extends Element {
      * set Bomb at your current position
      */
     setBomb() {
+
+        // if there's enough bombs left
         if (this.amountBombs > 0) {
+
+            // create object with current position
             let tempPosition = {x: this.position.x, y: this.position.y};
+
+            // place bomb inside your game
             this.game.bombs.push(new Bomb(tempPosition, 1500, 1, this.assets, this.gridSize, this.game));
+
             this.amountBombs--;
+
+            // send position of your bomb to all enemies
             this.socket.emit('setBomb', tempPosition);
 
-            // HTML manipulation
+            // set counter of your bombs in the browser
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
-            // TODO: Find a way to explode every bomb at its time
-
-
         }
     }
 
+    /**
+     * takes the current position and checks, if the next step is possible
+     * @param position
+     * @returns {boolean}
+     */
     isPositionColliding(position) {
         return !this.doesPlayerCrossPlayer(position) && !this.doesPlayerTouchAWall(position) && !this.isPlayerOutOfBounds(position);
     }
 
     doesPlayerTouchAWall(position) {
+
+        // checks, if there is a wall object on your position
         for (let i = 0; i < this.game.walls.length; i++) {
             if (this.game.walls[i].position.x === position.x && this.game.walls[i].position.y === position.y) {
                 return true;
@@ -238,8 +262,9 @@ export default class Player extends Element {
         return false;
     }
 
-    // TODO: doesn't work yet
     doesPlayerCrossPlayer(position) {
+
+        // checks, if there is a player object on your position
         for (let i = 0; i < this.game.players.length; i++) {
             if (this.game.players[i].position.x === position.x && this.game.players[i].position.y === position.y) {
                 return true;
@@ -249,10 +274,17 @@ export default class Player extends Element {
     }
 
     isPlayerOutOfBounds(position) {
+
+        //checks of position is out of bounds
         return position.x > this.game.width - 1 || position.y > this.game.height - 1 || position.x < 0 || position.y < 0;
     }
 
+    /**
+     * determines the next position based on your current direction
+     * @returns {{x: number, y: *}|{x: *, y: number}|{x: *, y: *}}
+     */
     getNextPosition() {
+
         switch (this.direction) {
             case "east":
                 return {x: this.position.x + 1, y: this.position.y};
