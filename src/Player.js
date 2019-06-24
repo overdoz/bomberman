@@ -158,38 +158,14 @@ export default class Player extends Element {
      * and move it one grid size on the x or y axis
      */
     update() {
-            let coords = null;
-            switch (this.direction) {
-                case "east":
-                    coords = {x: this.position.x + 1, y: this.position.y};
-                    if (!this.doesPlayerTouchAWall(coords) && !this.isPlayerOutOfBounds(coords)) {
-                        this.position.x++;
-                    }
-                    break;
+            let withNextStep = this.getNextPosition();
 
-                case "west":
-                    coords = {x: this.position.x - 1, y: this.position.y};
-                    if (!this.doesPlayerTouchAWall(coords) && !this.isPlayerOutOfBounds(coords)) {
-                        this.position.x--;
-                    }
-                    break;
+            if (this.isPositionColliding(withNextStep)) {
+                this.position.x = withNextStep.x;
+                this.position.y = withNextStep.y;
+                this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
 
-                case "south":
-                    coords = {x: this.position.x, y: this.position.y + 1};
-                    if (!this.doesPlayerTouchAWall(coords) && !this.isPlayerOutOfBounds(coords)) {
-                        this.position.y++;
-                    }
-                    break;
-
-                case "north":
-                    coords = {x: this.position.x, y: this.position.y - 1};
-                    if (!this.doesPlayerTouchAWall(coords) && !this.isPlayerOutOfBounds(coords)) {
-                        this.position.y--;
-                    }
-                    break;
-            };
-            console.log(this.position)
-            this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
+            }
     }
 
     /**
@@ -198,52 +174,26 @@ export default class Player extends Element {
      */
     buildWall() {
         if (this.amountWalls > 0) {
-            let coords = null;
-            let randomID = null;
-            switch (this.direction) {
-                case "east":
-                    coords = {x: this.position.x + 1, y: this.position.y};
-                    randomID = '_' + Math.random().toString(36).substr(2, 9);
 
-                    if (this.isPositionColliding(coords)) {
-                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize, randomID));
-                    }
-                    break;
+            let withNextStep = this.getNextPosition();
+            console.log('build wall at: ', withNextStep);
+            console.log('current position: ', this.position);
+            let randomID = '';
 
-                case "west":
-                    coords = {x: this.position.x - 1, y: this.position.y};
-                    randomID = '_' + Math.random().toString(36).substr(2, 9);
-
-                    if (this.isPositionColliding(coords)) {
-                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize, randomID));
-                    }
-                    break;
-
-                case "south":
-                    coords = {x: this.position.x, y: this.position.y + 1};
-
-                    randomID = '_' + Math.random().toString(36).substr(2, 9);
-                    if (this.isPositionColliding(coords)) {
-                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize, randomID));
-                    }
-                    break;
-
-                case "north":
-                    coords = {x: this.position.x, y: this.position.y - 1};
-
-                    randomID = '_' + Math.random().toString(36).substr(2, 9);
-                    if (this.isPositionColliding(coords)) {
-                        this.game.walls.push(new Wall(coords, 1, true, this.assets, this.gridSize, randomID));
-                    }
-                    break;
+            if (this.isPositionColliding(withNextStep)) {
+                randomID = '_' + Math.random().toString(36).substr(2, 9);
+                this.game.walls.push(new Wall(withNextStep, 1, true, this.assets, this.gridSize, randomID));
+                this.amountWalls--;
+                let data = {x: withNextStep.x, y: withNextStep.y, id: randomID};
+                this.socket.emit('setWall', data);
+                console.log('position after wall: ', this.position);
             }
-            this.amountWalls--;
 
-            coords['id'] = '_' + Math.random().toString(36).substr(2, 9);
-
-            this.socket.emit('setWall', coords);
 
             document.getElementById("amountWalls").innerHTML = this.amountWalls;
+
+
+            // TODO: player spawns at bottom right corner when building a wall
         }
     }
 
@@ -252,15 +202,15 @@ export default class Player extends Element {
      */
     setBomb() {
         if (this.amountBombs > 0) {
-            let tempPosition = {x: this.position.x, y: this.position.y};
-            this.game.bombs.push(new Bomb(tempPosition, 1500, 1, this.assets, this.gridSize, this.game));
+            // let tempPosition = {x: this.position.x, y: this.position.y};
+            this.game.bombs.push(new Bomb(this.position, 1500, 1, this.assets, this.gridSize, this.game));
             this.amountBombs--;
+            this.socket.emit('setBomb', this.position);
 
             // HTML manipulation
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
             // TODO: Find a way to explode every bomb at its time
 
-            this.socket.emit('setBomb', tempPosition);
 
         }
     }
@@ -270,25 +220,21 @@ export default class Player extends Element {
     }
 
     doesPlayerTouchAWall(position) {
-        this.game.walls.forEach(wall => {
-            if (wall.position.x === position.x && wall.position.y === position.y) {
-                console.log(wall.position);
-
+        for (let i = 0; i < this.game.walls.length; i++) {
+            if (this.game.walls[i].position.x === position.x && this.game.walls[i].position.y === position.y) {
                 return true;
             }
-        });
+        }
         return false;
     }
 
     // TODO: doesn't work yet
     doesPlayerCrossPlayer(position) {
-        this.game.players.forEach(player => {
-            if (player.position.x === position.x && player.position.y === position.y) {
-                console.log(player.position);
-
+        for (let i = 0; i < this.game.players.length; i++) {
+            if (this.game.players[i].position.x === position.x && this.game.players[i].position.y === position.y) {
                 return true;
             }
-        });
+        }
         return false;
     }
 
@@ -296,6 +242,22 @@ export default class Player extends Element {
         return position.x > this.game.width - 1 || position.y > this.game.height - 1 || position.x < 0 || position.y < 0;
     }
 
+    getNextPosition() {
+        switch (this.direction) {
+            case "east":
+                return {x: this.position.x + 1, y: this.position.y};
+
+            case "west":
+                return {x: this.position.x - 1, y: this.position.y};
+
+            case "south":
+                return {x: this.position.x, y: this.position.y + 1};
+
+            case "north":
+                return {x: this.position.x, y: this.position.y - 1};
+
+        }
+    }
 
 
 

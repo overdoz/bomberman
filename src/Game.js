@@ -117,8 +117,9 @@ export default class Game {
      * receive walls from enemy players
      * @param position = {x: 0, y: 0}
      */
-    getWall(position) {
-        this.walls.push(new Wall(position, 1, true, this.assets, this.gridSize, position.id));
+    getWall(data) {
+        let tempPosition = {x: data.x, y: data.y};
+        this.walls.push(new Wall(tempPosition, 1, true, this.assets, this.gridSize, data.id));
     }
 
     /**
