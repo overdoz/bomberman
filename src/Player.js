@@ -164,7 +164,6 @@ export default class Player extends Element {
                 this.position.x = withNextStep.x;
                 this.position.y = withNextStep.y;
                 this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
-
             }
     }
 
@@ -181,10 +180,20 @@ export default class Player extends Element {
             let randomID = '';
 
             if (this.isPositionColliding(withNextStep)) {
+
+                // generate randomID for easier removement
                 randomID = '_' + Math.random().toString(36).substr(2, 9);
-                this.game.walls.push(new Wall(withNextStep, 1, true, this.assets, this.gridSize, randomID));
-                this.amountWalls--;
+
+                // data to be send to server
                 let data = {x: withNextStep.x, y: withNextStep.y, id: randomID};
+                console.log(data);
+
+                // push wall at into our wall array
+                this.game.getWall(data);
+                // TODO: player spawns at bottom right corner when building a wall
+
+
+                this.amountWalls--;
                 this.socket.emit('setWall', data);
                 console.log('position after wall: ', this.position);
             }
@@ -193,7 +202,6 @@ export default class Player extends Element {
             document.getElementById("amountWalls").innerHTML = this.amountWalls;
 
 
-            // TODO: player spawns at bottom right corner when building a wall
         }
     }
 
