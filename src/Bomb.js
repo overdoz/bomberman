@@ -96,10 +96,10 @@ export default class Bomb extends Element {
         });
         // IMPORTANT! Because .splice() shortens the array, we safe all indexes, which have to be deleted inside of 'let indexes'
         indexes.sort((a, b) => {return b-a}).forEach((index) => {
+            this.socket.emit('deleteWall', {id: this.game.walls[index].id});
             let wall = this.game.walls.splice(index, 1)
-            console.log(wall)
 
-            // this.socket.emit('deleteWall', {id: wall.id});
+            console.log(wall)
 
 
         });

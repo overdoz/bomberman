@@ -195,12 +195,18 @@ io.on('connection', function(socket){
      * @param data = {id: '#fhs7fi''}
      */
     socket.on('deleteWall', function (data) {
+        console.log(data);
         // index of the wall to be deleted
-        let index = positionWalls.map(wall => {return wall.id}).indexOf(data.id);
+        for (let i = positionWalls.length - 1; i > 0; i--) {
+            if (positionWalls[i].id === data.id) {
+                console.log('wall to delete: ', positionWalls[i]);
+                console.log(positionWalls.length);
+                positionWalls.splice(i, 1);
+            }
+        }
 
-        // delete wall at index
-        let wall = positionWalls.splice(index, 1);
-        console.log('wall to delete: ', wall);
+
+
     })
 
 });
