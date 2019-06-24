@@ -50,8 +50,9 @@ new AssetLoader()
 
 
         let id = '';
+
         document.querySelector("#login").addEventListener("click", function(event) {
-            console.log(document.querySelector("#lname").value);
+
             event.preventDefault();
             id = document.querySelector("#lname").value;
 
@@ -70,9 +71,9 @@ new AssetLoader()
                 game.pushPlayer(data);
             });
 
-           /* socket.on('changeDirection', function (data) {
+            socket.on('changeDirection', function (data) {
                 game.changeDirection(data)
-            });*/
+            });
 
             socket.on('playerMoved', function (data) {
                 game.playerMoved(data);

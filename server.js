@@ -138,6 +138,10 @@ io.on('connection', function(socket){
         socket.broadcast.emit('changeDirection', data);
     });
 
+   socket.on('reset', function (data) {
+       positionPlayers = [];
+   })
+
     /**
      * @param data = {x: 4, y: 2, id: randomID, direction: 'east'}
      */

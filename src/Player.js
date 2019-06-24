@@ -73,6 +73,8 @@ export default class Player extends Element {
     }
 
     triggerEvent(e) {
+        let x = this.position.x;
+        let y = this.position.y;
         if (!this.dead) {
             switch (e.key) {
                 case 'ArrowLeft':
@@ -80,7 +82,6 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'west';
-                        this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
                     }
                     break;
 
@@ -89,7 +90,6 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'east';
-                        this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
                     }
                     break;
 
@@ -98,7 +98,6 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'north';
-                        this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
                     }
                     break;
 
@@ -107,7 +106,6 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'south';
-                        this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
                     }
                     break;
 
@@ -119,6 +117,7 @@ export default class Player extends Element {
                     this.buildWall();
                     break;
             }
+            this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
 
         };
     }
@@ -163,8 +162,9 @@ export default class Player extends Element {
             if (this.isPositionColliding(withNextStep)) {
                 this.position.x = withNextStep.x;
                 this.position.y = withNextStep.y;
-                this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
             }
+            this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
+
     }
 
     /**

@@ -62,8 +62,6 @@ export default class Game {
         // If there is no player with this particular ID, create new Player
         if (!doesContain) {
             this.players.push(new Player(position, this.assets, 1, 99, 99, this.gridSize, this, data.id, data.direction));
-        } else {
-            return;
         }
     }
 
@@ -141,13 +139,15 @@ export default class Game {
             player.draw(this.context);
         });
 
+        this.bombs.forEach(bomb => {
+            bomb.draw(this.context);
+        });
+
         this.walls.forEach(wall => {
             wall.draw(this.context);
         });
 
-        this.bombs.forEach(bomb => {
-            bomb.draw(this.context);
-        });
+
 
     }
 
