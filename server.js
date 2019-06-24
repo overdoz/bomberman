@@ -150,7 +150,7 @@ io.on('connection', function(socket){
                 player.direction = data.direction;
             }
         });
-        console.log(data);
+        console.log('[server] position changed: ',data);
 
     });
 

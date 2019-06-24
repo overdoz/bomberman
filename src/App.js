@@ -70,9 +70,9 @@ new AssetLoader()
                 game.pushPlayer(data);
             });
 
-            socket.on('changeDirection', function (data) {
+           /* socket.on('changeDirection', function (data) {
                 game.changeDirection(data)
-            });
+            });*/
 
             socket.on('playerMoved', function (data) {
                 game.playerMoved(data);

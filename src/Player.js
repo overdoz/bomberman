@@ -80,7 +80,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'west';
-                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+                        this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
                     }
                     break;
 
@@ -89,7 +89,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'east';
-                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+                        this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
                     }
                     break;
 
@@ -98,7 +98,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'north';
-                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+                        this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
                     }
                     break;
 
@@ -107,7 +107,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'south';
-                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+                        this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
                     }
                     break;
 
@@ -189,19 +189,19 @@ export default class Player extends Element {
                 console.log(data);
 
                 // push wall at into our wall array
-                this.game.getWall(data);
+                // this.game.getWall(data);
+                this.game.walls.push(new Wall(withNextStep, 1, true, this.assets, this.gridSize, randomID));
+
                 // TODO: player spawns at bottom right corner when building a wall
 
 
                 this.amountWalls--;
                 this.socket.emit('setWall', data);
-                console.log('position after wall: ', this.position);
+                console.log('position after wall was set: ', this.position);
+
+                document.getElementById("amountWalls").innerHTML = this.amountWalls;
+
             }
-
-
-            document.getElementById("amountWalls").innerHTML = this.amountWalls;
-
-
         }
     }
 

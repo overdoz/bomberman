@@ -119,7 +119,16 @@ export default class Game {
      */
     getWall(data) {
         let tempPosition = {x: data.x, y: data.y};
-        this.walls.push(new Wall(tempPosition, 1, true, this.assets, this.gridSize, data.id));
+        console.log('Game received wall: ', tempPosition);
+        let doesntContains = true;
+        this.walls.forEach(wall => {
+            if (wall.id === data.id) {
+                doesntContains = false;
+            }
+        })
+        if (doesntContains) {
+            this.walls.push(new Wall(tempPosition, 1, true, this.assets, this.gridSize, data.id));
+        }
     }
 
     /**
