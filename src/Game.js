@@ -8,7 +8,6 @@ export default class Game {
 
     constructor(canvas, width=13, height=13, assets, id) {
 
-
         this.canvas = document.getElementById(canvas);
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
@@ -32,8 +31,6 @@ export default class Game {
         this.walls = [];
 
 
-
-
         this.startAnimating();
     }
 
@@ -42,12 +39,18 @@ export default class Game {
 
     }
 
+
     /**
+     * create new player
+     * is being called in App.js whenever socket receives a signal
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
      */
     pushPlayer(data) {
 
+        // create position of this player
         let position = {x: data.x, y: data.y};
+
+        // we expect, that there is no player with this particular ID (data.id)
         let doesContain = false;
 
         // checks if there's already a player with this ID
@@ -56,8 +59,6 @@ export default class Game {
                 doesContain = true;
             }
         });
-
-
 
         // If there is no player with this particular ID, create new Player
         if (!doesContain) {
@@ -68,8 +69,10 @@ export default class Game {
 
     }
 
+
     /**
      * move own player
+     * is being called in App.js whenever user presses a key
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
      */
     movePlayer(data) {
@@ -80,8 +83,10 @@ export default class Game {
         });
     }
 
+
     /**
      * receive movement from enemy players
+     * is being called in App.js whenever socket receives a signal
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
      */
     playerMoved(data) {
@@ -94,8 +99,10 @@ export default class Game {
         });
     }
 
+
     /**
      * receive direction change from enemy players
+     * is being called in App.js whenever socket receives a signal
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
      */
     changeDirection(data) {
@@ -106,16 +113,20 @@ export default class Game {
         })
     }
 
+
     /**
      * receive bombs from enemy players
+     * is being called in App.js whenever socket receives a signal
      * @param position = {x: 0, y: 0}
      */
     getBomb(position) {
         this.bombs.push(new Bomb(position, 1500, 1, this.assets, this.gridSize, this));
     }
 
+
     /**
      * receive walls from enemy players
+     * is being called in App.js whenever socket receives a signal
      * @param data = {x: 0, y: 0, id: 'dasr43g4'}
      */
     getWall(data) {
@@ -126,14 +137,16 @@ export default class Game {
             if (wall.id === data.id) {
                 doesntContains = false;
             }
-        })
+        });
         if (doesntContains) {
             this.walls.push(new Wall(tempPosition, 1, true, this.assets, this.gridSize, data.id));
         }
     }
 
+
     /**
      * render method to display all elements on the game board
+     * canvas has to be cleared each render loop
      */
     draw() {
         this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
@@ -161,6 +174,7 @@ export default class Game {
         this.animate(this.then);
     }
 
+
     animate(currentTime) {
         window.requestAnimationFrame(this.animate.bind(this));
 
@@ -176,6 +190,12 @@ export default class Game {
         // this.frameCount++;
     }
 
+
+    /**
+     * creates an HTML node every time a player has been created
+     * @param data = {id: #344gds, amountBombs: 29, amountWalls: 93}
+     * TODO: sync all counters
+     */
     creatHTMLnode(data) {
         if (this.players.length > 1) {
             let enemyInventory = document.getElementById('inventoryEnemy');
@@ -190,7 +210,7 @@ export default class Game {
             img.src = "dist/bomb_icon.png";
 
             let p = document.createElement("p");
-            p.id = data.id + 'BombText'
+            p.id = data.id + 'BombText';
             p.innerText = '99';
 
             let img2 = document.createElement("img");
@@ -198,7 +218,7 @@ export default class Game {
             img2.src = "dist/wall.png";
 
             let p2 = document.createElement("p");
-            p2.id = data.id + 'WallText'
+            p2.id = data.id + 'WallText';
             p2.innerText = '99';
 
             container.appendChild(id);
@@ -210,9 +230,4 @@ export default class Game {
 
         }
     }
-
-
-
-
-
 }

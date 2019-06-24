@@ -61,7 +61,7 @@ export default class Player extends Element {
 
         this.socket = io.connect('http://localhost:9000');
 
-
+        // display initial bombs and walls counter on HTML
         document.getElementById("amountBombs").innerHTML = this.amountBombs;
         document.getElementById("amountWalls").innerHTML = this.amountWalls;
 
@@ -72,11 +72,13 @@ export default class Player extends Element {
         this.dead = true;
     }
 
+
     /**
-     * is being called in App.js every time the user presses a key
+     * @description is being called in App.js every time the user presses a key
      * calls the movePlayer() method in Game.js
      * TODO: maybe move the method from App.js into Game.js
      * @param e = {id: '9fh3j4', key: 'ArrowLeft'}
+     * @required in Game.js
      */
     triggerEvent(e) {
 
@@ -130,13 +132,11 @@ export default class Player extends Element {
     }
 
 
-
-
-
     /**
-     * renders the avatar
+     * @description renders the avatar
      * note, that we added 6px to our x axis to center the image
-     * draw() will also render our set of bombs
+     * draw() is being called inside of Game.js each render loop
+     * @required in Game.js
      */
     draw(context) {
 
@@ -161,6 +161,7 @@ export default class Player extends Element {
 
     }
 
+
     /**
      * change the direction of our avatar
      * and move it one grid size on the x or y axis
@@ -181,12 +182,15 @@ export default class Player extends Element {
 
     }
 
+
     /**
-     * buildWall() determines if you're allowed to set a wall at this position (let coords).
+     * @description buildWall() determines if you're allowed to set a wall at this position (let coords).
      * Set wall at this position, if there isn't a Player or Wall.
+     * @requires this.game
      */
     buildWall() {
 
+        // if there's enough walls left
         if (this.amountWalls > 0) {
 
             // initialize next position
@@ -218,8 +222,10 @@ export default class Player extends Element {
         }
     }
 
+
     /**
      * set Bomb at your current position
+     * @requires this.game
      */
     setBomb() {
 
@@ -242,10 +248,12 @@ export default class Player extends Element {
         }
     }
 
+
     /**
      * takes the current position and checks, if the next step is possible
      * @param position
      * @returns {boolean}
+     * @requires this.game.walls & this.game.players
      */
     isPositionColliding(position) {
         return !this.doesPlayerCrossPlayer(position) && !this.doesPlayerTouchAWall(position) && !this.isPlayerOutOfBounds(position);
@@ -279,9 +287,11 @@ export default class Player extends Element {
         return position.x > this.game.width - 1 || position.y > this.game.height - 1 || position.x < 0 || position.y < 0;
     }
 
+
     /**
      * determines the next position based on your current direction
      * @returns {{x: number, y: *}|{x: *, y: number}|{x: *, y: *}}
+     * @requires this.direction
      */
     getNextPosition() {
 
