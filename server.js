@@ -88,8 +88,8 @@ io.on('connection', function(socket){
             case 0:
                 positionPlayers.push(playerDetails);
                 socket.emit('createNewPlayer', playerDetails);
-                socket.emit('createWalls', [...positionWalls]);
 
+                socket.emit('createWalls', [...positionWalls]);
                 socket.broadcast.emit('createNewPlayer', playerDetails);
                 break;
 
@@ -131,11 +131,16 @@ io.on('connection', function(socket){
         }
     });
 
-
+    /**
+     * @param data = {id: this.id, direction: this.direction}
+     */
     socket.on('changeDirection', function(data) {
         socket.broadcast.emit('changeDirection', data);
     });
 
+    /**
+     * @param data = {x: 4, y: 2, id: randomID, direction: 'east'}
+     */
     socket.on('movePlayer', function(data) {
         socket.broadcast.emit('playerMoved', data);
         positionPlayers.forEach(player => {
@@ -149,14 +154,24 @@ io.on('connection', function(socket){
 
     });
 
+    /**
+     * @param data = {x: 4, y: 2}
+     */
     socket.on('setBomb', function(data) {
         socket.broadcast.emit('getBomb', data);
     });
 
+    /**
+     * @param data = {x: 4, y: 2, id: 'h28fkf#'}
+     */
     socket.on('setWall', function(data) {
         socket.broadcast.emit('getWall', data);
+        positionWalls.push({id: data.id, x: data.x, y: data.y, isDestructible: true});
     });
 
+    /**
+     * @param data = {id: 'playerID''}
+     */
     socket.on('deletePlayer', function (data) {
         // index of the player to be deleted
         let index = positionPlayers.map(player => {return player.id}).indexOf(data.id);
@@ -165,6 +180,9 @@ io.on('connection', function(socket){
         let player = positionPlayers.splice(index, 1);
     });
 
+    /**
+     * @param data = {id: '#fhs7fi''}
+     */
     socket.on('deleteWall', function (data) {
         // index of the wall to be deleted
         let index = positionWalls.map(wall => {return wall.id}).indexOf(data.id);

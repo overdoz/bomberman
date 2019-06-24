@@ -80,6 +80,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'west';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -88,6 +89,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'east';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -96,6 +98,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'north';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -104,6 +107,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'south';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -117,10 +121,6 @@ export default class Player extends Element {
             }
 
         };
-
-
-        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
-
     }
 
 
@@ -210,10 +210,10 @@ export default class Player extends Element {
      */
     setBomb() {
         if (this.amountBombs > 0) {
-            // let tempPosition = {x: this.position.x, y: this.position.y};
-            this.game.bombs.push(new Bomb(this.position, 1500, 1, this.assets, this.gridSize, this.game));
+            let tempPosition = {x: this.position.x, y: this.position.y};
+            this.game.bombs.push(new Bomb(tempPosition, 1500, 1, this.assets, this.gridSize, this.game));
             this.amountBombs--;
-            this.socket.emit('setBomb', this.position);
+            this.socket.emit('setBomb', tempPosition);
 
             // HTML manipulation
             document.getElementById("amountBombs").innerHTML = this.amountBombs;

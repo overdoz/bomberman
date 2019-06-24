@@ -115,7 +115,7 @@ export default class Game {
 
     /**
      * receive walls from enemy players
-     * @param position = {x: 0, y: 0, id: 'dasr43g4'}
+     * @param data = {x: 0, y: 0, id: 'dasr43g4'}
      */
     getWall(data) {
         let tempPosition = {x: data.x, y: data.y};
@@ -161,7 +161,7 @@ export default class Game {
             this.update();
             this.draw();
         }
-        this.frameCount++;
+        // this.frameCount++;
     }
 
 
