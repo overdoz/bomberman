@@ -47,8 +47,7 @@ new AssetLoader()
     .then(assets => {
         let game = null;
 
-        // let socket = io.connect('http://localhost:9000');
-        let socket = io.connect(' http://36a01488.ngrok.io');
+        let socket = io.connect('http://localhost:9000');
 
         let id = '';
 

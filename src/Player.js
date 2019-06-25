@@ -59,8 +59,7 @@ export default class Player extends Element {
         };
 
 
-        // this.socket = io.connect('http://localhost:9000');
-        this.socket = io.connect(' http://36a01488.ngrok.io');
+        this.socket = io.connect('http://localhost:9000');
 
         // display initial bombs and walls counter on HTML
         document.getElementById("amountBombs").innerHTML = this.amountBombs;
@@ -168,7 +167,6 @@ export default class Player extends Element {
      * and move it one grid size on the x or y axis
      */
     update() {
-
             // initialize next move
             let nextPosition = this.getNextPosition();
 
