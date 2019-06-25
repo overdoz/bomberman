@@ -59,7 +59,8 @@ export default class Player extends Element {
         };
 
 
-        this.socket = io.connect('http://localhost:9000');
+        // this.socket = io.connect('http://localhost:9000');
+        this.socket = io.connect(' http://36a01488.ngrok.io');
 
         // display initial bombs and walls counter on HTML
         document.getElementById("amountBombs").innerHTML = this.amountBombs;
