@@ -6,10 +6,14 @@ import Bomb from "./Bomb.js";
 
 export default class Game {
 
-    constructor(canvas, width=13, height=13, assets) {
+    constructor(canvas, width=13, height=13, assets, id) {
+
         this.canvas = document.getElementById(canvas);
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
+
+
+        this.id = id;
 
         this.width = width;
         this.height = height;
@@ -19,8 +23,6 @@ export default class Game {
 
         this.gridSize = this.canvas.width / width;
 
-        // TODO: initialize each player inside constructor or inside App.js?
-
 
         // let gameOver = false;
 
@@ -29,57 +31,122 @@ export default class Game {
         this.walls = [];
 
 
-
-        this.players.push(new Player({x: 0, y: 0}, this.assets, 1, 14, 77, this.gridSize, this));
-
-
-        this.generateRandomWalls(30);
         this.startAnimating();
     }
 
     // TODO: update function
     update() {
-        /**
-         * update player in the game board
-         */
+
+    }
+
+
+    /**
+     * create new player
+     * is being called in App.js whenever socket receives a signal
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     */
+    pushPlayer(data) {
+
+        // create position of this player
+        let position = {x: data.x, y: data.y};
+
+        // we expect, that there is no player with this particular ID (data.id)
+        let doesContain = false;
+
+        // checks if there's already a player with this ID
         this.players.forEach(player => {
-            if(this.frameCount % player.moveSpeed === 0) {
-                switch (player.direction) {
-                    case "east":
-                        let east = {x: player.position.x + 1, y: player.position.y};
-                        if (!player.isPlayerOutOfBounds(east) && !player.doesPlayerTouchAWall(east)) {
-                            player.position = east;
-                        }
-                        break;
-
-                    case "west":
-                        let west = {x: player.position.x - 1, y: player.position.y};
-                        if (!player.isPlayerOutOfBounds(west) && !player.doesPlayerTouchAWall(west)) {
-                            player.position = west;
-                        }
-                        break;
-
-                    case "south":
-                        let south = {x: player.position.x, y: player.position.y + 1};
-                        if (!player.isPlayerOutOfBounds(south) && !player.doesPlayerTouchAWall(south)) {
-                            player.position = south;
-                        }
-                        break;
-
-                    case "north":
-                        let north = {x: player.position.x, y: player.position.y - 1};
-                        if (!player.isPlayerOutOfBounds(north) && !player.doesPlayerTouchAWall(north)) {
-                            player.position = north;
-                        }
-                }
+            if (player.id === data.id) {
+                doesContain = true;
             }
-
         });
 
-}
+        // If there is no player with this particular ID, create new Player
+        if (!doesContain) {
+            this.players.push(new Player(position, this.assets, 1, 99, 99, this.gridSize, this, data.id, data.direction));
+            // this.creatHTMLnode(data);
+
+        }
+
+    }
+
+
+    /**
+     * move own player
+     * is being called in App.js whenever user presses a key
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     */
+    movePlayer(data) {
+        this.players.forEach(player => {
+            if (player.id === data.id) {
+                player.triggerEvent(data);
+            }
+        });
+    }
+
+
+    /**
+     * receive movement from enemy players
+     * is being called in App.js whenever socket receives a signal
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     */
+    playerMoved(data) {
+        this.players.forEach(player => {
+            if (player.id === data.id) {
+                player.position.x = data.x;
+                player.position.y = data.y;
+                player.direction = data.direction;
+            }
+        });
+    }
+
+
+    /**
+     * receive direction change from enemy players
+     * is being called in App.js whenever socket receives a signal
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     */
+    changeDirection(data) {
+        this.players.forEach(player => {
+            if (player.id === data.id) {
+                player.direction = data.direction;
+            }
+        })
+    }
+
+
+    /**
+     * receive bombs from enemy players
+     * is being called in App.js whenever socket receives a signal
+     * @param position = {x: 0, y: 0}
+     */
+    getBomb(position) {
+        this.bombs.push(new Bomb(position, 1500, 1, this.assets, this.gridSize, this));
+    }
+
+
+    /**
+     * receive walls from enemy players
+     * is being called in App.js whenever socket receives a signal
+     * @param data = {x: 0, y: 0, id: 'dasr43g4'}
+     */
+    getWall(data) {
+        let tempPosition = {x: data.x, y: data.y};
+        console.log('Game received wall: ', tempPosition);
+        let doesntContains = true;
+        this.walls.forEach(wall => {
+            if (wall.id === data.id) {
+                doesntContains = false;
+            }
+        });
+        if (doesntContains) {
+            this.walls.push(new Wall(tempPosition, 1, true, this.assets, this.gridSize, data.id));
+        }
+    }
+
 
     /**
      * render method to display all elements on the game board
+     * canvas has to be cleared each render loop
      */
     draw() {
         this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
@@ -88,21 +155,25 @@ export default class Game {
             player.draw(this.context);
         });
 
+        this.bombs.forEach(bomb => {
+            bomb.draw(this.context);
+        });
+
         this.walls.forEach(wall => {
             wall.draw(this.context);
         });
 
-        this.bombs.forEach(bomb => {
-            bomb.draw(this.context);
-        })
+
 
     }
 
+
     startAnimating() {
-        this.frameTime = 1000 / 10;
+        this.frameTime = 1000 / 30;
         this.then = window.performance.now();
         this.animate(this.then);
     }
+
 
     animate(currentTime) {
         window.requestAnimationFrame(this.animate.bind(this));
@@ -116,66 +187,47 @@ export default class Game {
             this.update();
             this.draw();
         }
-        this.frameCount++;
+        // this.frameCount++;
     }
+
 
     /**
-     * generate a grid of indestructible walls and destructible walls at random positions
-     * @param number - max amount of indestructible walls to create
+     * creates an HTML node every time a player has been created
+     * @param data = {id: #344gds, amountBombs: 29, amountWalls: 93}
+     * TODO: sync all counters
      */
-    generateRandomWalls(amount) {
-        // create grid of indestructible walls
-        for (let i = 1; i < this.width; i += 2) {
-            for (let j = 1; j < this.height; j += 2) {
-                this.walls.push(new Wall({x: i, y: j}, 1, false, this.assets, this.gridSize));
-            }
-        }
+    creatHTMLnode(data) {
+        if (this.players.length > 1) {
+            let enemyInventory = document.getElementById('inventoryEnemy');
+            let container = document.createElement("div");
+            container.id = 'bombs';
 
-        // create random destructible walls
-        let random = (limit) => {return Math.floor(Math.random() * limit)};
-        for (let i = 0; i < amount; i++) {
-            let atRandomPosition = {x: random(this.width), y: random(this.height)};
+            let id = document.createElement("p");
+            id.innerText = data.id;
 
-            if (this.isAlreadyExisting(atRandomPosition)) {
-                i--;
-            } else {
-                this.walls.push(new Wall(atRandomPosition, 1, true, this.assets, this.gridSize));
-            }
+            let img = document.createElement("img");
+            img.id = data.id + 'BombImg';
+            img.src = "dist/bomb_icon.png";
+
+            let p = document.createElement("p");
+            p.id = data.id + 'BombText';
+            p.innerText = '99';
+
+            let img2 = document.createElement("img");
+            img2.id = data.id + 'WallImg';
+            img2.src = "dist/wall.png";
+
+            let p2 = document.createElement("p");
+            p2.id = data.id + 'WallText';
+            p2.innerText = '99';
+
+            container.appendChild(id);
+            container.appendChild(img);
+            container.appendChild(p);
+            container.appendChild(img2);
+            container.appendChild(p2);
+            enemyInventory.appendChild(container);
+
         }
     }
-
-    isAlreadyExisting(position) {
-        for (let i = 0; i < this.walls.length; i++) {
-            if (position.x === this.walls[i].position.x && position.y === this.walls[i].position.y) {
-                return true;
-            }
-        }
-
-        // don't render walls at each corner within 3 blocks
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                switch (true) {
-                    case ((position.x === i) && (position.y === j)):
-                        return true;
-                    case ((position.x === (this.width-1-i)) && (position.y === (this.height-1-j))):
-                        return true;
-                    case ((position.x === i) && (position.y === (this.height-1-j))):
-                        return true;
-                    case ((position.x === (this.width-1-i)) && (position.y === j)):
-                        return true;
-                }
-                /*if (    (   (position.x === i)                            &&      (position.y === j)  )      ||
-                    (   (   position.x === (this.width - 1  - i)    )          &&      (position.y === (this.height - 1 - j) )) ||
-                    (   (   position.x === i)                             &&      (position.y  ===     (this.height - 1 - j) )  ) ||
-                    (   (   position.x === (this.width - 1 - i))              &&      (position.y === j ))
-                ) {
-                    return true;
-                }*/
-            }
-        };
-        return false;
-    }
-
-
-
 }

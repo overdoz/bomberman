@@ -2,15 +2,19 @@
 import Element from './Element.js';
 import Bomb from './Bomb.js';
 import Wall from './Wall.js';
+import io from "socket.io-client";
 
 
 export default class Player extends Element {
 
-    constructor(position, assets, health, moveSpeed, amountBombs, amountWalls, gridSize, game) {
+    constructor(position, assets, health, amountBombs, amountWalls, gridSize, game, id, direction) {
 
         super(position, assets);
 
         this.game = game;
+        this.id = id;
+
+        this.direction = direction;
 
         /**
          * assets required to render player and bombs
@@ -32,17 +36,8 @@ export default class Player extends Element {
         this.health = health; // double
         this.amountBombs = amountBombs;
         this.amountWalls = amountWalls;
-        /**
-         * move speed of a player
-         */
-        this.moveSpeed = 20; //double
 
-
-        // this.maximumNumberOfBombs = this.numberOfBombs*2;
-        // this.powerUps = null;
-        // this.timeLeftToBuildWall = 15; // move this logic inside setBomb() ???
         this.dead = false;
-        this.direction = 'east';
 
         this.spriteSheet = {
             south: {
@@ -63,24 +58,30 @@ export default class Player extends Element {
             }
         };
 
-        document.addEventListener("keydown", this.triggerEvent.bind(this));
 
+        this.socket = io.connect('http://localhost:9000');
+
+        // display initial bombs and walls counter on HTML
         document.getElementById("amountBombs").innerHTML = this.amountBombs;
         document.getElementById("amountWalls").innerHTML = this.amountWalls;
 
     }
 
-    isDead() {
-        return this.dead;
-    }
 
     setDead() {
         this.dead = true;
     }
 
 
-
+    /**
+     * @description is being called in App.js every time the user presses a key
+     * calls the movePlayer() method in Game.js
+     * TODO: maybe move the method from App.js into Game.js
+     * @param e = {id: '9fh3j4', key: 'ArrowLeft'}
+     * @required in Game.js
+     */
     triggerEvent(e) {
+
         if (!this.dead) {
             switch (e.key) {
                 case 'ArrowLeft':
@@ -88,6 +89,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'west';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -96,6 +98,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'east';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -104,6 +107,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'north';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -112,6 +116,7 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'south';
+                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -123,17 +128,19 @@ export default class Player extends Element {
                     this.buildWall();
                     break;
             }
-        }
+        };
     }
 
 
-
     /**
-     * renders the avatar
+     * @description renders the avatar
      * note, that we added 6px to our x axis to center the image
-     * draw() will also render our set of bombs
+     * draw() is being called inside of Game.js each render loop
+     * @required in Game.js
      */
     draw(context) {
+
+            // the +6 centers the image in this particular case
             context.drawImage(
                 this.assets['bomberman'],
                 this.spriteSheet[this.direction].x,
@@ -146,95 +153,114 @@ export default class Player extends Element {
                 this.spriteSize.y,
             );
 
+            // Display nickname at the top of each player
+            context.font = "10px Arial";
+            context.fillText(this.id, this.position.x * this.gridSize + this.gridSize / 2, this.position.y * this.gridSize - 5);
+            context.textAlign = "center";
+            context.globalCompositeOperation='destination-over';
+
     }
+
 
     /**
      * change the direction of our avatar
      * and move it one grid size on the x or y axis
      */
     update() {
-        if(this.game.frameCount % this.moveSpeed === 0) {
-            switch (this.direction) {
-                case "east":
-                    let east = {x: this.position.x + 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
-                        this.position = east;
-                    }
-                    break;
+            // initialize next move
+            let nextPosition = this.getNextPosition();
 
-                case "west":
-                    let west = {x: this.position.x - 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
-                        this.position = west;
-                    }
-                    break;
+            // if next position is not blocked by an object
+            if (this.isPositionColliding(nextPosition)) {
+                this.position.x = nextPosition.x;
+                this.position.y = nextPosition.y;
 
-                case "south":
-                    let south = {x: this.position.x, y: this.position.y + 1};
-                    if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
-                        this.position = south;
-                    }
-                    break;
-
-                case "north":
-                    let north = {x: this.position.x, y: this.position.y - 1};
-                    if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
-                        this.position = north;
-                    }
-                    break;
+                // if successful, send movement to server
+                this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
             }
-        }
+
     }
 
+
+    /**
+     * @description buildWall() determines if you're allowed to set a wall at this position (let coords).
+     * Set wall at this position, if there isn't a Player or Wall.
+     * @requires this.game
+     */
     buildWall() {
+
+        // if there's enough walls left
         if (this.amountWalls > 0) {
-            switch (this.direction) {
-                case "east":
-                    let east = {x: this.position.x + 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(east) && !this.doesPlayerTouchAWall(east)) {
-                        this.game.walls.push(new Wall(east, 1, true, this.assets, this.gridSize));
-                    }
-                    break;
 
-                case "west":
-                    let west = {x: this.position.x - 1, y: this.position.y};
-                    if (!this.isPlayerOutOfBounds(west) && !this.doesPlayerTouchAWall(west)) {
-                        this.game.walls.push(new Wall(west, 1, true, this.assets, this.gridSize));
-                    }
-                    break;
+            // initialize next position
+            let nextPosition = this.getNextPosition();
 
-                case "south":
-                    let south = {x: this.position.x, y: this.position.y + 1};
-                    if (!this.isPlayerOutOfBounds(south) && !this.doesPlayerTouchAWall(south)) {
-                        this.game.walls.push(new Wall(south, 1, true, this.assets, this.gridSize));
-                    }
-                    break;
+            let randomID = '';
 
-                case "north":
-                    let north = {x: this.position.x, y: this.position.y - 1};
-                    if (!this.isPlayerOutOfBounds(north) && !this.doesPlayerTouchAWall(north)) {
-                        this.game.walls.push(new Wall(north, 1, true, this.assets, this.gridSize));
-                    }
-                    break;
+            // if next position is not blocked by an object
+            if (this.isPositionColliding(nextPosition)) {
+
+                // generate randomID for easier removal
+                randomID = '_' + Math.random().toString(36).substr(2, 9);
+
+                // data to be send to server
+                let data = {x: nextPosition.x, y: nextPosition.y, id: randomID};
+
+                // push wall at into our wall array
+                // TODO: Can't we just socket.broadcast.emit to skip the server?
+                this.game.walls.push(new Wall(nextPosition, 1, true, this.assets, this.gridSize, randomID));
+
+                this.amountWalls--;
+
+                this.socket.emit('setWall', data);
+
+                // display the amount of walls you have currently have
+                document.getElementById("amountWalls").innerHTML = this.amountWalls;
+
             }
-            this.amountWalls--;
-            document.getElementById("amountWalls").innerHTML = this.amountWalls;
         }
     }
 
+
+    /**
+     * set Bomb at your current position
+     * @requires this.game
+     */
     setBomb() {
+
+        // if there's enough bombs left
         if (this.amountBombs > 0) {
+
+            // create object with current position
             let tempPosition = {x: this.position.x, y: this.position.y};
+
+            // place bomb inside your game
             this.game.bombs.push(new Bomb(tempPosition, 1500, 1, this.assets, this.gridSize, this.game));
+
             this.amountBombs--;
 
-            // HTML manipulation
+            // send position of your bomb to all enemies
+            this.socket.emit('setBomb', tempPosition);
+
+            // set counter of your bombs in the browser
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
-            // TODO: Find a way to explode every bomb at its time
         }
+    }
+
+
+    /**
+     * takes the current position and checks, if the next step is possible
+     * @param position
+     * @returns {boolean}
+     * @requires this.game.walls & this.game.players
+     */
+    isPositionColliding(position) {
+        return !this.doesPlayerCrossPlayer(position) && !this.doesPlayerTouchAWall(position) && !this.isPlayerOutOfBounds(position);
     }
 
     doesPlayerTouchAWall(position) {
+
+        // checks, if there is a wall object on your position
         for (let i = 0; i < this.game.walls.length; i++) {
             if (this.game.walls[i].position.x === position.x && this.game.walls[i].position.y === position.y) {
                 return true;
@@ -243,27 +269,46 @@ export default class Player extends Element {
         return false;
     }
 
+    doesPlayerCrossPlayer(position) {
+
+        // checks, if there is a player object on your position
+        for (let i = 0; i < this.game.players.length; i++) {
+            if (this.game.players[i].position.x === position.x && this.game.players[i].position.y === position.y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     isPlayerOutOfBounds(position) {
+
+        //checks of position is out of bounds
         return position.x > this.game.width - 1 || position.y > this.game.height - 1 || position.x < 0 || position.y < 0;
     }
 
 
+    /**
+     * determines the next position based on your current direction
+     * @returns {{x: number, y: *}|{x: *, y: number}|{x: *, y: *}}
+     * @requires this.direction
+     */
+    getNextPosition() {
 
+        switch (this.direction) {
+            case "east":
+                return {x: this.position.x + 1, y: this.position.y};
 
-    // Reduces the Life Left of the current Player
-    getDamage(damage) {
-        // damage must always be a negative double
-        if (damage < 0) {
-            throw new Error("Damage must be a negative double number!");
-        }
-        this.health -= damage;
-        // Player is dead
-        if (this.health <= 0) {
-            this.dead = true;
+            case "west":
+                return {x: this.position.x - 1, y: this.position.y};
+
+            case "south":
+                return {x: this.position.x, y: this.position.y + 1};
+
+            case "north":
+                return {x: this.position.x, y: this.position.y - 1};
+
         }
     }
-
-
 }
 
 

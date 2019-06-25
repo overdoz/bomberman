@@ -1,4 +1,5 @@
 import Element from './Element.js';
+import io from "socket.io-client";
 
 export default class Bomb extends Element {
 
@@ -13,8 +14,8 @@ export default class Bomb extends Element {
         this.gridSize = gridSize;
         this.isExploded = false;
 
-        this.timeToExplode = timeToExplode; // init for 5 seconds
-        this.radius = 2;
+        this.timeToExplode = timeToExplode;
+        this.radius = radius;
 
         this.spriteSize = {
             bomb: {
@@ -26,6 +27,7 @@ export default class Bomb extends Element {
                 y: 38,
             }
         };
+        this.socket = io.connect('http://localhost:9000');
 
         // bomb destroys itself after being created
         setTimeout(() => {
@@ -40,20 +42,19 @@ export default class Bomb extends Element {
         }, 500);
     }
 
+    /**
+     * calculate all positions within this.radius
+     *
+     * @returns {Array} with position objects
+     */
     getSurroundingPositions() {
-        let x = this.position.x;
-        let y = this.position.y;
-        return [
-            {x: x ,     y: y},
-            {x: x+1,    y: y},
-            {x: x,      y: y+1},
-            {x: x+1,    y: y+1},
-            {x: x-1,    y: y},
-            {x: x,      y: y-1},
-            {x: x-1,    y: y-1},
-            {x: x-1,    y: y+1},
-            {x: x+1,    y: y-1},
-        ];
+        let positions = [];
+        for (let i = -this.radius; i <= this.radius; i++) {
+            for (let j = -this.radius; j <= this.radius; j++) {
+                positions.push({x: this.position.x + i ,     y: this.position.y + j});
+            }
+        };
+        return positions;
     }
 
     /**
@@ -71,29 +72,37 @@ export default class Bomb extends Element {
 
 
         // delete affected players
-        this.game.players.forEach((value, index) => {
+        this.game.players.forEach((player, index) => {
             this.getSurroundingPositions().forEach(position => {
-                if (value.position.x === position.x && value.position.y === position.y) {
-                    v = this.game.players.splice(index, 1);
-                    //TODO: The f*** player doesn't die!!!
-                    v.setDead();
+                if (player.position.x === position.x && player.position.y === position.y) {
+                    let deletedPlayer = this.game.players.splice(index, 1);
+                    console.log(deletedPlayer)
+                    // this.socket.emit('deletePlayer', {id: deletedPlayer.id});
+
                 }
             })
         });
 
-        // TODO: not all walls are getting destroyed :( I guess, each time an element is deleted, ell upcoming indexes also change
         // delete affected walls
         let indexes = [];
-        this.game.walls.forEach((value, index) => {
+        this.game.walls.forEach((wall, index) => {
             this.getSurroundingPositions().forEach(position => {
-                if (value.position.x === position.x && value.position.y === position.y && value.isDestructible === true) {
+                if (wall.position.x === position.x && wall.position.y === position.y && wall.isDestructible === true) {
                     // v = this.game.walls.splice(index, 1, null);
                     indexes.push(index);
+
                 }
             })
         });
         // IMPORTANT! Because .splice() shortens the array, we safe all indexes, which have to be deleted inside of 'let indexes'
-        indexes.sort((a, b) => {return b-a}).forEach((index) => {this.game.walls.splice(index, 1)});
+        indexes.sort((a, b) => {return b-a}).forEach((index) => {
+            this.socket.emit('deleteWall', {id: this.game.walls[index].id});
+            let wall = this.game.walls.splice(index, 1)
+
+            console.log(wall)
+
+
+        });
     }
 
     // display bomb or fire image
@@ -124,7 +133,9 @@ export default class Bomb extends Element {
                     this.gridSize,
                     this.gridSize,
                 );
-            })
+                context.globalCompositeOperation='destination-over';
+
+            });
 
         }
     }

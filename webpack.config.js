@@ -1,13 +1,14 @@
 const path = require('path');
 
 module.exports = {
-	mode: "development",
+	mode: 'development',
+	watch: true,
 	entry: './src/App.js',
 	output: {
+
 		path: path.resolve(__dirname, 'dist'),
 		filename: 'main.js'
 	},
-	devtool: "inline-source-map",
 	module: {
 		rules: [
 			{
@@ -23,6 +24,6 @@ module.exports = {
 	         			'file-loader'
 	        			]
      		}
-		]
-	}
+]
+}
 };

@@ -40,6 +40,15 @@ body {
     margin: 10px;
 }
 
+#inventoryEnemy {
+    position: absolute;
+    bottom: 0;
+    right: 8vw;
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+}
+
 img {
     height: 40px;
     width: 40px;
@@ -71,3 +80,19 @@ p {
     font-size: 40px;
 }
 
+#loginForm {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 20px;
+}
+
+input {
+    border: 2px solid #024873;
+    font-family: 'Carter One', cursive;
+    font-size: 1.1em;
+    border-radius: 4px;
+    height: 40px;
+    margin-top: 15px;
+
+}

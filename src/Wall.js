@@ -2,9 +2,10 @@ import Element from './Element.js';
 
 export default class Wall extends Element {
 
-    constructor(position, strength, isDestructible, assets, gridSize) {
+    constructor(position, strength, isDestructible, assets, gridSize, id) {
         super(position, assets);
 
+        this.id = id;
         this.isDestructible = isDestructible;
         // this.strength = strength;
 
