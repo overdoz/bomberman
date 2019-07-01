@@ -1,28 +1,76 @@
+
+//###################################################//
+//                                                   //
+//          G A M E    S E T T I N G S               //
+//                                                   //
+//###################################################//
+
+
 const GAME_WIDTH = 13;
 const GAME_HEIGHT = 13;
+
+const AMOUNT_BOMBS = 20;
+const AMOUNT_WALLS = 20;
+const HEALTH = 20;
+
+const DIRECTIONS = {
+    EAST: 'east',
+    WEST: 'west',
+    SOUTH: 'south',
+    NORTH: 'north',
+};
+
+const AMOUNT_RANDOM_WALLS = 30;
+
+
+
+
+
+
+
+
+//###################################################//
+//                                                   //
+//          S E R V E R    S E T T I N G S           //
+//                                                   //
+//###################################################//
+
 
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server,{});
+const ROOT = '/index.html';
+const PORT = 9000;
 
-
-let positionPlayers = [];
-let positionWalls = [];
-let dir = '/index.html';
 
 // serve root folder
 app.get('/',function (req,res) {
-    res.sendFile(__dirname + dir);
+    res.sendFile(__dirname + ROOT);
 });
 
 // serve everything from local
 app.use(express.static('.'));
 
 
-server.listen(9000, function() {
-    console.log("Server is now listening at the PORT: 9000");
+server.listen(PORT, function() {
+    console.log("Server is now listening at the PORT: " + PORT);
 });
+
+
+
+
+
+
+//###################################################//
+//                                                   //
+//             S T A R T      G A M E                //
+//                                                   //
+//###################################################//
+
+
+let positionPlayers = [];
+let positionWalls = [];
 
 /**
  * creates wall objects and stores them in positionWalls array
@@ -93,31 +141,63 @@ const isAlreadyExisting = (position) => {
  * create destructible and indestructible walls after server starts
  * @param amount = number
  */
-generateRandomWalls(30);
+generateRandomWalls(AMOUNT_RANDOM_WALLS);
 
+
+
+
+
+
+//###################################################//
+//                                                   //
+//           S O C K E T     C A L L S               //
+//                                                   //
+//###################################################//
 
 io.on('connection', function(socket){
 
-    // after user pressed the login button
+
+    /**
+     * broadcast new player registration after user has pressed the login button
+     * @param data = {id: 'MICKEYMOUSE'}
+     */
     socket.on('loginPlayer', function (data) {
 
         // determines where to place each incoming player
-        let playerDetails = {id: data.id, x: 0, y: 0, direction: 'east'}
+        let playerDetails = {
+            id: data.id,
+            x: 0,
+            y: 0,
+            direction: DIRECTIONS.EAST,
+            amountBombs: AMOUNT_BOMBS,
+            amountWalls: AMOUNT_WALLS,
+            health: HEALTH,
+        };
+
         switch (positionPlayers.length) {
             case 0:
                 break;
             case 1:
-                playerDetails = {id: data.id, x: GAME_WIDTH - 1, y: 0, direction: 'south'}
+                playerDetails.x = GAME_WIDTH - 1;
+                playerDetails.y = 0;
+                playerDetails.direction = DIRECTIONS.SOUTH;
+                console.log(playerDetails);
                 break;
             case 2:
-                playerDetails = {id: data.id, x: GAME_WIDTH - 1, y: GAME_HEIGHT - 1, direction: 'west'}
+                playerDetails.x = GAME_WIDTH - 1;
+                playerDetails.y = GAME_HEIGHT - 1;
+                playerDetails.direction = DIRECTIONS.WEST;
+                console.log(playerDetails);
                 break;
             case 3:
-                playerDetails = {id: data.id, x: 0, y: GAME_HEIGHT - 1, direction: 'north'}
+                playerDetails.x = 0;
+                playerDetails.y = GAME_HEIGHT - 1;
+                playerDetails.direction = DIRECTIONS.NORTH;
+                console.log(playerDetails);
                 break;
             default:
                 break;
-        };
+        }
 
         // store incoming player
         positionPlayers.push(playerDetails);
@@ -139,7 +219,7 @@ io.on('connection', function(socket){
 
     /**
      * broadcast new direction change to each client
-     * @param data = {id: this.id, direction: this.direction}
+     * @param data = {id: 'SANTACLAUS', direction: this.direction}
      */
     socket.on('changeDirection', function(data) {
         socket.broadcast.emit('directionChanged', data);
@@ -153,7 +233,7 @@ io.on('connection', function(socket){
 
     /**
      * broadcast new player movement to each client
-     * @param data = {x: 4, y: 2, id: randomID, direction: 'east'}
+     * @param data = {x: 4, y: 2, id: 'THOR', direction: 'east'}
      */
     socket.on('movePlayer', function(data) {
         socket.broadcast.emit('playerMoved', data);
@@ -179,7 +259,7 @@ io.on('connection', function(socket){
 
     /**
      * broadcast new wall object to each client
-     * @param data = {x: 4, y: 2, id: 'h28fkf#'}
+     * @param data = {x: 4, y: 2, id: 'SPIDERMAN'}
      */
     socket.on('setWall', function(data) {
         socket.broadcast.emit('getWall', data);
@@ -189,7 +269,7 @@ io.on('connection', function(socket){
 
     /**
      * look for index of the player to be deleted based on data.id
-     * @param data = {id: 'playerID''}
+     * @param data = {id: 'HULK'}
      */
     socket.on('deletePlayer', function (data) {
         for (let i = positionPlayers.length - 1; i > 0; i--) {
@@ -202,7 +282,7 @@ io.on('connection', function(socket){
 
     /**
      * look for index of the wall to be deleted based on data.id
-     * @param data = {id: '#fhs7fi''}
+     * @param data = {id: 'BATMAN'}
      */
     socket.on('deleteWall', function (data) {
         for (let i = positionWalls.length - 1; i > 0; i--) {

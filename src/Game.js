@@ -64,8 +64,8 @@ export default class Game {
         if (!doesContain) {
             this.players.push(new Player(position, this.assets, 1, 99, 99, this.gridSize, this, data.id, data.direction));
             // this.creatHTMLnode(data);
-
         }
+
 
     }
 
@@ -169,7 +169,7 @@ export default class Game {
 
 
     startAnimating() {
-        this.frameTime = 1000 / 30;
+        this.frameTime = 1000;
         this.then = window.performance.now();
         this.animate(this.then);
     }
@@ -198,6 +198,9 @@ export default class Game {
      */
     creatHTMLnode(data) {
         if (this.players.length > 1) {
+
+
+
             let enemyInventory = document.getElementById('inventoryEnemy');
             let container = document.createElement("div");
             container.id = 'bombs';
@@ -211,7 +214,7 @@ export default class Game {
 
             let p = document.createElement("p");
             p.id = data.id + 'BombText';
-            p.innerText = '99';
+            p.innerText = data.amountBombs;
 
             let img2 = document.createElement("img");
             img2.id = data.id + 'WallImg';
@@ -219,7 +222,7 @@ export default class Game {
 
             let p2 = document.createElement("p");
             p2.id = data.id + 'WallText';
-            p2.innerText = '99';
+            p2.innerText = data.amountWalls;
 
             container.appendChild(id);
             container.appendChild(img);
