@@ -106,7 +106,7 @@ export default class Game {
 
 
         // keyboard events
-        document.addEventListener("keydown", (e) => {
+        document.addEventListener("keyup", (e) => {
             this.movePlayer({id: id, key: e.key})
 
         });

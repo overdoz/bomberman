@@ -88,7 +88,6 @@ export default class Bomb extends Element {
                 if (player.position.x === position.x && player.position.y === position.y) {
                     let deletedPlayer = this.game.players.splice(index, 1);
                     console.log(deletedPlayer)
-                    // this.socket.emit('deletePlayer', {id: deletedPlayer.id});
 
                 }
             })
