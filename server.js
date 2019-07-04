@@ -253,19 +253,19 @@ io.on('connection', function(socket){
      */
     socket.on(MOVE_PLAYER, function(data) {
         socket.broadcast.emit(MOVE_PLAYER, data);
-        let player = positionPlayers.find(function(player) {
+      /*  let player = positionPlayers.find(function(player) {
             return player.id === data.id;
         });
         player.x = data.x;
         player.y = data.y;
-        player.direction = data.direction;
-     /*   positionPlayers.forEach(player => {
+        player.direction = data.direction;*/
+        positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.x = data.x;
                 player.y = data.y;
                 player.direction = data.direction;
             }
-        });*/
+        });
 
     });
 

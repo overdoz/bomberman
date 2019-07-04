@@ -294,7 +294,7 @@ export default class Game {
             this.update();
             this.draw();
         }
-        // this.frameCount++;
+        this.frameCount++;
     }
 
 

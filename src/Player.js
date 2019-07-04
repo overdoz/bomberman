@@ -38,7 +38,10 @@ export default class Player extends Element {
 
         this.dead = false;
 
-        this.spriteSheet = {
+        this.currentAnimationState = 0;
+        this.animationSpeed = 15;
+
+/*        this.spriteSheet = {
             south: {
                 x: 0,
                 y: 0
@@ -55,7 +58,82 @@ export default class Player extends Element {
                 x: 0,
                 y: 3 * this.spriteSize.y
             }
-        };
+        };*/
+
+        this.animationSheet = [
+            {
+                south: {
+                    x: 0,
+                    y: 0
+                },
+                west: {
+                    x: 0,
+                    y: this.spriteSize.y
+                },
+                north: {
+                    x: 0,
+                    y: 2 * this.spriteSize.y
+                },
+                east: {
+                    x: 0,
+                    y: 3 * this.spriteSize.y
+                }
+            },
+            {
+                south: {
+                    x: this.spriteSize.x,
+                    y: 0
+                },
+                west: {
+                    x: this.spriteSize.x,
+                    y: this.spriteSize.y
+                },
+                north: {
+                    x: this.spriteSize.x,
+                    y: 2 * this.spriteSize.y
+                },
+                east: {
+                    x: this.spriteSize.x,
+                    y: 3 * this.spriteSize.y
+                }
+            },
+            {
+                south: {
+                    x: 2 * this.spriteSize.x,
+                    y: 0
+                },
+                west: {
+                    x: 2 * this.spriteSize.x,
+                    y: this.spriteSize.y
+                },
+                north: {
+                    x: 2 * this.spriteSize.x,
+                    y: 2 * this.spriteSize.y
+                },
+                east: {
+                    x: 2 * this.spriteSize.x,
+                    y: 3 * this.spriteSize.y
+                }
+            },
+            {
+                south: {
+                    x: 3 * this.spriteSize.x,
+                    y: 0
+                },
+                west: {
+                    x: 3 * this.spriteSize.x,
+                    y: this.spriteSize.y
+                },
+                north: {
+                    x: 3 * this.spriteSize.x,
+                    y: 2 * this.spriteSize.y
+                },
+                east: {
+                    x: 3 * this.spriteSize.x,
+                    y: 3 * this.spriteSize.y
+                }
+            }
+        ]
 
 
 
@@ -141,11 +219,17 @@ export default class Player extends Element {
      */
     draw(context) {
 
+            if (this.game.frameCount % this.animationSpeed === 0) {
+                this.currentAnimationState = (this.currentAnimationState + 1) % this.animationSheet.length;
+            }
+
+            let state = this.animationSheet[this.currentAnimationState];
+
             // the +6 centers the image in this particular case
             context.drawImage(
                 this.assets['bomberman'],
-                this.spriteSheet[this.direction].x,
-                this.spriteSheet[this.direction].y,
+                state[this.direction].x,
+                state[this.direction].y,
                 this.spriteSize.x,
                 this.spriteSize.y,
                 this.position.x * this.gridSize + 6,
