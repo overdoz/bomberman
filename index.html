@@ -12,7 +12,7 @@
 
 
 
-    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <!--<script type="text/javascript" src="/socket.io/socket.io.js"></script>-->
 
 
 
@@ -24,13 +24,17 @@
     </form>
     <div id="inventory">
         <div id="bombs">
-            <img src="dist/bomb_icon.png" alt="bomb" />
-            <p id="amountBombs">0</p>
+            <img id="pic" src="dist/bomb_icon.png" alt="bomb" />
+            <div class="countBox">
+                <p id="amountBombs">0</p>
+            </div>
         </div>
 
         <div id="walls">
             <img src="dist/wall.png" alt="wall" />
-            <p id="amountWalls">0</p>
+            <div class="countBox">
+                <p id="amountWalls">0</p>
+            </div>
         </div>
 
     </div>
