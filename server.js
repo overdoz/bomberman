@@ -23,6 +23,7 @@ const DIRECTIONS = {
 
 const AMOUNT_RANDOM_WALLS = 30;
 
+// TODO: couldn't use import {const, ...} -> maybe require()
 const CHANGE_DIRECTION = 'changeDirection';
 const MOVE_PLAYER = 'movePlayer';
 const PLACE_BOMB = 'placeBomb';
@@ -162,6 +163,7 @@ generateRandomWalls(AMOUNT_RANDOM_WALLS);
 //                                                   //
 //###################################################//
 
+
 io.on('connection', function(socket){
 
 
@@ -229,6 +231,7 @@ io.on('connection', function(socket){
     });
 
 
+    // TODO: Array.prototype.find() didn't work - works at MOVE_PLAYER
     /**
      * broadcast new direction change to each client
      * @param data = {id: 'SANTACLAUS', direction: this.direction}
@@ -240,6 +243,7 @@ io.on('connection', function(socket){
                 player.direction = data.direction;
             }
         });
+
     });
 
 
@@ -249,13 +253,19 @@ io.on('connection', function(socket){
      */
     socket.on(MOVE_PLAYER, function(data) {
         socket.broadcast.emit(MOVE_PLAYER, data);
-        positionPlayers.forEach(player => {
+        let player = positionPlayers.find(function(player) {
+            return player.id === data.id;
+        });
+        player.x = data.x;
+        player.y = data.y;
+        player.direction = data.direction;
+     /*   positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.x = data.x;
                 player.y = data.y;
                 player.direction = data.direction;
             }
-        });
+        });*/
 
     });
 

@@ -65,26 +65,22 @@ export default class Game {
         });
 
         this.socket.on(CREATE_PLAYER, (data) => {
-            console.log(data);
             this.pushPlayer(data);
         });
 
         // receive direction changes
         this.socket.on(CHANGE_DIRECTION, (data) => {
-            console.log('direction changed', data);
             this.changeDirection(data)
         });
 
         // receive enemy player movements
         this.socket.on(MOVE_PLAYER, (data) => {
-            console.log('player moved', data);
             this.playerMoved(data);
         });
 
         // receive bombs set by enemies
         // {x: nextPosition.x, y: nextPosition.y, id: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs}
         this.socket.on(PLACE_BOMB, (data) => {
-            console.log('receive bomb', data);
             this.getBomb(data);
 
             try {
@@ -160,8 +156,6 @@ export default class Game {
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east', amountWalls: 99, amountBombs: 99, health: 99}
      */
     pushPlayer(data) {
-        console.log(this.players);
-
         // create position of this player
         let position = {x: data.x, y: data.y};
 
@@ -277,8 +271,6 @@ export default class Game {
         this.walls.forEach(wall => {
             wall.draw(this.context);
         });
-
-
 
     }
 
