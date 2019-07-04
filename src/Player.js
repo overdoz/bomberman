@@ -2,7 +2,6 @@
 import Element from './Element.js';
 import Bomb from './Bomb.js';
 import Wall from './Wall.js';
-import io from "socket.io-client";
 
 
 export default class Player extends Element {
@@ -59,11 +58,29 @@ export default class Player extends Element {
         };
 
 
-        this.socket = io.connect('http://localhost:9000');
 
         // display initial bombs and walls counter on HTML
-        document.getElementById("amountBombs").innerHTML = this.amountBombs;
-        document.getElementById("amountWalls").innerHTML = this.amountWalls;
+        try {
+            document.getElementById("amountBombs").innerText = this.amountBombs;
+            document.getElementById("amountWalls").innerText = this.amountWalls;
+        } catch (e) {
+            console.log(e)
+        }
+
+      /*  setInterval(() => {
+            this.amountWalls++;
+            this.amountBombs++;
+            try {
+                document.getElementById(this.id + "BombText").innerText = this.amountBombs;
+                document.getElementById(this.id + "WallText").innerText = this.amountWalls;
+
+            } catch (e) {
+                console.log(e);
+            }
+            this.game.broadcastInventory({id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs});
+
+        }, 7000);*/
+
 
     }
 
@@ -89,7 +106,8 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'west';
-                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+                        this.game.broadcastDirection({id: this.id, direction: this.direction});
+                        // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -98,7 +116,8 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'east';
-                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+                        this.game.broadcastDirection({id: this.id, direction: this.direction});
+                        // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -107,7 +126,8 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'north';
-                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+                        this.game.broadcastDirection({id: this.id, direction: this.direction});
+                        // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -116,7 +136,8 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'south';
-                        this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
+                        this.game.broadcastDirection({id: this.id, direction: this.direction});
+                        // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -128,7 +149,7 @@ export default class Player extends Element {
                     this.buildWall();
                     break;
             }
-        };
+        }
     }
 
 
@@ -176,7 +197,8 @@ export default class Player extends Element {
                 this.position.y = nextPosition.y;
 
                 // if successful, send movement to server
-                this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
+                this.game.broadcastPosition({id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
+                //this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
             }
 
     }
@@ -203,8 +225,7 @@ export default class Player extends Element {
                 // generate randomID for easier removal
                 randomID = '_' + Math.random().toString(36).substr(2, 9);
 
-                // data to be send to server
-                let data = {x: nextPosition.x, y: nextPosition.y, id: randomID};
+
 
                 // push wall at into our wall array
                 // TODO: Can't we just socket.broadcast.emit to skip the server?
@@ -212,10 +233,17 @@ export default class Player extends Element {
 
                 this.amountWalls--;
 
-                this.socket.emit('setWall', data);
+                // data to be send to server
+                let data = {id: this.id, x: nextPosition.x, y: nextPosition.y, wallId: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs};
+
+
+                this.game.broadcastWall(data);
+                //this.game.broadcastInventory({id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs});
+
+
 
                 // display the amount of walls you have currently have
-                document.getElementById("amountWalls").innerHTML = this.amountWalls;
+                document.getElementById("amountWalls").innerText = this.amountWalls;
 
             }
         }
@@ -231,16 +259,23 @@ export default class Player extends Element {
         // if there's enough bombs left
         if (this.amountBombs > 0) {
 
-            // create object with current position
-            let tempPosition = {x: this.position.x, y: this.position.y};
 
             // place bomb inside your game
-            this.game.bombs.push(new Bomb(tempPosition, 1500, 1, this.assets, this.gridSize, this.game));
+            this.game.bombs.push(new Bomb({x: this.position.x, y: this.position.y}, 1500, 1, this.assets, this.gridSize, this.game));
 
             this.amountBombs--;
 
+            // this.socket.emit('updateInventory', {id: this.id, amountBombs: this.amountBombs, amountWalls: this.amountWalls})
+
+            // create object with current position
+            let playerState = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};
+
+
             // send position of your bomb to all enemies
-            this.socket.emit('setBomb', tempPosition);
+            // this.socket.emit('setBomb', playerState);
+            this.game.broadcastBomb(playerState);
+            //this.game.broadcastInventory({id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs});
+
 
             // set counter of your bombs in the browser
             document.getElementById("amountBombs").innerHTML = this.amountBombs;

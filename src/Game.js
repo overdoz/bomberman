@@ -3,6 +3,7 @@
 import Player from './Player.js';
 import Wall from './Wall.js';
 import Bomb from "./Bomb.js";
+import io from "socket.io-client";
 
 export default class Game {
 
@@ -14,6 +15,8 @@ export default class Game {
 
 
         this.id = id;
+
+
 
         this.width = width;
         this.height = height;
@@ -30,9 +33,118 @@ export default class Game {
         this.players = [];
         this.walls = [];
 
+        this.socket = io.connect('http://localhost:9000');
+
+        // send notification to server to create your player
+        this.socket.emit('loginPlayer', { id: this.id });
+        document.getElementById("login").disabled = true;
+        document.getElementById("lname").disabled = true;
+        document.getElementById("myCanvas").focus();
+
+        // after logging in your player, the server will send you all generated walls
+        this.socket.on('createWalls', (data) => {
+            data.forEach(d => {
+                let pos = {x: d.x, y: d.y};
+                this.walls.push(new Wall(pos, 1, d.isDestructible, assets, 40, d.wallId));
+            });
+        });
+
+        this.socket.on('createNewPlayer', (data) => {
+            console.log(data);
+            this.pushPlayer(data);
+            // game.creatHTMLnode(data);
+        });
+
+        // receive direction changes
+        this.socket.on('directionChanged', (data) => {
+            console.log('direction changed', data);
+            this.changeDirection(data)
+        });
+
+        // receive enemy player movements
+        this.socket.on('playerMoved', (data) => {
+            console.log('playerMoved', data);
+            this.playerMoved(data);
+        });
+
+        // receive bombs set by enemies
+        // {x: nextPosition.x, y: nextPosition.y, id: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs}
+        this.socket.on('getBomb', (data) => {
+            console.log('got bomb', data);
+            this.getBomb(data);
+
+            try {
+                let bomb = document.getElementById(data.id + 'BombText');
+                bomb.innerText = data.amountBombs;
+            } catch (e) {
+                console.log(e.message);
+            }
+        });
+
+        // receive walls set by enemies
+        this.socket.on('getWall', (data) => {
+            console.log('got wall', data);
+            this.getWall(data);
+
+            try {
+                let wall = document.getElementById(data.id + 'WallText');
+                wall.innerText = data.amountWalls;
+            } catch (e) {
+                console.log(e.message);
+            }
+        });
+
+      /*  this.socket.on('updateInventory', (data) => {
+            try {
+                let bomb = document.getElementById(data.id + 'BombText');
+                bomb.innerText = data.amountBombs;
+                let wall = document.getElementById(data.id + 'WallText');
+                wall.innerText = data.amountWalls;
+            } catch (e) {
+                console.log(e.message);
+            }
+
+        });*/
+
+
+        // keyboard events
+        document.addEventListener("keydown", (e) => {
+            this.movePlayer({id: id, key: e.key})
+
+        });
+
+
+
 
         this.startAnimating();
     }
+
+
+    broadcastPosition(position) {
+        this.socket.emit('movePlayer', position);
+    }
+
+    broadcastDirection(direction) {
+        this.socket.emit('changeDirection', direction);
+    }
+
+    // {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs}
+    broadcastWall(wall) {
+        this.socket.emit('setWall', wall);
+    }
+
+    // {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs}
+    broadcastBomb(bomb) {
+        this.socket.emit('setBomb', bomb);
+    }
+
+    broadcastDestroyedWall(wall) {
+        this.socket.emit('deleteWall', {wallId: wall.wallId});
+    }
+
+   /* broadcastInventory(inventory) {
+        this.socket.emit('setInventory', inventory);
+    }*/
 
     // TODO: update function
     update() {
@@ -43,9 +155,10 @@ export default class Game {
     /**
      * create new player
      * is being called in App.js whenever socket receives a signal
-     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east', amountWalls: 99, amountBombs: 99, health: 99}
      */
     pushPlayer(data) {
+        console.log(this.players);
 
         // create position of this player
         let position = {x: data.x, y: data.y};
@@ -62,8 +175,8 @@ export default class Game {
 
         // If there is no player with this particular ID, create new Player
         if (!doesContain) {
-            this.players.push(new Player(position, this.assets, 1, 99, 99, this.gridSize, this, data.id, data.direction));
-            // this.creatHTMLnode(data);
+            this.players.push(new Player(position, this.assets, 1, data.amountBombs, data.amountWalls, this.gridSize, this, data.id, data.direction));
+            this.creatHTMLnode(data);
         }
 
 
@@ -134,12 +247,12 @@ export default class Game {
         console.log('Game received wall: ', tempPosition);
         let doesntContains = true;
         this.walls.forEach(wall => {
-            if (wall.id === data.id) {
+            if (wall.wallId === data.wallId) {
                 doesntContains = false;
             }
         });
         if (doesntContains) {
-            this.walls.push(new Wall(tempPosition, 1, true, this.assets, this.gridSize, data.id));
+            this.walls.push(new Wall(tempPosition, 1, true, this.assets, this.gridSize, data.wallId));
         }
     }
 
@@ -169,7 +282,7 @@ export default class Game {
 
 
     startAnimating() {
-        this.frameTime = 1000;
+        this.frameTime = 1000 / 30;
         this.then = window.performance.now();
         this.animate(this.then);
     }
@@ -203,32 +316,43 @@ export default class Game {
 
             let enemyInventory = document.getElementById('inventoryEnemy');
             let container = document.createElement("div");
-            container.id = 'bombs';
+            container.id = 'playerInfos';
+
 
             let id = document.createElement("p");
             id.innerText = data.id;
+            id.id = "nickname";
 
             let img = document.createElement("img");
             img.id = data.id + 'BombImg';
             img.src = "dist/bomb_icon.png";
 
+            let pContainer = document.createElement("div");
+            pContainer.className = "countBox";
+
             let p = document.createElement("p");
             p.id = data.id + 'BombText';
             p.innerText = data.amountBombs;
+            pContainer.appendChild(p);
 
             let img2 = document.createElement("img");
             img2.id = data.id + 'WallImg';
             img2.src = "dist/wall.png";
 
+            let p2Container = document.createElement("div");
+            p2Container.className = "countBox";
+
             let p2 = document.createElement("p");
             p2.id = data.id + 'WallText';
             p2.innerText = data.amountWalls;
+            p2Container.appendChild(p2);
+
 
             container.appendChild(id);
             container.appendChild(img);
-            container.appendChild(p);
+            container.appendChild(pContainer);
             container.appendChild(img2);
-            container.appendChild(p2);
+            container.appendChild(p2Container);
             enemyInventory.appendChild(container);
 
         }

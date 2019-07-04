@@ -1,5 +1,4 @@
 import Element from './Element.js';
-import io from "socket.io-client";
 
 export default class Bomb extends Element {
 
@@ -27,7 +26,7 @@ export default class Bomb extends Element {
                 y: 38,
             }
         };
-        this.socket = io.connect('http://localhost:9000');
+        // this.socket = io.connect('http://localhost:9000');
 
         // bomb destroys itself after being created
         setTimeout(() => {
@@ -53,7 +52,7 @@ export default class Bomb extends Element {
             for (let j = -this.radius; j <= this.radius; j++) {
                 positions.push({x: this.position.x + i ,     y: this.position.y + j});
             }
-        };
+        }
         return positions;
     }
 
@@ -68,7 +67,7 @@ export default class Bomb extends Element {
         let index = this.game.bombs.map(bomb => {return bomb.ID}).indexOf(this.ID);
 
         // delete bomb at index
-        let v = this.game.bombs.splice(index, 1);
+        this.game.bombs.splice(index, 1);
 
 
         // delete affected players
@@ -96,10 +95,11 @@ export default class Bomb extends Element {
         });
         // IMPORTANT! Because .splice() shortens the array, we safe all indexes, which have to be deleted inside of 'let indexes'
         indexes.sort((a, b) => {return b-a}).forEach((index) => {
-            this.socket.emit('deleteWall', {id: this.game.walls[index].id});
-            let wall = this.game.walls.splice(index, 1)
+            this.game.broadcastDestroyedWall({wallId: this.game.walls[index].id});
+            // this.socket.emit('deleteWall', {id: this.game.walls[index].id});
+            this.game.walls.splice(index, 1)
 
-            console.log(wall)
+            // console.log(wall)
 
 
         });

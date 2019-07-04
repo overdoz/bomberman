@@ -21,7 +21,7 @@ body {
     position: absolute;
     top: 0;
     color: rgb(122,72,51);
-    box-shadow: 0px 5px 20px #024873;
+    box-shadow: 0 5px 20px #024873;
     border: 4px solid rgb(122,72,51);
     padding: 3px;
     font-family: 'Allerta Stencil', sans-serif;
@@ -37,21 +37,44 @@ body {
     left: 0;
     display: flex;
     flex-direction: row;
-    margin: 10px;
+    margin-left: 1em;
 }
 
 #inventoryEnemy {
     position: absolute;
     bottom: 0;
-    right: 8vw;
+    right: 0;
+    margin: 10px;
     display: flex;
     flex-direction: column;
-    margin: 20px;
+    align-items: flex-end;
+    font-size: 1.0em;
 }
 
 img {
     height: 40px;
     width: 40px;
+}
+
+#nickname {
+    font-size: 1.1em;
+    margin-right: 0.9em;
+}
+
+.countBox {
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    margin: 5px;
+}
+
+#playerInfos {
+    font-size: 1.5em;
+    margin-right: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 #bombs {
@@ -70,6 +93,11 @@ img {
     justify-content: center;
     align-items: center;
     width: 80px;
+}
+
+#pic {
+    height: 40px;
+    width: 40px;
 }
 
 p {

@@ -22,6 +22,14 @@ const DIRECTIONS = {
 
 const AMOUNT_RANDOM_WALLS = 30;
 
+const CHANGE_DIRECTION = 'changeDirection';
+const MOVE_PLAYER = 'movePlayer';
+const PLACE_BOMB = 'placeBomb';
+const PLACE_WALL = 'placeWall';
+const DELETE_PLAYER = 'deletePlayer';
+const DELETE_WALL = 'deleteWall';
+
+
 
 
 
@@ -83,7 +91,7 @@ const generateRandomWalls = (amount) => {
         for (let j = 1; j < GAME_HEIGHT-1; j += 2) {
             // unique ID
             let randomID = '_' + Math.random().toString(36).substr(2, 9);
-            positionWalls.push({id: randomID, x: i, y: j, isDestructible: false});
+            positionWalls.push({wallId: randomID, x: i, y: j, isDestructible: false});
         }
     }
 
@@ -101,10 +109,10 @@ const generateRandomWalls = (amount) => {
         } else {
             // if not, generate an unique ID and push object into positionWalls
             let randomID = '_' + Math.random().toString(36).substr(2, 9);
-            positionWalls.push({id: randomID, x: atRandomPosition.x, y: atRandomPosition.y, isDestructible: true});
+            positionWalls.push({wallId: randomID, x: atRandomPosition.x, y: atRandomPosition.y, isDestructible: true});
         }
     }
-}
+};
 
 
 /**
@@ -133,9 +141,9 @@ const isAlreadyExisting = (position) => {
                     return true;
             }
         }
-    };
+    }
     return false;
-}
+};
 
 /**
  * create destructible and indestructible walls after server starts
@@ -202,9 +210,12 @@ io.on('connection', function(socket){
         // store incoming player
         positionPlayers.push(playerDetails);
 
+        socket.emit('createNewPlayer', playerDetails);
+
+
         // create all currently attending player
         if (positionPlayers.length > 0) {
-            for (let i = 0; i < positionPlayers.length; i++) {
+            for (let i = 0; i < positionPlayers.length - 1; i++) {
                 socket.emit('createNewPlayer', positionPlayers[i]);
             }
         }
@@ -254,6 +265,12 @@ io.on('connection', function(socket){
      */
     socket.on('setBomb', function(data) {
         socket.broadcast.emit('getBomb', data);
+        positionPlayers.forEach(player => {
+            if (player.id === data.id) {
+                player.amountBombs = data.amountBombs;
+                console.log(player)
+            }
+        })
     });
 
 
@@ -263,7 +280,14 @@ io.on('connection', function(socket){
      */
     socket.on('setWall', function(data) {
         socket.broadcast.emit('getWall', data);
-        positionWalls.push({id: data.id, x: data.x, y: data.y, isDestructible: true});
+        positionPlayers.forEach(player => {
+            if (player.id === data.id) {
+                player.amountWalls = data.amountWalls;
+                console.log(player)
+
+            }
+        });
+        positionWalls.push({id: data.wallId, x: data.x, y: data.y, isDestructible: true});
     });
 
 
@@ -286,13 +310,21 @@ io.on('connection', function(socket){
      */
     socket.on('deleteWall', function (data) {
         for (let i = positionWalls.length - 1; i > 0; i--) {
-            if (positionWalls[i].id === data.id) {
+            if (positionWalls[i].id === data.wallId) {
                 console.log('wall to delete: ', positionWalls[i]);
                 console.log(positionWalls.length);
                 positionWalls.splice(i, 1);
             }
         }
     });
+
+   /* socket.on('updateInventory', function (data) {
+        socket.broadcast.emit('updateHTML', data);
+    });*/
+
+    socket.on('setInventory', function (data) {
+        socket.broadcast.emit('updateInventory', data);
+    })
 
 });
 
