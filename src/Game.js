@@ -4,6 +4,16 @@ import Player from './Player.js';
 import Wall from './Wall.js';
 import Bomb from "./Bomb.js";
 import io from "socket.io-client";
+import {
+    CHANGE_DIRECTION,
+    MOVE_PLAYER,
+    PLACE_BOMB,
+    PLACE_WALL,
+    DELETE_WALL,
+    CREATE_PLAYER,
+    LOGIN_PLAYER,
+    CREATE_WALLS
+} from "./constant.js";
 
 export default class Game {
 
@@ -14,6 +24,7 @@ export default class Game {
         this.assets = assets;
 
 
+        // ID of your client
         this.id = id;
 
 
@@ -35,42 +46,45 @@ export default class Game {
 
         this.socket = io.connect('http://localhost:9000');
 
-        // send notification to server to create your player
-        this.socket.emit('loginPlayer', { id: this.id });
+        // send notification to server in order to create your player
+        this.socket.emit(LOGIN_PLAYER, { id: this.id });
+
+        // disable input
         document.getElementById("login").disabled = true;
         document.getElementById("lname").disabled = true;
+
+        // set focus on canvas
         document.getElementById("myCanvas").focus();
 
         // after logging in your player, the server will send you all generated walls
-        this.socket.on('createWalls', (data) => {
+        this.socket.on(CREATE_WALLS, (data) => {
             data.forEach(d => {
                 let pos = {x: d.x, y: d.y};
                 this.walls.push(new Wall(pos, 1, d.isDestructible, assets, 40, d.wallId));
             });
         });
 
-        this.socket.on('createNewPlayer', (data) => {
+        this.socket.on(CREATE_PLAYER, (data) => {
             console.log(data);
             this.pushPlayer(data);
-            // game.creatHTMLnode(data);
         });
 
         // receive direction changes
-        this.socket.on('directionChanged', (data) => {
+        this.socket.on(CHANGE_DIRECTION, (data) => {
             console.log('direction changed', data);
             this.changeDirection(data)
         });
 
         // receive enemy player movements
-        this.socket.on('playerMoved', (data) => {
-            console.log('playerMoved', data);
+        this.socket.on(MOVE_PLAYER, (data) => {
+            console.log('player moved', data);
             this.playerMoved(data);
         });
 
         // receive bombs set by enemies
         // {x: nextPosition.x, y: nextPosition.y, id: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs}
-        this.socket.on('getBomb', (data) => {
-            console.log('got bomb', data);
+        this.socket.on(PLACE_BOMB, (data) => {
+            console.log('receive bomb', data);
             this.getBomb(data);
 
             try {
@@ -82,10 +96,9 @@ export default class Game {
         });
 
         // receive walls set by enemies
-        this.socket.on('getWall', (data) => {
+        this.socket.on(PLACE_WALL, (data) => {
             console.log('got wall', data);
             this.getWall(data);
-
             try {
                 let wall = document.getElementById(data.id + 'WallText');
                 wall.innerText = data.amountWalls;
@@ -94,17 +107,6 @@ export default class Game {
             }
         });
 
-      /*  this.socket.on('updateInventory', (data) => {
-            try {
-                let bomb = document.getElementById(data.id + 'BombText');
-                bomb.innerText = data.amountBombs;
-                let wall = document.getElementById(data.id + 'WallText');
-                wall.innerText = data.amountWalls;
-            } catch (e) {
-                console.log(e.message);
-            }
-
-        });*/
 
 
         // keyboard events
@@ -114,37 +116,37 @@ export default class Game {
         });
 
 
-
-
+        // START GAME
         this.startAnimating();
     }
 
 
+    // evoked by Player.js
     broadcastPosition(position) {
-        this.socket.emit('movePlayer', position);
+        this.socket.emit(MOVE_PLAYER, position);
     }
 
+    // evoked by Player.js
     broadcastDirection(direction) {
-        this.socket.emit('changeDirection', direction);
+        this.socket.emit(CHANGE_DIRECTION, direction);
     }
 
+    // evoked by Player.js
     // {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs}
     broadcastWall(wall) {
-        this.socket.emit('setWall', wall);
+        this.socket.emit(PLACE_WALL, wall);
     }
 
+    // evoked by Player.js
     // {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs}
     broadcastBomb(bomb) {
-        this.socket.emit('setBomb', bomb);
+        this.socket.emit(PLACE_BOMB, bomb);
     }
 
     broadcastDestroyedWall(wall) {
-        this.socket.emit('deleteWall', {wallId: wall.wallId});
+        this.socket.emit(DELETE_WALL, {wallId: wall.wallId});
     }
 
-   /* broadcastInventory(inventory) {
-        this.socket.emit('setInventory', inventory);
-    }*/
 
     // TODO: update function
     update() {
@@ -307,12 +309,9 @@ export default class Game {
     /**
      * creates an HTML node every time a player has been created
      * @param data = {id: #344gds, amountBombs: 29, amountWalls: 93}
-     * TODO: sync all counters
      */
     creatHTMLnode(data) {
         if (this.players.length > 1) {
-
-
 
             let enemyInventory = document.getElementById('inventoryEnemy');
             let container = document.createElement("div");
