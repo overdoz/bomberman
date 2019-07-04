@@ -26,7 +26,19 @@ export default class Bomb extends Element {
                 y: 38,
             }
         };
-        // this.socket = io.connect('http://localhost:9000');
+
+        this.currentAnimationState = 0;
+
+        this.animationSpeed = 20;
+
+        this.animationSheet = [
+            {x: 0, y: 0},
+            {x: 28, y: 0},
+            {x: 2 * 28, y: 0},
+            {x: 3 * 28, y: 0},
+            {x: 4 * 28, y: 0},
+
+        ];
 
         // bomb destroys itself after being created
         setTimeout(() => {
@@ -108,9 +120,12 @@ export default class Bomb extends Element {
     // display bomb or fire image
     draw(context) {
         if (!this.isExploded) {
+            if (this.game.frameCount % this.animationSpeed === 0) {
+                this.currentAnimationState = (this.currentAnimationState + 1) % this.animationSheet.length;
+            }
             context.drawImage(
                 this.assets['bomb'],
-                0,
+                this.animationSheet[this.currentAnimationState].x,
                 0,
                 this.spriteSize.bomb.x,
                 this.spriteSize.bomb.y,

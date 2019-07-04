@@ -1,4 +1,5 @@
 
+
 //###################################################//
 //                                                   //
 //          G A M E    S E T T I N G S               //
@@ -22,15 +23,15 @@ const DIRECTIONS = {
 
 const AMOUNT_RANDOM_WALLS = 30;
 
+// TODO: couldn't use import {const, ...} -> maybe require()
 const CHANGE_DIRECTION = 'changeDirection';
 const MOVE_PLAYER = 'movePlayer';
 const PLACE_BOMB = 'placeBomb';
 const PLACE_WALL = 'placeWall';
 const DELETE_PLAYER = 'deletePlayer';
 const DELETE_WALL = 'deleteWall';
-
-
-
+const CREATE_PLAYER ='createPlayer';
+const CREATE_WALLS = 'createWalls';
 
 
 
@@ -162,6 +163,7 @@ generateRandomWalls(AMOUNT_RANDOM_WALLS);
 //                                                   //
 //###################################################//
 
+
 io.on('connection', function(socket){
 
 
@@ -210,35 +212,38 @@ io.on('connection', function(socket){
         // store incoming player
         positionPlayers.push(playerDetails);
 
-        socket.emit('createNewPlayer', playerDetails);
+        // create incoming player
+        socket.emit(CREATE_PLAYER, playerDetails);
 
 
-        // create all currently attending player
+        // create rest of all currently attending player
         if (positionPlayers.length > 0) {
             for (let i = 0; i < positionPlayers.length - 1; i++) {
-                socket.emit('createNewPlayer', positionPlayers[i]);
+                socket.emit(CREATE_PLAYER, positionPlayers[i]);
             }
         }
 
         // send all wall objects to client
-        socket.emit('createWalls', [...positionWalls]);
+        socket.emit(CREATE_WALLS, [...positionWalls]);
 
-        // notify each client and create new player
-        socket.broadcast.emit('createNewPlayer', playerDetails);
+        // notify each client and send them new incoming player
+        socket.broadcast.emit(CREATE_PLAYER, playerDetails);
     });
 
 
+    // TODO: Array.prototype.find() didn't work - works at MOVE_PLAYER
     /**
      * broadcast new direction change to each client
      * @param data = {id: 'SANTACLAUS', direction: this.direction}
      */
-    socket.on('changeDirection', function(data) {
-        socket.broadcast.emit('directionChanged', data);
+    socket.on(CHANGE_DIRECTION, function(data) {
+        socket.broadcast.emit(CHANGE_DIRECTION, data);
         positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.direction = data.direction;
             }
         });
+
     });
 
 
@@ -246,8 +251,14 @@ io.on('connection', function(socket){
      * broadcast new player movement to each client
      * @param data = {x: 4, y: 2, id: 'THOR', direction: 'east'}
      */
-    socket.on('movePlayer', function(data) {
-        socket.broadcast.emit('playerMoved', data);
+    socket.on(MOVE_PLAYER, function(data) {
+        socket.broadcast.emit(MOVE_PLAYER, data);
+      /*  let player = positionPlayers.find(function(player) {
+            return player.id === data.id;
+        });
+        player.x = data.x;
+        player.y = data.y;
+        player.direction = data.direction;*/
         positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.x = data.x;
@@ -263,8 +274,8 @@ io.on('connection', function(socket){
      * broadcast new bomb object to each client
      * @param data = {x: 4, y: 2}
      */
-    socket.on('setBomb', function(data) {
-        socket.broadcast.emit('getBomb', data);
+    socket.on(PLACE_BOMB, function(data) {
+        socket.broadcast.emit(PLACE_BOMB, data);
         positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.amountBombs = data.amountBombs;
@@ -278,8 +289,8 @@ io.on('connection', function(socket){
      * broadcast new wall object to each client
      * @param data = {x: 4, y: 2, id: 'SPIDERMAN'}
      */
-    socket.on('setWall', function(data) {
-        socket.broadcast.emit('getWall', data);
+    socket.on(PLACE_WALL, function(data) {
+        socket.broadcast.emit(PLACE_WALL, data);
         positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.amountWalls = data.amountWalls;
@@ -295,7 +306,7 @@ io.on('connection', function(socket){
      * look for index of the player to be deleted based on data.id
      * @param data = {id: 'HULK'}
      */
-    socket.on('deletePlayer', function (data) {
+    socket.on(DELETE_PLAYER, function (data) {
         for (let i = positionPlayers.length - 1; i > 0; i--) {
             if (positionPlayers[i].id === data.id) {
                 positionPlayers.splice(i, 1);
@@ -308,7 +319,7 @@ io.on('connection', function(socket){
      * look for index of the wall to be deleted based on data.id
      * @param data = {id: 'BATMAN'}
      */
-    socket.on('deleteWall', function (data) {
+    socket.on(DELETE_WALL, function (data) {
         for (let i = positionWalls.length - 1; i > 0; i--) {
             if (positionWalls[i].id === data.wallId) {
                 console.log('wall to delete: ', positionWalls[i]);
@@ -318,13 +329,9 @@ io.on('connection', function(socket){
         }
     });
 
-   /* socket.on('updateInventory', function (data) {
-        socket.broadcast.emit('updateHTML', data);
-    });*/
 
-    socket.on('setInventory', function (data) {
-        socket.broadcast.emit('updateInventory', data);
-    })
+
+
 
 });
 

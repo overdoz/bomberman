@@ -38,7 +38,10 @@ export default class Player extends Element {
 
         this.dead = false;
 
-        this.spriteSheet = {
+        this.currentAnimationState = 0;
+        this.animationSpeed = 15;
+
+/*        this.spriteSheet = {
             south: {
                 x: 0,
                 y: 0
@@ -55,7 +58,82 @@ export default class Player extends Element {
                 x: 0,
                 y: 3 * this.spriteSize.y
             }
-        };
+        };*/
+
+        this.animationSheet = [
+            {
+                south: {
+                    x: 0,
+                    y: 0
+                },
+                west: {
+                    x: 0,
+                    y: this.spriteSize.y
+                },
+                north: {
+                    x: 0,
+                    y: 2 * this.spriteSize.y
+                },
+                east: {
+                    x: 0,
+                    y: 3 * this.spriteSize.y
+                }
+            },
+            {
+                south: {
+                    x: this.spriteSize.x,
+                    y: 0
+                },
+                west: {
+                    x: this.spriteSize.x,
+                    y: this.spriteSize.y
+                },
+                north: {
+                    x: this.spriteSize.x,
+                    y: 2 * this.spriteSize.y
+                },
+                east: {
+                    x: this.spriteSize.x,
+                    y: 3 * this.spriteSize.y
+                }
+            },
+            {
+                south: {
+                    x: 2 * this.spriteSize.x,
+                    y: 0
+                },
+                west: {
+                    x: 2 * this.spriteSize.x,
+                    y: this.spriteSize.y
+                },
+                north: {
+                    x: 2 * this.spriteSize.x,
+                    y: 2 * this.spriteSize.y
+                },
+                east: {
+                    x: 2 * this.spriteSize.x,
+                    y: 3 * this.spriteSize.y
+                }
+            },
+            {
+                south: {
+                    x: 3 * this.spriteSize.x,
+                    y: 0
+                },
+                west: {
+                    x: 3 * this.spriteSize.x,
+                    y: this.spriteSize.y
+                },
+                north: {
+                    x: 3 * this.spriteSize.x,
+                    y: 2 * this.spriteSize.y
+                },
+                east: {
+                    x: 3 * this.spriteSize.x,
+                    y: 3 * this.spriteSize.y
+                }
+            }
+        ]
 
 
 
@@ -67,19 +145,6 @@ export default class Player extends Element {
             console.log(e)
         }
 
-      /*  setInterval(() => {
-            this.amountWalls++;
-            this.amountBombs++;
-            try {
-                document.getElementById(this.id + "BombText").innerText = this.amountBombs;
-                document.getElementById(this.id + "WallText").innerText = this.amountWalls;
-
-            } catch (e) {
-                console.log(e);
-            }
-            this.game.broadcastInventory({id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs});
-
-        }, 7000);*/
 
 
     }
@@ -93,7 +158,6 @@ export default class Player extends Element {
     /**
      * @description is being called in App.js every time the user presses a key
      * calls the movePlayer() method in Game.js
-     * TODO: maybe move the method from App.js into Game.js
      * @param e = {id: '9fh3j4', key: 'ArrowLeft'}
      * @required in Game.js
      */
@@ -106,8 +170,6 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'west';
-                        this.game.broadcastDirection({id: this.id, direction: this.direction});
-                        // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -116,8 +178,6 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'east';
-                        this.game.broadcastDirection({id: this.id, direction: this.direction});
-                        // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -126,8 +186,6 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'north';
-                        this.game.broadcastDirection({id: this.id, direction: this.direction});
-                        // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -136,8 +194,6 @@ export default class Player extends Element {
                         this.update();
                     } else {
                         this.direction = 'south';
-                        this.game.broadcastDirection({id: this.id, direction: this.direction});
-                        // this.socket.emit('changeDirection', {id: this.id, direction: this.direction});
                     }
                     break;
 
@@ -149,6 +205,8 @@ export default class Player extends Element {
                     this.buildWall();
                     break;
             }
+            this.game.broadcastDirection({id: this.id, direction: this.direction});
+
         }
     }
 
@@ -161,11 +219,17 @@ export default class Player extends Element {
      */
     draw(context) {
 
+            if (this.game.frameCount % this.animationSpeed === 0) {
+                this.currentAnimationState = (this.currentAnimationState + 1) % this.animationSheet.length;
+            }
+
+            let state = this.animationSheet[this.currentAnimationState];
+
             // the +6 centers the image in this particular case
             context.drawImage(
                 this.assets['bomberman'],
-                this.spriteSheet[this.direction].x,
-                this.spriteSheet[this.direction].y,
+                state[this.direction].x,
+                state[this.direction].y,
                 this.spriteSize.x,
                 this.spriteSize.y,
                 this.position.x * this.gridSize + 6,
@@ -198,7 +262,6 @@ export default class Player extends Element {
 
                 // if successful, send movement to server
                 this.game.broadcastPosition({id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
-                //this.socket.emit('movePlayer', {id: this.id, x: this.position.x, y: this.position.y, direction: this.direction});
             }
 
     }
@@ -226,9 +289,7 @@ export default class Player extends Element {
                 randomID = '_' + Math.random().toString(36).substr(2, 9);
 
 
-
                 // push wall at into our wall array
-                // TODO: Can't we just socket.broadcast.emit to skip the server?
                 this.game.walls.push(new Wall(nextPosition, 1, true, this.assets, this.gridSize, randomID));
 
                 this.amountWalls--;
@@ -238,9 +299,6 @@ export default class Player extends Element {
 
 
                 this.game.broadcastWall(data);
-                //this.game.broadcastInventory({id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs});
-
-
 
                 // display the amount of walls you have currently have
                 document.getElementById("amountWalls").innerText = this.amountWalls;
@@ -265,17 +323,12 @@ export default class Player extends Element {
 
             this.amountBombs--;
 
-            // this.socket.emit('updateInventory', {id: this.id, amountBombs: this.amountBombs, amountWalls: this.amountWalls})
-
             // create object with current position
             let playerState = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};
 
 
             // send position of your bomb to all enemies
-            // this.socket.emit('setBomb', playerState);
             this.game.broadcastBomb(playerState);
-            //this.game.broadcastInventory({id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs});
-
 
             // set counter of your bombs in the browser
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
