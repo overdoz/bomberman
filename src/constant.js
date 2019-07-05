@@ -7,3 +7,5 @@ export const DELETE_WALL = 'deleteWall';
 export const CREATE_PLAYER ='createPlayer';
 export const LOGIN_PLAYER = 'loginPlayer';
 export const CREATE_WALLS = 'createWalls';
+
+export const SPRITE_SIZE = 40;

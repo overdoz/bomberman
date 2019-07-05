@@ -307,7 +307,8 @@ export default class Game {
 
             let enemyInventory = document.getElementById('inventoryEnemy');
             let container = document.createElement("div");
-            container.id = 'playerInfos';
+            container.className = 'playerInfos';
+            container.id = data.id;
 
 
             let id = document.createElement("p");

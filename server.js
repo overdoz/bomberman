@@ -186,6 +186,7 @@ io.on('connection', function(socket){
 
         switch (positionPlayers.length) {
             case 0:
+                console.log(playerDetails);
                 break;
             case 1:
                 playerDetails.x = GAME_WIDTH - 1;
