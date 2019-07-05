@@ -136,6 +136,23 @@ p {
   text-shadow: 2px 2px 4px #000000;
 }
 
+#youwinscreen {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  background-color: rgb(165, 300, 60, 0.4);
+  position: absolute;
+}
+
+#youwinText{
+  font-size: 3em;
+  font-family: "Carter One", cursive;
+  text-shadow: 2px 2px 4px #000000;
+}
+
 input {
   border: 2px solid #024873;
   font-family: "Carter One", cursive;

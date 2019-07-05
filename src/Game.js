@@ -28,8 +28,6 @@ export default class Game {
         // ID of your client
         this.id = id;
 
-
-
         this.width = width;
         this.height = height;
 
@@ -39,7 +37,7 @@ export default class Game {
         this.gridSize = this.canvas.width / width;
 
 
-        // let gameOver = false;
+        this.gameOver = false;
 
         this.bombs = [];
         this.players = [];
@@ -108,7 +106,9 @@ export default class Game {
 
         // keyboard events
         document.addEventListener("keyup", (e) => {
-            this.movePlayer({id: id, key: e.key})
+            if (!this.gameOver) {
+                this.movePlayer({id: id, key: e.key})
+            }
 
         });
 
@@ -211,6 +211,17 @@ export default class Game {
                 player.direction = data.direction;
             }
         });
+    }
+
+    checkForWinner() {
+        let winner = false;
+        if (this.players.length === 1 && this.players[0].id === this.id) {
+            winner = true;
+        }
+        if (winner) {
+            this.gameOver = true;
+        }
+        return winner;
     }
 
 
