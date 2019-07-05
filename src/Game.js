@@ -12,7 +12,8 @@ import {
     DELETE_WALL,
     CREATE_PLAYER,
     LOGIN_PLAYER,
-    CREATE_WALLS
+    CREATE_WALLS,
+    DELETE_PLAYER
 } from "./constant.js";
 
 export default class Game {
@@ -141,6 +142,10 @@ export default class Game {
 
     broadcastDestroyedWall(wall) {
         this.socket.emit(DELETE_WALL, {wallId: wall.wallId});
+    }
+
+    broadcastDeletedPlayer(player) {
+        this.socket.emit(DELETE_PLAYER, player);
     }
 
 

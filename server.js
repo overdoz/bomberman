@@ -295,8 +295,6 @@ io.on('connection', function(socket){
         positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.amountWalls = data.amountWalls;
-                console.log(player)
-
             }
         });
         positionWalls.push({id: data.wallId, x: data.x, y: data.y, isDestructible: true});
@@ -308,11 +306,17 @@ io.on('connection', function(socket){
      * @param data = {id: 'HULK'}
      */
     socket.on(DELETE_PLAYER, function (data) {
-        for (let i = positionPlayers.length - 1; i > 0; i--) {
+        /* for (let i = positionPlayers.length - 1; i > 0; i--) {
             if (positionPlayers[i].id === data.id) {
                 positionPlayers.splice(i, 1);
+                console.log(positionPlayers);
             }
-        }
+        } */
+        positionPlayers.forEach((player, i) => {
+            if (player.id === data.id) {
+                positionPlayers.splice(i, 1);
+            }
+        });
     });
 
 
@@ -322,9 +326,9 @@ io.on('connection', function(socket){
      */
     socket.on(DELETE_WALL, function (data) {
         for (let i = positionWalls.length - 1; i > 0; i--) {
-            if (positionWalls[i].id === data.wallId) {
+            if (positionWalls[i].wallId === data.wallId) {
                 console.log('wall to delete: ', positionWalls[i]);
-                console.log(positionWalls.length);
+                // console.log(positionWalls.length);
                 positionWalls.splice(i, 1);
             }
         }

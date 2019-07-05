@@ -88,6 +88,8 @@ export default class Bomb extends Element {
                 if (player.position.x === position.x && player.position.y === position.y) {
                     let deletedPlayer = this.game.players.splice(index, 1);
 
+                    this.game.broadcastDeletedPlayer({id: player.id})
+
                     if (player.id === this.game.id) {
                         document.getElementById("inventory").style.display = "none";
                         document.getElementById("gameOverScreen").style.display = "flex";

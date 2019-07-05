@@ -5,6 +5,6 @@
 # IntelliJ project files
 .idea
 *.iml
-/node_modules
+node_modules/
 out
 gen
