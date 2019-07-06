@@ -39,7 +39,7 @@ export default class Player extends Element {
         this.dead = false;
 
         this.currentAnimationState = 0;
-        this.animationSpeed = 15;
+        this.animationSpeed = 10;
 
 /*        this.spriteSheet = {
             south: {
@@ -133,7 +133,7 @@ export default class Player extends Element {
                     y: 3 * this.spriteSize.y
                 }
             }
-        ]
+        ];
 
 
 
@@ -343,7 +343,10 @@ export default class Player extends Element {
      * @requires this.game.walls & this.game.players
      */
     isPositionColliding(position) {
-        return !this.doesPlayerCrossPlayer(position) && !this.doesPlayerTouchAWall(position) && !this.isPlayerOutOfBounds(position);
+        return !this.doesPlayerCrossPlayer(position)
+            && !this.doesPlayerTouchAWall(position)
+            && !this.isPlayerOutOfBounds(position)
+            && !this.doesPlayerCrossBomb(position);
     }
 
     doesPlayerTouchAWall(position) {
@@ -362,6 +365,17 @@ export default class Player extends Element {
         // checks, if there is a player object on your position
         for (let i = 0; i < this.game.players.length; i++) {
             if (this.game.players[i].position.x === position.x && this.game.players[i].position.y === position.y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    doesPlayerCrossBomb(position) {
+
+        // checks, if there is a bomb object on your position
+        for (let i = 0; i < this.game.bombs.length; i++) {
+            if (this.game.bombs[i].position.x === position.x && this.game.bombs[i].position.y === position.y) {
                 return true;
             }
         }
