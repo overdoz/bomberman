@@ -27,6 +27,7 @@ export default class Player extends Element {
         };
 
         this.gridSize = gridSize;
+        this.isARunner = false;
 
 
         /**
@@ -141,6 +142,7 @@ export default class Player extends Element {
         try {
             document.getElementById("amountBombs").innerText = this.amountBombs;
             document.getElementById("amountWalls").innerText = this.amountWalls;
+            document.getElementById("amountLives").innerText = this.health;
         } catch (e) {
             console.log(e)
         }
@@ -161,9 +163,10 @@ export default class Player extends Element {
      * @param e = {id: '9fh3j4', key: 'ArrowLeft'}
      * @required in Game.js
      */
-    triggerEvent(e) {
+    triggerEvent(e, fastMode=false) {
 
         if (!this.dead) {
+            var walking = true;
             switch (e.key) {
                 case 'ArrowLeft':
                     if (this.direction === 'west') {
@@ -198,14 +201,23 @@ export default class Player extends Element {
                     break;
 
                 case "b":
-                    this.setBomb();
+                    if (!fastMode) {
+                        this.setBomb();
+                        walking = false;
+                    }
                     break;
 
                 case " ":
-                    this.buildWall();
+                    if (!fastMode) {
+                        this.buildWall();
+                        walking = false;
+                    }
                     break;
             }
-            this.game.broadcastDirection({id: this.id, direction: this.direction});
+
+            if (walking || (!fastMode && !walking)) {
+                this.game.broadcastDirection({id: this.id, direction: this.direction});
+            }
 
         }
     }
@@ -321,15 +333,35 @@ export default class Player extends Element {
             // place bomb inside your game
             this.game.bombs.push(new Bomb({x: this.position.x, y: this.position.y}, 1500, 1, this.assets, this.gridSize, this.game));
 
-            this.amountBombs--;
+            this.updateBombCount(-1, true)
 
             // create object with current position
             let playerState = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};
 
-
             // send position of your bomb to all enemies
             this.game.broadcastBomb(playerState);
 
+
+        }
+    }
+
+    updateHealth(isLocal, id=null) {
+        if (isLocal) {
+            document.getElementById("amountLives").innerText = this.health;
+        } else {
+            try {
+                let healthIndicator = document.getElementById(id + 'HealthText');
+                healthIndicator.innerText = this.health;
+            } catch (e) {
+                console.log(e.message);
+            }
+        }
+    }
+
+    updateBombCount(relative, localPlayer) {
+        this.amountBombs += relative;
+
+        if (localPlayer) {
             // set counter of your bombs in the browser
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
         }
@@ -349,6 +381,18 @@ export default class Player extends Element {
             && !this.doesPlayerCrossBomb(position);
     }
 
+    doesPlayerCrossBomb(position) {
+
+        // checks, if there is a bomb object on your position
+        for (let i = 0; i < this.game.bombs.length; i++) {
+            if (this.game.bombs[i].position.x === position.x && this.game.bombs[i].position.y === position.y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     doesPlayerTouchAWall(position) {
 
         // checks, if there is a wall object on your position
@@ -365,17 +409,6 @@ export default class Player extends Element {
         // checks, if there is a player object on your position
         for (let i = 0; i < this.game.players.length; i++) {
             if (this.game.players[i].position.x === position.x && this.game.players[i].position.y === position.y) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    doesPlayerCrossBomb(position) {
-
-        // checks, if there is a bomb object on your position
-        for (let i = 0; i < this.game.bombs.length; i++) {
-            if (this.game.bombs[i].position.x === position.x && this.game.bombs[i].position.y === position.y) {
                 return true;
             }
         }

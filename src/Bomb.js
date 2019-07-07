@@ -1,11 +1,19 @@
 import Element from './Element.js';
+import Spoil from './Spoil.js';
+
+import {
+    SPOIL_TYPE_BOMB,
+    SPOIL_TYPE_LIFE,
+    SPOIL_TYPE_RUN
+} from "./constant.js";
 
 export default class Bomb extends Element {
 
-    constructor(position, timeToExplode = 5000, radius, assets, gridSize, game) {
+    constructor(position, timeToExplode = 5000, radius, assets, gridSize, game, remote=false) {
         super(position, assets);
 
         this.game = game;
+        this.remoteBomb = remote;
 
         // unique ID function from stackoverflow
         this.ID = '_' + Math.random().toString(36).substr(2, 9);
@@ -86,22 +94,28 @@ export default class Bomb extends Element {
         this.game.players.forEach((player, index) => {
             this.getSurroundingPositions().forEach(position => {
                 if (player.position.x === position.x && player.position.y === position.y) {
-                    let deletedPlayer = this.game.players.splice(index, 1);
+                    player.health--;
 
-                    this.game.broadcastDeletedPlayer({id: player.id});
+                    player.updateHealth(player.id == this.game.id, player.id);
+                    
+                    if(player.health < 1) {
 
-                    if (player.id === this.game.id) {
-                        document.getElementById("inventory").style.display = "none";
-                        document.getElementById("gameOverScreen").style.display = "flex";
-                    } else {
-                        if (this.game.checkForWinner()) {
+                        let deletedPlayer = this.game.players.splice(index, 1);
+                        this.game.broadcastDeletedPlayer({id: player.id});
+
+                        if (player.id === this.game.id) {
                             document.getElementById("inventory").style.display = "none";
-                            document.getElementById("youwinscreen").style.display = "flex";
+                            document.getElementById("gameOverScreen").style.display = "flex";
                         } else {
-                            document.getElementById(player.id).style.display = "none";
+                            if (this.game.checkForWinner()) {
+                                document.getElementById("inventory").style.display = "none";
+                                document.getElementById("youwinscreen").style.display = "flex";
+                            } else {
+                                document.getElementById(player.id).style.display = "none";
+                            }
                         }
+                        console.log(deletedPlayer);
                     }
-                    console.log(deletedPlayer)
                 }
             })
         });
@@ -119,12 +133,32 @@ export default class Bomb extends Element {
         });
         // IMPORTANT! Because .splice() shortens the array, we safe all indexes, which have to be deleted inside of 'let indexes'
         indexes.sort((a, b) => {return b-a}).forEach((index) => {
-            this.game.broadcastDestroyedWall({wallId: this.game.walls[index].id});
+            let wallId = this.game.walls[index].id;
+            let position = this.game.walls[index].position;
+
+            this.game.broadcastDestroyedWall({wallId: wallId});
             // this.socket.emit('deleteWall', {id: this.game.walls[index].id});
-            this.game.walls.splice(index, 1)
+            this.game.walls.splice(index, 1);
 
-            // console.log(wall)
 
+            if (Math.random() <= 0.3 && !this.remoteBomb) {
+                let spoilType = SPOIL_TYPE_LIFE;
+                let spoilDetermination = Math.random();
+
+                if (spoilDetermination > 0.66) {
+                    spoilType = SPOIL_TYPE_BOMB;
+                } else if (spoilDetermination > 0.33) {
+                    spoilType = SPOIL_TYPE_RUN;
+                }
+
+                console.log("spoil is: ", spoilType);
+                
+                this.game.broadcastSpoil({position:position, type: spoilType});
+                this.game.spoils.push(new Spoil({x: position.x, y: position.y}, spoilType, this.assets, this.gridSize, this.game));
+                console.log("Creating spoil with type: ", spoilType);
+            } else {
+                console.log("Not creating a new spoil at position: ", position);
+            }
 
         });
     }

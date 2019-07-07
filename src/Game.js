@@ -13,8 +13,15 @@ import {
     CREATE_PLAYER,
     LOGIN_PLAYER,
     CREATE_WALLS,
-    DELETE_PLAYER
+    DELETE_PLAYER,
+    CREATE_SPOIL,
+    GRAB_SPOIL,
+    SPOIL_TYPE_LIFE,
+    SPOIL_TYPE_BOMB,
+    SPOIL_TYPE_RUN,
+    HURT_PLAYER,
 } from "./constant.js";
+import Spoil from './Spoil.js';
 
 export default class Game {
 
@@ -42,6 +49,7 @@ export default class Game {
         this.bombs = [];
         this.players = [];
         this.walls = [];
+        this.spoils = [];
 
         this.socket = io.connect('http://localhost:9000');
 
@@ -71,6 +79,10 @@ export default class Game {
             this.pushPlayer(data);
         });
 
+        this.socket.on(HURT_PLAYER, (data) => {
+            this.hurtPlayer(data);
+        });
+
         // receive direction changes
         this.socket.on(CHANGE_DIRECTION, (data) => {
             this.changeDirection(data)
@@ -79,6 +91,11 @@ export default class Game {
         // receive enemy player movements
         this.socket.on(MOVE_PLAYER, (data) => {
             this.playerMoved(data);
+        });
+
+        // player grabbed spoil
+        this.socket.on(GRAB_SPOIL, (data) => {
+            this.grabbedSpoil(data);
         });
 
         // receive bombs set by enemies
@@ -94,6 +111,12 @@ export default class Game {
             }
         });
 
+        // receive spoils created by exploding walls
+        // {x: nextPosition.x, y: nextPosition.y, id: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs}
+        this.socket.on(CREATE_SPOIL, (data) => {
+            this.getSpoil(data);
+        });
+
         // receive walls set by enemies
         this.socket.on(PLACE_WALL, (data) => {
             console.log('got wall', data);
@@ -105,8 +128,6 @@ export default class Game {
                 console.log(e.message);
             }
         });
-
-
 
         // keyboard events
         document.addEventListener("keyup", (e) => {
@@ -144,6 +165,10 @@ export default class Game {
         this.socket.emit(PLACE_BOMB, bomb);
     }
 
+    broadcastSpoil(spoil) {
+        this.socket.emit(CREATE_SPOIL, spoil);
+    }
+
     broadcastDestroyedWall(wall) {
         this.socket.emit(DELETE_WALL, {wallId: wall.wallId});
     }
@@ -152,6 +177,22 @@ export default class Game {
         this.socket.emit(DELETE_PLAYER, player);
     }
 
+    broadcastHurtPlayer(player) {
+        this.socket.emit(HURT_PLAYER, player);
+    }
+
+    hurtPlayer(hurtPlayer) {
+        if (hurtPlayer.id != this.id) {
+            this.players.forEach(player => {
+                if (player.id === hurtPlayer.id) {
+                    player.health--;
+                    player.updateHealth(hurtPlayer.id == this.id, player.id);
+                }
+            });
+        }
+    }
+
+    
 
     // TODO: update function
     update() {
@@ -194,6 +235,50 @@ export default class Game {
         }
 
 
+    }
+
+    grabbedSpoil(data) {
+        let spoil = data.spoil;
+        let localPlayer = data.player.id == this.id;
+
+        this.players.forEach((player) => {
+            if (player.id == data.player.id) {
+                if (data.spoil.type == SPOIL_TYPE_BOMB) {
+                    console.log("Player gets an extra bomb!");
+                    player.updateBombCount(1, localPlayer);
+                } else if (data.spoil.type == SPOIL_TYPE_LIFE) {
+                    console.log("Player gets an extra life!");
+                    player.health++;
+                    player.updateHealth(this.id == data.player.id, data.player.id);
+                } else if (data.spoil.type == SPOIL_TYPE_RUN) {
+                    console.log("Player becomes faster!");
+                    // make player faster
+
+                    if (!player.isARunner) {
+                        document.addEventListener("keydown", (e) => {
+                            if (!this.gameOver) {
+                                this.movePlayer({id: this.id, key: e.key})
+                            }
+                        });
+                        player.isARunner = true;
+                    }
+                }
+            }
+        });
+
+        let removalIndex = -1;
+
+        for (var i = 0; i < this.spoils.length; i++) {
+            let pos = this.spoils[i].position
+            if (pos.x == spoil.position.x && pos.y == spoil.position.y) {
+                removalIndex = i;
+                break;
+            }
+        }
+
+        if (removalIndex >= 0) {
+            this.spoils.splice(removalIndex, 1);
+        }
     }
 
 
@@ -258,9 +343,12 @@ export default class Game {
      * @param position = {x: 0, y: 0}
      */
     getBomb(position) {
-        this.bombs.push(new Bomb(position, 1500, 1, this.assets, this.gridSize, this));
+        this.bombs.push(new Bomb(position, 1500, 1, this.assets, this.gridSize, this, true));
     }
 
+    getSpoil(data) {
+        this.spoils.push(new Spoil(data.position, data.type, this.assets, this.gridSize, this));
+    }
 
     /**
      * receive walls from enemy players
@@ -299,6 +387,10 @@ export default class Game {
 
         this.walls.forEach(wall => {
             wall.draw(this.context);
+        });
+
+        this.spoils.forEach(spoil => {
+            spoil.draw(this.context);
         });
 
     }
@@ -344,6 +436,22 @@ export default class Game {
             id.innerText = data.id;
             id.id = "nickname";
 
+            // START LIVES
+
+            let img3 = document.createElement("img");
+            img3.id = data.id + 'LifeImg';
+            img3.src = "images/spoilLife.png";
+
+            let p3Container = document.createElement("div");
+            p3Container.className = "countBox";
+
+            let p3 = document.createElement("p");
+            p3.id = data.id + 'HealthText';
+            p3.innerText = data.health;
+            p3Container.appendChild(p3);
+
+            // LIVES END
+
             let img = document.createElement("img");
             img.id = data.id + 'BombImg';
             img.src = "dist/bomb_icon.png";
@@ -370,6 +478,8 @@ export default class Game {
 
 
             container.appendChild(id);
+            container.appendChild(img3);
+            container.appendChild(p3Container);
             container.appendChild(img);
             container.appendChild(pContainer);
             container.appendChild(img2);

@@ -81,13 +81,22 @@ img {
   animation: fadein 2s;
 }
 
+#lives {
+  margin: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 90px;
+}
+
 #bombs {
   margin: 20px;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: 80px;
+  width: 90px;
 }
 
 #walls {
@@ -96,7 +105,7 @@ img {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: 80px;
+  width: 90px;
 }
 
 #pic {

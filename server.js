@@ -11,7 +11,7 @@ const GAME_HEIGHT = 13;
 
 const AMOUNT_BOMBS = 20;
 const AMOUNT_WALLS = 20;
-const HEALTH = 20;
+const HEALTH = 1;
 
 const DIRECTIONS = {
     EAST: 'east',
@@ -31,6 +31,9 @@ const DELETE_PLAYER = 'deletePlayer';
 const DELETE_WALL = 'deleteWall';
 const CREATE_PLAYER ='createPlayer';
 const CREATE_WALLS = 'createWalls';
+const CREATE_SPOIL = 'createSpoil';
+const GRAB_SPOIL = 'grabSpoil';
+const HURT_PLAYER = 'hurtPlayer';
 
 
 
@@ -80,6 +83,7 @@ server.listen(PORT, function() {
 let positionPlayers = [];
 let usernames = [];
 let positionWalls = [];
+let spoils = [];
 
 /**
  * creates wall objects and stores them in positionWalls array
@@ -235,7 +239,6 @@ io.on('connection', function(socket){
         socket.broadcast.emit(CREATE_PLAYER, playerDetails);
     });
 
-
     // TODO: Array.prototype.find() didn't work - works at MOVE_PLAYER
     /**
      * broadcast new direction change to each client
@@ -252,16 +255,24 @@ io.on('connection', function(socket){
     });
 
     socket.on('disconnect', function() {
-       for (let i = 0; i < positionPlayers.length; i++) {
-           if (name === positionPlayers[i].id) {
-               positionPlayers.splice(i,1);
-               socket.broadcast.emit('timeout', {id: name});
-               console.log("JUST KICKED OFF THE PLAYER: " + name);
-           }
-       }
+        for (let i = 0; i < positionPlayers.length; i++) {
+            if (name === positionPlayers[i].id) {
+                positionPlayers.splice(i,1);
+                socket.broadcast.emit('timeout', {id: name});
+                console.log("JUST KICKED OFF THE PLAYER: " + name);
+            }
+        }
     });
+    socket.on(HURT_PLAYER, function(data) {
+        socket.broadcast.emit(HURT_PLAYER, data);
+        positionPlayers.forEach(player => {
+            if (player.id === data.id) {
+                player.health--;
+            }
+        });
 
-
+    });
+    
     /**
      * broadcast new player movement to each client
      * @param data = {x: 4, y: 2, id: 'THOR', direction: 'east'}
@@ -279,6 +290,27 @@ io.on('connection', function(socket){
                 player.x = data.x;
                 player.y = data.y;
                 player.direction = data.direction;
+
+
+                let spoilIndex = -1;
+                var spoil = null;
+                for (var i = 0; i < spoils.length; i++) {
+                    spoil = spoils[i];
+
+                    if (spoil.position.x == data.x && spoil.position.y == data.y) {
+                        spoilIndex = i;
+                        break;
+                    }
+                }
+
+                if (spoilIndex >= 0) {
+                    spoils.splice(spoilIndex, 1);
+                    socket.broadcast.emit(GRAB_SPOIL, {spoil: spoil, player: player});
+                    socket.emit(GRAB_SPOIL, {spoil: spoil, player: player});
+                    console.log("A player cought the spoil at: ", spoil.position);
+                    
+                }
+
             }
         });
 
@@ -297,6 +329,22 @@ io.on('connection', function(socket){
                 console.log(player)
             }
         })
+    });
+
+    /**
+     * broadcast new available spoil object to each client
+     * @param data = {position: {x: 4, y: 2}, type: "spoil_life"}
+     */
+    socket.on(CREATE_SPOIL, function(data) {
+        socket.broadcast.emit(CREATE_SPOIL, data);
+
+        let spoilDetails = {
+            position: data.position,
+            type: data.type,
+        };
+
+        spoils.push(spoilDetails);
+
     });
 
 
@@ -347,10 +395,6 @@ io.on('connection', function(socket){
             }
         }
     });
-
-
-
-
 
 });
 

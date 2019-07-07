@@ -28,14 +28,13 @@ export class AssetLoader {
     }
 }
 
-
-
-
-
 new AssetLoader()
     .loadAssets([
         { name: 'bomberman', url: '../images/bomberman.png' },
         { name: 'wall', url: '../images/wall.png' },
+        { name: 'spoilLife', url: '../images/spoilLife.png' },
+        { name: 'spoilRun', url: '../images/spoilRun.png' },
+        { name: 'spoilBomb', url: '../images/spoilBomb.png' },
         { name: 'bomb', url: '../images/bomb.png' },
         { name: 'grid_option2', url: '../images/grid_option2.png' },
         { name: 'fire', url: '../images/fire.png' },
