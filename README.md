@@ -16,8 +16,6 @@ To start the server use:
 ```bash
 npm build run
 
-Then,
-
 node server
 ```
 for development use:
