@@ -1,5 +1,4 @@
 
-
 //###################################################//
 //                                                   //
 //          G A M E    S E T T I N G S               //
@@ -79,6 +78,7 @@ server.listen(PORT, function() {
 
 
 let positionPlayers = [];
+let usernames = [];
 let positionWalls = [];
 
 /**
@@ -166,6 +166,7 @@ generateRandomWalls(AMOUNT_RANDOM_WALLS);
 
 io.on('connection', function(socket){
 
+    let name = "";
 
     /**
      * broadcast new player registration after user has pressed the login button
@@ -183,6 +184,8 @@ io.on('connection', function(socket){
             amountWalls: AMOUNT_WALLS,
             health: HEALTH,
         };
+
+        name = data.id;
 
         switch (positionPlayers.length) {
             case 0:
@@ -212,6 +215,7 @@ io.on('connection', function(socket){
 
         // store incoming player
         positionPlayers.push(playerDetails);
+        usernames.push(name);
 
         // create incoming player
         socket.emit(CREATE_PLAYER, playerDetails);
@@ -245,6 +249,16 @@ io.on('connection', function(socket){
             }
         });
 
+    });
+
+    socket.on('disconnect', function() {
+       for (let i = 0; i < positionPlayers.length; i++) {
+           if (name === positionPlayers[i].id) {
+               positionPlayers.splice(i,1);
+               socket.broadcast.emit('timeout', {id: name});
+               console.log("JUST KICKED OFF THE PLAYER: " + name);
+           }
+       }
     });
 
 

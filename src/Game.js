@@ -55,6 +55,10 @@ export default class Game {
         // set focus on canvas
         document.getElementById("myCanvas").focus();
 
+        this.socket.on('timeout', (data) => {
+            this.disconnected(data);
+        });
+
         // after logging in your player, the server will send you all generated walls
         this.socket.on(CREATE_WALLS, (data) => {
             data.forEach(d => {
@@ -154,6 +158,15 @@ export default class Game {
 
     }
 
+    disconnected(data) {
+        console.log("-------------------------------------------------------");
+        this.players.forEach((player, i) => {
+            if (this.players[i].id === data.id) {
+                document.getElementById(this.players[i].id).style.display = "none";
+                this.players.splice(i, 1);
+            }
+        });
+    }
 
     /**
      * create new player
