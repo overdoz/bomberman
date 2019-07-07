@@ -14,6 +14,9 @@ npm install
 #Run
 To start the server use:
 ```bash
+npm build run
+
+```bash
 node server
 ```
 for development use:
