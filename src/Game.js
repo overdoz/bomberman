@@ -254,7 +254,7 @@ export default class Game {
                     console.log("Player becomes faster!");
                     // make player faster
 
-                    if (!player.isARunner) {
+                    if (!player.isARunner && localPlayer) {
                         document.addEventListener("keydown", (e) => {
                             if (!this.gameOver) {
                                 this.movePlayer({id: this.id, key: e.key})

@@ -272,7 +272,7 @@ io.on('connection', function(socket){
         });
 
     });
-    
+
     /**
      * broadcast new player movement to each client
      * @param data = {x: 4, y: 2, id: 'THOR', direction: 'east'}
