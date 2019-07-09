@@ -182,11 +182,11 @@ export default class Game {
     }
 
     hurtPlayer(hurtPlayer) {
-        if (hurtPlayer.id != this.id) {
+        if (hurtPlayer.id !== this.id) {
             this.players.forEach(player => {
                 if (player.id === hurtPlayer.id) {
                     player.health--;
-                    player.updateHealth(hurtPlayer.id == this.id, player.id);
+                    player.updateHealth(hurtPlayer.id === this.id, player.id);
                 }
             });
         }
@@ -194,10 +194,6 @@ export default class Game {
 
     
 
-    // TODO: update function
-    update() {
-
-    }
 
     disconnected(data) {
         console.log("-------------------------------------------------------");
@@ -236,28 +232,33 @@ export default class Game {
 
 
     }
-
+    /**
+     * the player grab the spoil
+     * is being called in App.js whenever socket receives a signal
+     * check the type of the spoil and update then broadcast it
+     * @param data = {id: data.id, x: 0, y: 0, direction: 'east', amountWalls: 99, amountBombs: 99, health: 99}
+     */
     grabbedSpoil(data) {
         let spoil = data.spoil;
-        let localPlayer = data.player.id == this.id;
+        let localPlayer = data.player.id === this.id;
 
         this.players.forEach((player) => {
-            if (player.id == data.player.id) {
-                if (data.spoil.type == SPOIL_TYPE_BOMB) {
+            if (player.id === data.player.id) {
+                if (data.spoil.type === SPOIL_TYPE_BOMB) {
                     console.log("Player gets an extra bomb!");
                     player.updateBombCount(1, localPlayer);
-                } else if (data.spoil.type == SPOIL_TYPE_LIFE) {
+                } else if (data.spoil.type === SPOIL_TYPE_LIFE) {
                     console.log("Player gets an extra life!");
                     player.health++;
-                    player.updateHealth(this.id == data.player.id, data.player.id);
-                } else if (data.spoil.type == SPOIL_TYPE_RUN) {
+                    player.updateHealth(this.id === data.player.id, data.player.id);
+                } else if (data.spoil.type === SPOIL_TYPE_RUN) {
                     console.log("Player becomes faster!");
                     // make player faster
 
                     if (!player.isARunner && localPlayer) {
                         document.addEventListener("keydown", (e) => {
                             if (!this.gameOver) {
-                                this.movePlayer({id: this.id, key: e.key})
+                                this.movePlayer({id: this.id, key: e.key}, true)
                             }
                         });
                         player.isARunner = true;
@@ -270,7 +271,7 @@ export default class Game {
 
         for (var i = 0; i < this.spoils.length; i++) {
             let pos = this.spoils[i].position
-            if (pos.x == spoil.position.x && pos.y == spoil.position.y) {
+            if (pos.x === spoil.position.x && pos.y === spoil.position.y) {
                 removalIndex = i;
                 break;
             }
@@ -287,10 +288,10 @@ export default class Game {
      * is being called in App.js whenever user presses a key
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
      */
-    movePlayer(data) {
+    movePlayer(data, fastMode) {
         this.players.forEach(player => {
             if (player.id === data.id) {
-                player.triggerEvent(data);
+                player.triggerEvent(data, fastMode);
             }
         });
     }
@@ -411,8 +412,6 @@ export default class Game {
 
         if (elapsed > this.frameTime) {
             this.then = now;
-
-            this.update();
             this.draw();
         }
         this.frameCount++;

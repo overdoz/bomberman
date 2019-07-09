@@ -266,7 +266,6 @@ export default class Player extends Element {
     update() {
             // initialize next move
             let nextPosition = this.getNextPosition();
-
             // if next position is not blocked by an object
             if (this.isPositionColliding(nextPosition)) {
                 this.position.x = nextPosition.x;
