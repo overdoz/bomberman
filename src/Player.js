@@ -230,6 +230,10 @@ export default class Player extends Element {
      * @required in Game.js
      */
     draw(context) {
+        let photo = 'bomberman';
+        if (this.id != this.game.id) {
+            photo = 'enemy';
+        }
 
             if (this.game.frameCount % this.animationSpeed === 0) {
                 this.currentAnimationState = (this.currentAnimationState + 1) % this.animationSheet.length;
@@ -239,7 +243,7 @@ export default class Player extends Element {
 
             // the +6 centers the image in this particular case
             context.drawImage(
-                this.assets['bomberman'],
+                this.assets[photo],
                 state[this.direction].x,
                 state[this.direction].y,
                 this.spriteSize.x,

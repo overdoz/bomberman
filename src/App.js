@@ -38,10 +38,10 @@ new AssetLoader()
         { name: 'bomb', url: '../images/bomb.png' },
         { name: 'grid_option2', url: '../images/grid_option2.png' },
         { name: 'fire', url: '../images/fire.png' },
-        {name: 'enemy', url: '../images/bomberman_boy.png' },
         {name: 'finger', url: '../images/finger.png' },
         {name: 'love', url: '../images/love.png'},
         {name: 'lol', url: '../images/lol.png'},
+        {name: 'enemy', url: '../images/enemy_bomberman.png'}
     ])
     .then(assets => {
         let game = null;
