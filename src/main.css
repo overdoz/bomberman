@@ -8,7 +8,7 @@ body {
 }
 
 #reactionCanvas {
-  border-radius: 30px;
+  border-radius: 10px;
   background-image: radial-gradient(#302ee7, #650973);
   position: absolute;
   top: 200px;
@@ -167,7 +167,7 @@ p {
 #emoji_chat {
   position: absolute;
   top: 160px;
-  right: 100px;
+  right: 10px;
   font-size: 1em;
   font-family : "Carter One", cursive;
   text-shadow: 1px 1px 2px #FF0000;
@@ -175,8 +175,8 @@ p {
 
 #you_suck_text {
   position: absolute;
-  top: 80px;
-  left: 700px;
+  top: 620px;
+  right: 20px;
   font-size: 1em;
   font-family : "Carter One", cursive;
   text-shadow: 1px 1px 2px #FF0000;

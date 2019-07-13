@@ -418,19 +418,19 @@ export default class Game {
                 break;
 
             case "finger":
-                this.reactionContext.drawImage(this.assets['finger'], 100, 10, 100, 100);
+                this.reactionContext.drawImage(this.assets['finger'], 15, 10, 75, 75);
                 setTimeout(() => {
                     this.reactionContext.clearRect(0,0, this.reactionCanvas.width, this.reactionCanvas.height);
                 }, 4000);
                 break;
             case "love":
-                this.reactionContext.drawImage(this.assets['love'], 80, 160, 120, 100);
+                this.reactionContext.drawImage(this.assets['love'], 13, 160, 75, 75);
                 setTimeout(() => {
                     this.reactionContext.clearRect(0,0, this.reactionCanvas.width, this.reactionCanvas.height);
                 }, 4000);
                 break;
             case "lol":
-                this.reactionContext.drawImage(this.assets['lol'], 105, 290, 90, 90);
+                this.reactionContext.drawImage(this.assets['lol'], 20, 290, 65, 75);
                 setTimeout(() => {
                     this.reactionContext.clearRect(0,0, this.reactionCanvas.width, this.reactionCanvas.height);
                 }, 4000);
