@@ -7,6 +7,14 @@ body {
   align-items: center;
 }
 
+#reactionCanvas {
+  border-radius: 30px;
+  background-image: radial-gradient(#302ee7, #650973);
+  position: absolute;
+  top: 200px;
+  right: 20px;
+}
+
 #myCanvas {
   border-radius: 10px;
   background-image: radial-gradient(#f2daac, #d9b282);
@@ -126,6 +134,52 @@ p {
   top: 0;
   right: 0;
   margin: 20px;
+}
+
+#lol_button {
+  position: absolute;
+  top: 190px;
+  left: 12px;
+  margin: 20px;
+}
+
+#love_button {
+  position: absolute;
+  top: 160px;
+  left: 12px;
+  margin: 20px;
+}
+
+#finger_button {
+  position: absolute;
+  top: 130px;
+  left: 12px;
+  margin: 20px;
+}
+
+#you_suck_button {
+  position: absolute;
+  top: 100px;
+  left: 12px;
+  margin: 20px;
+}
+
+#emoji_chat {
+  position: absolute;
+  top: 160px;
+  right: 100px;
+  font-size: 1em;
+  font-family : "Carter One", cursive;
+  text-shadow: 1px 1px 2px #FF0000;
+}
+
+#you_suck_text {
+  position: absolute;
+  top: 80px;
+  left: 700px;
+  font-size: 1em;
+  font-family : "Carter One", cursive;
+  text-shadow: 1px 1px 2px #FF0000;
 }
 
 #gameOverScreen {

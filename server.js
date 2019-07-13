@@ -396,6 +396,13 @@ io.on('connection', function(socket){
         }
     });
 
+    /**
+     * Sends reaction to the rest players
+     */
+    socket.on("reaction", function(data) {
+        socket.broadcast.emit('reaction', data);
+    });
+
 });
 
 

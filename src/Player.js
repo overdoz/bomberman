@@ -332,7 +332,7 @@ export default class Player extends Element {
             // place bomb inside your game
             this.game.bombs.push(new Bomb({x: this.position.x, y: this.position.y}, 1500, 1, this.assets, this.gridSize, this.game));
 
-            this.updateBombCount(-1, true)
+            this.updateBombCount(-1, true);
 
             // create object with current position
             let playerState = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};

@@ -39,10 +39,15 @@ new AssetLoader()
         { name: 'grid_option2', url: '../images/grid_option2.png' },
         { name: 'fire', url: '../images/fire.png' },
         {name: 'enemy', url: '../images/bomberman_boy.png' },
+        {name: 'finger', url: '../images/finger.png' },
+        {name: 'love', url: '../images/love.png'},
+        {name: 'lol', url: '../images/lol.png'},
     ])
     .then(assets => {
         let game = null;
 
+        document.getElementById("you_suck").style.display = "none";
+        document.getElementById("chat").style.display = "flex";
 
         let id = '';
 
@@ -124,7 +129,33 @@ new AssetLoader()
 
         }, false);
 
+        document.querySelector("#you_suck_button").addEventListener('click', function (event){
+            event.preventDefault();
+            if (game != null) {
+                game.broadcastReaction("you_suck");
+            }
+        });
 
+        document.querySelector('#finger_button').addEventListener('click', function (event) {
+           event.preventDefault();
+           if (game != null) {
+               game.broadcastReaction('finger');
+           }
+        });
+
+        document.querySelector('#love_button').addEventListener('click', function (event) {
+            event.preventDefault();
+            if (game != null) {
+                game.broadcastReaction('love');
+            }
+        });
+
+        document.querySelector('#lol_button').addEventListener('click', function (event) {
+            event.preventDefault();
+            if (game != null) {
+                game.broadcastReaction('lol');
+            }
+        });
 
 
 

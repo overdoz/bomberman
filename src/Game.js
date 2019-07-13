@@ -31,6 +31,11 @@ export default class Game {
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
 
+        this.reactionCanvas = document.getElementById('reactionCanvas');
+        this.reactionContext = this.reactionCanvas.getContext('2d');
+
+
+
 
         // ID of your client
         this.id = id;
@@ -62,6 +67,10 @@ export default class Game {
 
         // set focus on canvas
         document.getElementById("myCanvas").focus();
+
+        this.socket.on('reaction', (data) => {
+            this.drawReaction(data);
+        });
 
         this.socket.on('timeout', (data) => {
             this.disconnected(data);
@@ -142,6 +151,9 @@ export default class Game {
         this.startAnimating();
     }
 
+    broadcastReaction(reaction) {
+        this.socket.emit("reaction", {id:this.id, reaction:reaction});
+    }
 
     // evoked by Player.js
     broadcastPosition(position) {
@@ -393,6 +405,37 @@ export default class Game {
         this.spoils.forEach(spoil => {
             spoil.draw(this.context);
         });
+
+    }
+
+    drawReaction(data) {
+        switch (data.reaction) {
+            case "you_suck":
+                document.getElementById("you_suck").style.display = "flex";
+                setTimeout(() => {
+                    document.getElementById("you_suck").style.display = "none";
+                }, 5000);
+                break;
+
+            case "finger":
+                this.reactionContext.drawImage(this.assets['finger'], 100, 10, 100, 100);
+                setTimeout(() => {
+                    this.reactionContext.clearRect(0,0, this.reactionCanvas.width, this.reactionCanvas.height);
+                }, 4000);
+                break;
+            case "love":
+                this.reactionContext.drawImage(this.assets['love'], 80, 160, 120, 100);
+                setTimeout(() => {
+                    this.reactionContext.clearRect(0,0, this.reactionCanvas.width, this.reactionCanvas.height);
+                }, 4000);
+                break;
+            case "lol":
+                this.reactionContext.drawImage(this.assets['lol'], 105, 290, 90, 90);
+                setTimeout(() => {
+                    this.reactionContext.clearRect(0,0, this.reactionCanvas.width, this.reactionCanvas.height);
+                }, 4000);
+                break;
+        }
 
     }
 
