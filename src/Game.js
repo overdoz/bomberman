@@ -514,7 +514,7 @@ export default class Game {
     /**
      * creates an HTML node every time a player has been created
      * @param data = {id: #344gds, amountBombs: 29, amountWalls: 93}
-     * TODO: rename variables @Thanh
+     * TODO: rename variables & delete node when dead @Thanh
      */
     creatHTMLnode(data) {
         if (this.players.length > 1) {

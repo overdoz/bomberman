@@ -394,7 +394,7 @@ io.on('connection', function(socket){
     });
 
 
-    // TODO: sync states @Thanh
+    // TODO: sync states at server and HTML nodes @Thanh
     socket.on('updateHealth', function (playerState) {
         positionPlayers.forEach((player) => {
             if (player.id === playerState.id) {
