@@ -5,14 +5,7 @@
     <link rel="stylesheet" href="./src/main.css">
     <title>Bombastic 4D</title>
     <link href="https://fonts.googleapis.com/css?family=Asap:700|Carter+One|Fugaz+One&display=swap" rel="stylesheet">
-    <!--<script src="main.js"></script>-->
 
-
-    <!--<script src="/socket.io/socket.io.js"></script>-->
-
-
-
-    <!--<script type="text/javascript" src="/socket.io/socket.io.js"></script>-->
 
 
 
@@ -37,19 +30,19 @@
     </form>
 
     <form id="loginForm" >
-        <input type="text" id="lname" name="lname" placeholder="Enter your nickname">
+        <input type="text" id="lname" name="lname" placeholder="Enter your nickname" maxlength="20" minlength="1">
         <input type="submit" value="Log in" id="login">
     </form>
 
     <div id="inventory">
         <div id="lives">
-                <img id="pic" src="images/spoilLife.png" alt="life" />
+                <img src="images/spoilLife.png" alt="life" />
                 <div class="countBox">
                     <p id="amountLives">0</p>
                 </div>
         </div>
         <div id="bombs">
-            <img id="pic" src="dist/bomb_icon.png" alt="bomb" />
+            <img  src="dist/bomb_icon.png" alt="bomb" />
             <div class="countBox">
                 <p id="amountBombs">0</p>
             </div>

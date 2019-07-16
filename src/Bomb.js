@@ -9,6 +9,7 @@ import {
 
 export default class Bomb extends Element {
 
+    // TODO: delete radius @Thanh
     constructor(position, timeToExplode = 5000, radius, assets, gridSize, game, remote=false) {
         super(position, assets);
 

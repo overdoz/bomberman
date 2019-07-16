@@ -312,6 +312,8 @@ export default class Game {
                     // make player faster
 
                     if (!player.isARunner && localPlayer) {
+
+                        // TODO
                         document.addEventListener("keydown", (e) => {
                             if (!this.gameOver) {
                                 this.movePlayer({id: this.id, key: e.key}, true)
@@ -326,7 +328,7 @@ export default class Game {
         let removalIndex = -1;
 
         for (let i = 0; i < this.spoils.length; i++) {
-            let pos = this.spoils[i].position
+            let pos = this.spoils[i].position;
             if (pos.x === spoil.position.x && pos.y === spoil.position.y) {
                 removalIndex = i;
                 break;
@@ -343,6 +345,7 @@ export default class Game {
      * move own player
      * is being called in App.js whenever user presses a key
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     * @param fastMode type boolean
      */
     movePlayer(data, fastMode) {
         this.players.forEach(player => {
@@ -357,7 +360,7 @@ export default class Game {
      * receive movement from enemy players
      * is being called in App.js whenever socket receives a signal
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
-     * TODO: rename method
+     * TODO: rename method @Thanh
      */
     playerMoved(data) {
         this.players.forEach(player => {
