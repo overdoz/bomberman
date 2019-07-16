@@ -37,6 +37,7 @@ body {
   /*font-family: 'Kirang Haerang', cursive;*/
 }
 
+/* TODO: fix inventory*/
 #inventory {
   position: absolute;
   top: 0;

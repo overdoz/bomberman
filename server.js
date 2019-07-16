@@ -81,7 +81,6 @@ server.listen(PORT, function() {
 
 
 let positionPlayers = [];
-let usernames = [];
 let positionWalls = [];
 let spoils = [];
 
@@ -168,6 +167,8 @@ generateRandomWalls(AMOUNT_RANDOM_WALLS);
 //###################################################//
 
 
+// TODO: check for duplicates @Paula
+// TODO: generate new walls @Thanh
 io.on('connection', function(socket){
 
     let name = "";
@@ -189,7 +190,7 @@ io.on('connection', function(socket){
             health: HEALTH,
         };
 
-        name = data.id;
+        // TODO: fix full lobby @Angelos
 
         switch (positionPlayers.length) {
             case 0:
@@ -219,7 +220,8 @@ io.on('connection', function(socket){
 
         // store incoming player
         positionPlayers.push(playerDetails);
-        usernames.push(name);
+
+
 
         // create incoming player
         socket.emit(CREATE_PLAYER, playerDetails);
@@ -239,7 +241,6 @@ io.on('connection', function(socket){
         socket.broadcast.emit(CREATE_PLAYER, playerDetails);
     });
 
-    // TODO: Array.prototype.find() didn't work - works at MOVE_PLAYER
     /**
      * broadcast new direction change to each client
      * @param data = {id: 'SANTACLAUS', direction: this.direction}
@@ -279,12 +280,7 @@ io.on('connection', function(socket){
      */
     socket.on(MOVE_PLAYER, function(data) {
         socket.broadcast.emit(MOVE_PLAYER, data);
-      /*  let player = positionPlayers.find(function(player) {
-            return player.id === data.id;
-        });
-        player.x = data.x;
-        player.y = data.y;
-        player.direction = data.direction;*/
+
         positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.x = data.x;
@@ -293,11 +289,11 @@ io.on('connection', function(socket){
 
 
                 let spoilIndex = -1;
-                var spoil = null;
-                for (var i = 0; i < spoils.length; i++) {
+                let spoil = null;
+                for (let i = 0; i < spoils.length; i++) {
                     spoil = spoils[i];
 
-                    if (spoil.position.x == data.x && spoil.position.y == data.y) {
+                    if (spoil.position.x === data.x && spoil.position.y === data.y) {
                         spoilIndex = i;
                         break;
                     }
@@ -368,12 +364,6 @@ io.on('connection', function(socket){
      * @param data = {id: 'HULK'}
      */
     socket.on(DELETE_PLAYER, function (data) {
-        /* for (let i = positionPlayers.length - 1; i > 0; i--) {
-            if (positionPlayers[i].id === data.id) {
-                positionPlayers.splice(i, 1);
-                console.log(positionPlayers);
-            }
-        } */
         positionPlayers.forEach((player, i) => {
             if (player.id === data.id) {
                 positionPlayers.splice(i, 1);
@@ -390,7 +380,7 @@ io.on('connection', function(socket){
         for (let i = positionWalls.length - 1; i > 0; i--) {
             if (positionWalls[i].wallId === data.wallId) {
                 console.log('wall to delete: ', positionWalls[i]);
-                // console.log(positionWalls.length);
+
                 positionWalls.splice(i, 1);
             }
         }
@@ -402,6 +392,16 @@ io.on('connection', function(socket){
     socket.on("reaction", function(data) {
         socket.broadcast.emit('reaction', data);
     });
+
+
+    socket.on('updateHealth', function (playerState) {
+        positionPlayers.forEach((player) => {
+            if (player.id === playerState.id) {
+                player.health = playerState.health;
+            }
+        });
+        socket.broadcast.emit('updateHealth', playerState);
+    })
 
 });
 

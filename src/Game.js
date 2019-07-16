@@ -68,6 +68,27 @@ export default class Game {
         // set focus on canvas
         document.getElementById("myCanvas").focus();
 
+        // keyboard events
+        document.addEventListener("keyup", (e) => {
+            if (!this.gameOver) {
+                this.movePlayer({id: id, key: e.key})
+            }
+
+        });
+
+
+
+
+
+
+
+
+//###################################################//
+//                                                   //
+//         S O C K E T    A C T I O N S              //
+//                                                   //
+//###################################################//
+
         this.socket.on('reaction', (data) => {
             this.drawReaction(data);
         });
@@ -138,18 +159,28 @@ export default class Game {
             }
         });
 
-        // keyboard events
-        document.addEventListener("keyup", (e) => {
-            if (!this.gameOver) {
-                this.movePlayer({id: id, key: e.key})
-            }
 
+        this.socket.on('updateHealth', (data) => {
+            let healthIndicator = document.getElementById(data.id + 'HealthText');
+            healthIndicator.innerText = data.health;
         });
+
+
 
 
         // START GAME
         this.startAnimating();
     }
+
+
+
+
+
+//###################################################//
+//                                                   //
+//       S O C K E T    B R O A D C A S T            //
+//                                                   //
+//###################################################//
 
     broadcastReaction(reaction) {
         this.socket.emit("reaction", {id:this.id, reaction:reaction});
@@ -189,9 +220,6 @@ export default class Game {
         this.socket.emit(DELETE_PLAYER, player);
     }
 
-    broadcastHurtPlayer(player) {
-        this.socket.emit(HURT_PLAYER, player);
-    }
 
     hurtPlayer(hurtPlayer) {
         if (hurtPlayer.id !== this.id) {
@@ -204,7 +232,17 @@ export default class Game {
         }
     }
 
-    
+
+
+
+
+
+
+//###################################################//
+//                                                   //
+//         G A M E     M U T A T I O N S             //
+//                                                   //
+//###################################################//
 
 
     disconnected(data) {
@@ -263,7 +301,13 @@ export default class Game {
                     console.log("Player gets an extra life!");
                     player.health++;
                     player.updateHealth(this.id === data.player.id, data.player.id);
+
+                    let playerState = {id: player.id, health: player.health};
+
+                    this.socket.emit('updateHealth', playerState)
                 } else if (data.spoil.type === SPOIL_TYPE_RUN) {
+
+                    // TODO: stop running after 30 secs @Sophia
                     console.log("Player becomes faster!");
                     // make player faster
 
@@ -281,7 +325,7 @@ export default class Game {
 
         let removalIndex = -1;
 
-        for (var i = 0; i < this.spoils.length; i++) {
+        for (let i = 0; i < this.spoils.length; i++) {
             let pos = this.spoils[i].position
             if (pos.x === spoil.position.x && pos.y === spoil.position.y) {
                 removalIndex = i;
@@ -313,6 +357,7 @@ export default class Game {
      * receive movement from enemy players
      * is being called in App.js whenever socket receives a signal
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     * TODO: rename method
      */
     playerMoved(data) {
         this.players.forEach(player => {
@@ -367,6 +412,7 @@ export default class Game {
      * receive walls from enemy players
      * is being called in App.js whenever socket receives a signal
      * @param data = {x: 0, y: 0, id: 'dasr43g4'}
+     * TODO: rename method -> receiveWall
      */
     getWall(data) {
         let tempPosition = {x: data.x, y: data.y};
@@ -408,6 +454,7 @@ export default class Game {
 
     }
 
+    // TODO: replace with soft emojis @Angelos
     drawReaction(data) {
         switch (data.reaction) {
             case "you_suck":
@@ -464,6 +511,7 @@ export default class Game {
     /**
      * creates an HTML node every time a player has been created
      * @param data = {id: #344gds, amountBombs: 29, amountWalls: 93}
+     * TODO: rename variables @Thanh
      */
     creatHTMLnode(data) {
         if (this.players.length > 1) {

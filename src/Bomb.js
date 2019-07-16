@@ -24,6 +24,7 @@ export default class Bomb extends Element {
         this.timeToExplode = timeToExplode;
         this.radius = radius;
 
+        // TODO: resize spritesheets @Paula
         this.spriteSize = {
             bomb: {
                 x: 28,
@@ -66,13 +67,82 @@ export default class Bomb extends Element {
      *
      * @returns {Array} with position objects
      */
-    getSurroundingPositions() {
+/*    getSurroundingPositions() {
         let positions = [];
         for (let i = -this.radius; i <= this.radius; i++) {
             for (let j = -this.radius; j <= this.radius; j++) {
                 positions.push({x: this.position.x + i ,     y: this.position.y + j});
             }
         }
+        return positions;
+    }*/
+
+    getSurroundingPositions() {
+        let positions = [];
+
+        let positionsHorizontal = [
+            {x: this.position.x+1, y: this.position.y},
+            {x: this.position.x-1, y: this.position.y},
+        ];
+
+        let positionsVertical = [
+            {x: this.position.x, y: this.position.y+1},
+            {x: this.position.x, y: this.position.y-1},
+        ];
+
+        let horizontalCollision = false;
+        let verticalCollision = false;
+
+        for (let i = 0; i < this.game.walls.length; i++) {
+            for (let j = 0; j < positionsHorizontal.length; j++) {
+                if (this.game.walls[i].position.x === positionsHorizontal[j].x && this.game.walls[i].position.y === positionsHorizontal[j].y && this.game.walls[i].isDestructible === false) {
+                    horizontalCollision = true;
+                }
+            }
+        }
+
+        for (let i = 0; i < this.game.walls.length; i++) {
+            for (let j = 0; j < positionsVertical.length; j++) {
+                if (this.game.walls[i].position.x === positionsVertical[j].x && this.game.walls[i].position.y === positionsVertical[j].y && this.game.walls[i].isDestructible === false) {
+                    verticalCollision = true;
+                }
+            }
+        }
+
+        if (horizontalCollision === true) {
+            positions = [
+                {x: this.position.x, y: this.position.y},
+                {x: this.position.x, y: this.position.y+1},
+                {x: this.position.x, y: this.position.y+2},
+                {x: this.position.x, y: this.position.y-1},
+                {x: this.position.x, y: this.position.y-2},
+            ]
+        } else if (verticalCollision === true) {
+            positions = [
+                {x: this.position.x, y: this.position.y},
+                {x: this.position.x+1, y: this.position.y},
+                {x: this.position.x+2, y: this.position.y},
+                {x: this.position.x-1, y: this.position.y},
+                {x: this.position.x-2, y: this.position.y},
+            ]
+        } else {
+            positions = [
+                {x: this.position.x, y: this.position.y},
+                {x: this.position.x, y: this.position.y+1},
+                {x: this.position.x, y: this.position.y+2},
+                {x: this.position.x, y: this.position.y-1},
+                {x: this.position.x, y: this.position.y-2},
+                {x: this.position.x+1, y: this.position.y},
+                {x: this.position.x+2, y: this.position.y},
+                {x: this.position.x-1, y: this.position.y},
+                {x: this.position.x-2, y: this.position.y},
+            ]
+        }
+
+
+
+
+
         return positions;
     }
 
@@ -96,7 +166,7 @@ export default class Bomb extends Element {
                 if (player.position.x === position.x && player.position.y === position.y) {
                     player.health--;
 
-                    player.updateHealth(player.id == this.game.id, player.id);
+                    player.updateHealth(player.id === this.game.id, player.id);
                     
                     if(player.health < 1) {
 

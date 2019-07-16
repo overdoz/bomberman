@@ -152,10 +152,6 @@ export default class Player extends Element {
     }
 
 
-    setDead() {
-        this.dead = true;
-    }
-
 
     /**
      * @description is being called in App.js every time the user presses a key
@@ -231,7 +227,7 @@ export default class Player extends Element {
      */
     draw(context) {
         let photo = 'bomberman';
-        if (this.id != this.game.id) {
+        if (this.id !== this.game.id) {
             photo = 'enemy';
         }
 
