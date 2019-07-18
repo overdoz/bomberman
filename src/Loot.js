@@ -1,6 +1,6 @@
 import Element from './Element.js';
 
-export default class Spoil extends Element {
+export default class Loot extends Element {
 
 
     constructor(position, type, assets, gridSize, game) {

@@ -42,97 +42,32 @@ export default class Player extends Element {
         this.currentAnimationState = 0;
         this.animationSpeed = 10;
 
-/*        this.spriteSheet = {
-            south: {
-                x: 0,
-                y: 0
-            },
-            west: {
-                x: 0,
-                y: this.spriteSize.y
-            },
-            north: {
-                x: 0,
-                y: 2 * this.spriteSize.y
-            },
-            east: {
-                x: 0,
-                y: 3 * this.spriteSize.y
-            }
-        };*/
+
 
         this.animationSheet = [
             {
-                south: {
-                    x: 0,
-                    y: 0
-                },
-                west: {
-                    x: 0,
-                    y: this.spriteSize.y
-                },
-                north: {
-                    x: 0,
-                    y: 2 * this.spriteSize.y
-                },
-                east: {
-                    x: 0,
-                    y: 3 * this.spriteSize.y
-                }
+                south: {x: 0, y: 0},
+                west: {x: 0, y: this.spriteSize.y},
+                north: {x: 0, y: 2 * this.spriteSize.y},
+                east: {x: 0, y: 3 * this.spriteSize.y}
             },
             {
-                south: {
-                    x: this.spriteSize.x,
-                    y: 0
-                },
-                west: {
-                    x: this.spriteSize.x,
-                    y: this.spriteSize.y
-                },
-                north: {
-                    x: this.spriteSize.x,
-                    y: 2 * this.spriteSize.y
-                },
-                east: {
-                    x: this.spriteSize.x,
-                    y: 3 * this.spriteSize.y
-                }
+                south: {x: this.spriteSize.x, y: 0},
+                west: {x: this.spriteSize.x, y: this.spriteSize.y},
+                north: {x: this.spriteSize.x, y: 2 * this.spriteSize.y},
+                east: {x: this.spriteSize.x, y: 3 * this.spriteSize.y}
             },
             {
-                south: {
-                    x: 2 * this.spriteSize.x,
-                    y: 0
-                },
-                west: {
-                    x: 2 * this.spriteSize.x,
-                    y: this.spriteSize.y
-                },
-                north: {
-                    x: 2 * this.spriteSize.x,
-                    y: 2 * this.spriteSize.y
-                },
-                east: {
-                    x: 2 * this.spriteSize.x,
-                    y: 3 * this.spriteSize.y
-                }
+                south: {x: 2 * this.spriteSize.x, y: 0},
+                west: {x: 2 * this.spriteSize.x, y: this.spriteSize.y},
+                north: {x: 2 * this.spriteSize.x, y: 2 * this.spriteSize.y},
+                east: {x: 2 * this.spriteSize.x, y: 3 * this.spriteSize.y}
             },
             {
-                south: {
-                    x: 3 * this.spriteSize.x,
-                    y: 0
-                },
-                west: {
-                    x: 3 * this.spriteSize.x,
-                    y: this.spriteSize.y
-                },
-                north: {
-                    x: 3 * this.spriteSize.x,
-                    y: 2 * this.spriteSize.y
-                },
-                east: {
-                    x: 3 * this.spriteSize.x,
-                    y: 3 * this.spriteSize.y
-                }
+                south: {x: 3 * this.spriteSize.x, y: 0},
+                west: {x: 3 * this.spriteSize.x, y: this.spriteSize.y},
+                north: {x: 3 * this.spriteSize.x, y: 2 * this.spriteSize.y},
+                east: {x: 3 * this.spriteSize.x, y: 3 * this.spriteSize.y}
             }
         ];
 
@@ -158,11 +93,12 @@ export default class Player extends Element {
      * calls the movePlayer() method in Game.js
      * @param e = {id: '9fh3j4', key: 'ArrowLeft'}
      * @required in Game.js
+     * TODO: delete fastMode? @Sophia
      */
     triggerEvent(e, fastMode=false) {
 
         if (!this.dead) {
-            var walking = true;
+            let isWalking = true;
             switch (e.key) {
                 case 'ArrowLeft':
                     if (this.direction === 'west') {
@@ -198,20 +134,20 @@ export default class Player extends Element {
 
                 case "b":
                     if (!fastMode) {
-                        this.setBomb();
-                        walking = false;
+                        this.plantBomb();
+                        isWalking = false;
                     }
                     break;
 
                 case " ":
                     if (!fastMode) {
                         this.buildWall();
-                        walking = false;
+                        isWalking = false;
                     }
                     break;
             }
 
-            if (walking || (!fastMode && !walking)) {
+            if (isWalking || (!fastMode && !isWalking)) {
                 this.game.broadcastDirection({id: this.id, direction: this.direction});
             }
 
@@ -323,14 +259,14 @@ export default class Player extends Element {
      * set Bomb at your current position
      * @requires this.game
      */
-    setBomb() {
+    plantBomb() {
 
         // if there's enough bombs left
         if (this.amountBombs > 0) {
 
 
             // place bomb inside your game
-            this.game.bombs.push(new Bomb({x: this.position.x, y: this.position.y}, 1500, 1, this.assets, this.gridSize, this.game));
+            this.game.bombs.push(new Bomb({x: this.position.x, y: this.position.y}, 1500, 2, this.assets, this.gridSize, this.game));
 
             this.updateBombCount(-1, true);
 

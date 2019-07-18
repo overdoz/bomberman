@@ -1,5 +1,5 @@
 import Element from './Element.js';
-import Spoil from './Spoil.js';
+import Loot from './Loot.js';
 
 import {
     SPOIL_TYPE_BOMB,
@@ -9,7 +9,6 @@ import {
 
 export default class Bomb extends Element {
 
-    // TODO: delete radius @Thanh
     constructor(position, timeToExplode = 5000, radius, assets, gridSize, game, remote=false) {
         super(position, assets);
 
@@ -68,18 +67,7 @@ export default class Bomb extends Element {
      *
      * @returns {Array} with position objects
      */
-/*    getSurroundingPositions() {
-        let positions = [];
-        for (let i = -this.radius; i <= this.radius; i++) {
-            for (let j = -this.radius; j <= this.radius; j++) {
-                positions.push({x: this.position.x + i ,     y: this.position.y + j});
-            }
-        }
-        return positions;
-    }*/
-
     getSurroundingPositions() {
-        let positions = [];
 
         let positionsHorizontal = [
             {x: this.position.x+1, y: this.position.y},
@@ -100,9 +88,6 @@ export default class Bomb extends Element {
                     horizontalCollision = true;
                 }
             }
-        }
-
-        for (let i = 0; i < this.game.walls.length; i++) {
             for (let j = 0; j < positionsVertical.length; j++) {
                 if (this.game.walls[i].position.x === positionsVertical[j].x && this.game.walls[i].position.y === positionsVertical[j].y && this.game.walls[i].isDestructible === false) {
                     verticalCollision = true;
@@ -110,41 +95,37 @@ export default class Bomb extends Element {
             }
         }
 
+
         if (horizontalCollision === true) {
-            positions = [
-                {x: this.position.x, y: this.position.y},
-                {x: this.position.x, y: this.position.y+1},
-                {x: this.position.x, y: this.position.y+2},
-                {x: this.position.x, y: this.position.y-1},
-                {x: this.position.x, y: this.position.y-2},
-            ]
+            let horizontalFire = [];
+            for (let i = (-this.radius); i < this.radius+1; i++) {
+                horizontalFire.push({x: this.position.x, y: (this.position.y + i)})
+            }
+            return horizontalFire
+
         } else if (verticalCollision === true) {
-            positions = [
-                {x: this.position.x, y: this.position.y},
-                {x: this.position.x+1, y: this.position.y},
-                {x: this.position.x+2, y: this.position.y},
-                {x: this.position.x-1, y: this.position.y},
-                {x: this.position.x-2, y: this.position.y},
-            ]
+            let verticalFire = [];
+            for (let i = (-this.radius); i < this.radius+1; i++) {
+                verticalFire.push({x: (this.position.x + i), y: this.position.y})
+            }
+            return verticalFire
+
         } else {
-            positions = [
-                {x: this.position.x, y: this.position.y},
-                {x: this.position.x, y: this.position.y+1},
-                {x: this.position.x, y: this.position.y+2},
-                {x: this.position.x, y: this.position.y-1},
-                {x: this.position.x, y: this.position.y-2},
-                {x: this.position.x+1, y: this.position.y},
-                {x: this.position.x+2, y: this.position.y},
-                {x: this.position.x-1, y: this.position.y},
-                {x: this.position.x-2, y: this.position.y},
-            ]
+            let crossFire = [];
+            for (let i = (-this.radius); i < this.radius+1; i++) {
+                crossFire.push({x: this.position.x, y: (this.position.y + i)})
+            }
+            for (let i = (-this.radius); i < this.radius+1; i++) {
+                crossFire.push({x: (this.position.x + i), y: this.position.y})
+            }
+            return crossFire
         }
 
 
 
 
 
-        return positions;
+
     }
 
     /**
@@ -213,20 +194,20 @@ export default class Bomb extends Element {
 
 
             if (Math.random() <= 0.3 && !this.remoteBomb) {
-                let spoilType = SPOIL_TYPE_LIFE;
+                let lootType = SPOIL_TYPE_LIFE;
                 let spoilDetermination = Math.random();
 
                 if (spoilDetermination > 0.66) {
-                    spoilType = SPOIL_TYPE_BOMB;
+                    lootType = SPOIL_TYPE_BOMB;
                 } else if (spoilDetermination > 0.33) {
-                    spoilType = SPOIL_TYPE_RUN;
+                    lootType = SPOIL_TYPE_RUN;
                 }
 
-                console.log("spoil is: ", spoilType);
+                console.log("spoil is: ", lootType);
                 
-                this.game.broadcastSpoil({position:position, type: spoilType});
-                this.game.spoils.push(new Spoil({x: position.x, y: position.y}, spoilType, this.assets, this.gridSize, this.game));
-                console.log("Creating spoil with type: ", spoilType);
+                this.game.broadcastSpoil({position:position, type: lootType});
+                this.game.spoils.push(new Loot({x: position.x, y: position.y}, lootType, this.assets, this.gridSize, this.game));
+                console.log("Creating spoil with type: ", lootType);
             } else {
                 console.log("Not creating a new spoil at position: ", position);
             }

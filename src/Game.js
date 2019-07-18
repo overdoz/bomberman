@@ -21,7 +21,7 @@ import {
     SPOIL_TYPE_RUN,
     HURT_PLAYER,
 } from "./constant.js";
-import Spoil from './Spoil.js';
+import Loot from './Loot.js';
 
 export default class Game {
 
@@ -120,18 +120,18 @@ export default class Game {
 
         // receive enemy player movements
         this.socket.on(MOVE_PLAYER, (data) => {
-            this.playerMoved(data);
+            this.moveEnemy(data);
         });
 
         // player grabbed spoil
         this.socket.on(GRAB_SPOIL, (data) => {
-            this.grabbedSpoil(data);
+            this.pickUpItem(data);
         });
 
         // receive bombs set by enemies
         // {x: nextPosition.x, y: nextPosition.y, id: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs}
         this.socket.on(PLACE_BOMB, (data) => {
-            this.getBomb(data);
+            this.receiveBomb(data);
 
             try {
                 let bomb = document.getElementById(data.id + 'BombText');
@@ -144,13 +144,13 @@ export default class Game {
         // receive spoils created by exploding walls
         // {x: nextPosition.x, y: nextPosition.y, id: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs}
         this.socket.on(CREATE_SPOIL, (data) => {
-            this.getSpoil(data);
+            this.receiveItem(data);
         });
 
         // receive walls set by enemies
         this.socket.on(PLACE_WALL, (data) => {
             console.log('got wall', data);
-            this.getWall(data);
+            this.receiveWall(data);
             try {
                 let wall = document.getElementById(data.id + 'WallText');
                 wall.innerText = data.amountWalls;
@@ -288,7 +288,7 @@ export default class Game {
      * check the type of the spoil and update then broadcast it
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east', amountWalls: 99, amountBombs: 99, health: 99}
      */
-    grabbedSpoil(data) {
+    pickUpItem(data) {
         let spoil = data.spoil;
         let localPlayer = data.player.id === this.id;
 
@@ -360,9 +360,8 @@ export default class Game {
      * receive movement from enemy players
      * is being called in App.js whenever socket receives a signal
      * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
-     * TODO: rename method @Thanh
      */
-    playerMoved(data) {
+    moveEnemy(data) {
         this.players.forEach(player => {
             if (player.id === data.id) {
                 player.position.x = data.x;
@@ -403,12 +402,12 @@ export default class Game {
      * is being called in App.js whenever socket receives a signal
      * @param position = {x: 0, y: 0}
      */
-    getBomb(position) {
-        this.bombs.push(new Bomb(position, 1500, 1, this.assets, this.gridSize, this, true));
+    receiveBomb(position) {
+        this.bombs.push(new Bomb(position, 1500, 2, this.assets, this.gridSize, this, true));
     }
 
-    getSpoil(data) {
-        this.spoils.push(new Spoil(data.position, data.type, this.assets, this.gridSize, this));
+    receiveItem(data) {
+        this.spoils.push(new Loot(data.position, data.type, this.assets, this.gridSize, this));
     }
 
     /**
@@ -417,7 +416,7 @@ export default class Game {
      * @param data = {x: 0, y: 0, id: 'dasr43g4'}
      * TODO: rename method -> receiveWall
      */
-    getWall(data) {
+    receiveWall(data) {
         let tempPosition = {x: data.x, y: data.y};
         console.log('Game received wall: ', tempPosition);
         let doesntContains = true;
@@ -514,7 +513,7 @@ export default class Game {
     /**
      * creates an HTML node every time a player has been created
      * @param data = {id: #344gds, amountBombs: 29, amountWalls: 93}
-     * TODO: rename variables & delete node when dead @Thanh
+     * TODO: delete node when dead @Thanh
      */
     creatHTMLnode(data) {
         if (this.players.length > 1) {
@@ -531,52 +530,52 @@ export default class Game {
 
             // START LIVES
 
-            let img3 = document.createElement("img");
-            img3.id = data.id + 'LifeImg';
-            img3.src = "images/spoilLife.png";
+            let healthImage = document.createElement("img");
+            healthImage.id = data.id + 'LifeImg';
+            healthImage.src = "images/spoilLife.png";
 
-            let p3Container = document.createElement("div");
-            p3Container.className = "countBox";
+            let healthBox = document.createElement("div");
+            healthBox.className = "countBox";
 
-            let p3 = document.createElement("p");
-            p3.id = data.id + 'HealthText';
-            p3.innerText = data.health;
-            p3Container.appendChild(p3);
+            let healthText = document.createElement("p");
+            healthText.id = data.id + 'HealthText';
+            healthText.innerText = data.health;
+            healthBox.appendChild(healthText);
 
             // LIVES END
 
-            let img = document.createElement("img");
-            img.id = data.id + 'BombImg';
-            img.src = "dist/bomb_icon.png";
+            let bombImage = document.createElement("img");
+            bombImage.id = data.id + 'BombImg';
+            bombImage.src = "dist/bomb_icon.png";
 
-            let pContainer = document.createElement("div");
-            pContainer.className = "countBox";
+            let bombBox = document.createElement("div");
+            bombBox.className = "countBox";
 
-            let p = document.createElement("p");
-            p.id = data.id + 'BombText';
-            p.innerText = data.amountBombs;
-            pContainer.appendChild(p);
+            let bombText = document.createElement("p");
+            bombText.id = data.id + 'BombText';
+            bombText.innerText = data.amountBombs;
+            bombBox.appendChild(bombText);
 
-            let img2 = document.createElement("img");
-            img2.id = data.id + 'WallImg';
-            img2.src = "dist/wall.png";
+            let wallImage = document.createElement("img");
+            wallImage.id = data.id + 'WallImg';
+            wallImage.src = "dist/wall.png";
 
-            let p2Container = document.createElement("div");
-            p2Container.className = "countBox";
+            let wallBox = document.createElement("div");
+            wallBox.className = "countBox";
 
-            let p2 = document.createElement("p");
-            p2.id = data.id + 'WallText';
-            p2.innerText = data.amountWalls;
-            p2Container.appendChild(p2);
+            let wallText = document.createElement("p");
+            wallText.id = data.id + 'WallText';
+            wallText.innerText = data.amountWalls;
+            wallBox.appendChild(wallText);
 
 
             container.appendChild(id);
-            container.appendChild(img3);
-            container.appendChild(p3Container);
-            container.appendChild(img);
-            container.appendChild(pContainer);
-            container.appendChild(img2);
-            container.appendChild(p2Container);
+            container.appendChild(healthImage);
+            container.appendChild(healthBox);
+            container.appendChild(bombImage);
+            container.appendChild(bombBox);
+            container.appendChild(wallImage);
+            container.appendChild(wallBox);
             enemyInventory.appendChild(container);
 
         }
