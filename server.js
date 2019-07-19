@@ -85,6 +85,14 @@ let positionWalls = [];
 let spoils = [];
 
 /**
+ * generates an unique ID
+ * @returns {string}
+ */
+const generateRandomID = () => {
+    return '_' + Math.random().toString(36).substr(2, 9);
+};
+
+/**
  * creates wall objects and stores them in positionWalls array
  * @param amount = amount of walls to be generated
  */
@@ -93,9 +101,7 @@ const generateRandomWalls = (amount) => {
     // create grid of indestructible walls
     for (let i = 1; i < GAME_WIDTH-1; i += 2) {
         for (let j = 1; j < GAME_HEIGHT-1; j += 2) {
-            // unique ID
-            let randomID = '_' + Math.random().toString(36).substr(2, 9);
-            positionWalls.push({wallId: randomID, x: i, y: j, isDestructible: false});
+            positionWalls.push({wallId: generateRandomID(), x: i, y: j, isDestructible: false});
         }
     }
 
@@ -112,8 +118,7 @@ const generateRandomWalls = (amount) => {
             i--;
         } else {
             // if not, generate an unique ID and push object into positionWalls
-            let randomID = '_' + Math.random().toString(36).substr(2, 9);
-            positionWalls.push({wallId: randomID, x: atRandomPosition.x, y: atRandomPosition.y, isDestructible: true});
+            positionWalls.push({wallId: generateRandomID(), x: atRandomPosition.x, y: atRandomPosition.y, isDestructible: true});
         }
     }
 };
@@ -369,6 +374,7 @@ io.on('connection', function(socket){
                 positionPlayers.splice(i, 1);
             }
         });
+        socket.broadcast.emit()
     });
 
 

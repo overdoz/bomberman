@@ -165,6 +165,14 @@ export default class Game {
             healthIndicator.innerText = data.health;
         });
 
+        this.socket.on(DELETE_PLAYER, (data) => {
+            this.players.forEach((player, index) => {
+                if (player.id === data.id) {
+                    this.players.splice(index, 1);
+                }
+            })
+        });
+
 
 
 
