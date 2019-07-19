@@ -152,21 +152,34 @@ export default class Bomb extends Element {
                     
                     if(player.health < 1) {
 
-                        let deletedPlayer = this.game.players.splice(index, 1);
+                        this.game.players.splice(index, 1);
                         this.game.broadcastDeletedPlayer({id: player.id});
 
-                        if (player.id === this.game.id) {
-                            document.getElementById("inventory").style.display = "none";
-                            document.getElementById("gameOverScreen").style.display = "flex";
-                        } else {
-                            if (this.game.checkForWinner()) {
-                                document.getElementById("inventory").style.display = "none";
-                                document.getElementById("youwinscreen").style.display = "flex";
-                            } else {
-                                document.getElementById(player.id).style.display = "none";
-                            }
+                        try {
+                            document.getElementById(player.id).style.display = "none";
+                        } catch (e) {
+                            console.log(e);
                         }
-                        console.log(deletedPlayer);
+
+
+                        if (player.id === this.game.id) {
+                            console.log(`${player.id} is dead`);
+                            try {
+                                document.getElementById("inventory").style.display = "none";
+                                document.getElementById("gameOverScreen").style.display = "flex";
+                            } catch (e) {
+                                console.log(e);
+                            }
+
+                        } else if (this.game.checkForWinner()) {
+                            try {
+                                // document.getElementById("inventory").style.display = "none";
+                                document.getElementById("youwinscreen").style.display = "flex";
+                            } catch (e) {
+                                console.log(e);
+                            }
+
+                        }
                     }
                 }
             })
