@@ -137,33 +137,7 @@ p {
   margin: 20px;
 }
 
-#lol_button {
-  position: absolute;
-  top: 190px;
-  left: 12px;
-  margin: 20px;
-}
 
-#love_button {
-  position: absolute;
-  top: 160px;
-  left: 12px;
-  margin: 20px;
-}
-
-#finger_button {
-  position: absolute;
-  top: 130px;
-  left: 12px;
-  margin: 20px;
-}
-
-#you_suck_button {
-  position: absolute;
-  top: 100px;
-  left: 12px;
-  margin: 20px;
-}
 
 #emoji_chat {
   position: absolute;
@@ -172,6 +146,7 @@ p {
   font-size: 1em;
   font-family : "Carter One", cursive;
   text-shadow: 1px 1px 2px #FF0000;
+  display: none;
 }
 
 #you_suck_text {
@@ -190,7 +165,7 @@ p {
   justify-content: center;
   align-items: center;
   z-index: 100;
-  background-color: rgb(165, 42, 42, 0.4);
+  background-color: rgba(165, 42, 42, 0.4);
   position: absolute;
 }
 
@@ -207,7 +182,7 @@ p {
   justify-content: center;
   align-items: center;
   z-index: 100;
-  background-color: rgb(165, 300, 60, 0.4);
+  background-color: rgba(165, 300, 60, 0.4);
   position: absolute;
 }
 
@@ -225,6 +200,41 @@ input {
   height: 40px;
   margin-top: 15px;
 }
+
+button {
+  border: 2px solid #024873;
+  font-family: "Carter One", cursive;
+  font-size: 1.1em;
+  border-radius: 4px;
+  height: 40px;
+  width: 200px;
+  margin: 5px;
+  text-align: left;
+}
+
+#reactions {
+  height: 5vh;
+  display: flex;
+  align-content: space-between;
+  flex-direction: column;
+  position: absolute;
+  left: 10px;
+  top: 15vh;
+}
+
+#echat {
+  height: 30vh;
+  position: absolute;
+  right: 10px;
+  top: 15vh;
+  overflow-y: scroll;
+  float: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 10px;
+}
+
 
 @keyframes fadein {
   from {

@@ -70,29 +70,37 @@ new AssetLoader()
 
         document.querySelector("#you_suck_button").addEventListener('click', function (event){
             event.preventDefault();
+            const YOU_SUCK = "you_suck";
             if (game != null) {
-                game.broadcastReaction("you_suck");
+                game.broadcastReaction(YOU_SUCK);
+                game.drawReaction({id: game.id, reaction: YOU_SUCK})
             }
         });
 
         document.querySelector('#finger_button').addEventListener('click', function (event) {
            event.preventDefault();
+           const FINGER = 'finger';
            if (game != null) {
-               game.broadcastReaction('finger');
+               game.broadcastReaction(FINGER);
+               game.drawReaction({id: game.id, reaction: FINGER})
            }
         });
 
         document.querySelector('#love_button').addEventListener('click', function (event) {
             event.preventDefault();
+            const LOVE = 'love';
             if (game != null) {
-                game.broadcastReaction('love');
+                game.broadcastReaction(LOVE);
+                game.drawReaction({id: game.id, reaction: LOVE})
             }
         });
 
         document.querySelector('#lol_button').addEventListener('click', function (event) {
             event.preventDefault();
+            const LOL = 'lol';
             if (game != null) {
-                game.broadcastReaction('lol');
+                game.broadcastReaction(LOL);
+                game.drawReaction({id: game.id, reaction: LOL})
             }
         });
 

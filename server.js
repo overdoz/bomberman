@@ -98,10 +98,12 @@ const generateRandomID = () => {
  */
 const generateRandomWalls = (amount) => {
 
+    let randomWalls = [];
+
     // create grid of indestructible walls
     for (let i = 1; i < GAME_WIDTH-1; i += 2) {
         for (let j = 1; j < GAME_HEIGHT-1; j += 2) {
-            positionWalls.push({wallId: generateRandomID(), x: i, y: j, isDestructible: false});
+            randomWalls.push({wallId: generateRandomID(), x: i, y: j, isDestructible: false});
         }
     }
 
@@ -118,9 +120,11 @@ const generateRandomWalls = (amount) => {
             i--;
         } else {
             // if not, generate an unique ID and push object into positionWalls
-            positionWalls.push({wallId: generateRandomID(), x: atRandomPosition.x, y: atRandomPosition.y, isDestructible: true});
+            randomWalls.push({wallId: generateRandomID(), x: atRandomPosition.x, y: atRandomPosition.y, isDestructible: true});
         }
     }
+
+    return randomWalls;
 };
 
 
@@ -158,7 +162,7 @@ const isAlreadyExisting = (position) => {
  * create destructible and indestructible walls after server starts
  * @param amount = number
  */
-generateRandomWalls(AMOUNT_RANDOM_WALLS);
+// generateRandomWalls(AMOUNT_RANDOM_WALLS);
 
 
 
@@ -173,7 +177,6 @@ generateRandomWalls(AMOUNT_RANDOM_WALLS);
 
 
 // TODO: check for duplicates @Paula
-// TODO: generate new walls @Thanh
 io.on('connection', function(socket){
 
     let name = "";
@@ -199,6 +202,7 @@ io.on('connection', function(socket){
 
         switch (positionPlayers.length) {
             case 0:
+                positionWalls = generateRandomWalls(AMOUNT_RANDOM_WALLS);
                 console.log(playerDetails);
                 break;
             case 1:
@@ -400,7 +404,7 @@ io.on('connection', function(socket){
     });
 
 
-    // TODO: sync states at server and HTML nodes @Thanh
+    // TODO: sync states at server @Thanh
     socket.on('updateHealth', function (playerState) {
         positionPlayers.forEach((player) => {
             if (player.id === playerState.id) {

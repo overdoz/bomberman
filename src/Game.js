@@ -31,9 +31,6 @@ export default class Game {
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
 
-        this.reactionCanvas = document.getElementById('reactionCanvas');
-        this.reactionContext = this.reactionCanvas.getContext('2d');
-
 
 
 
@@ -422,7 +419,6 @@ export default class Game {
      * receive walls from enemy players
      * is being called in App.js whenever socket receives a signal
      * @param data = {x: 0, y: 0, id: 'dasr43g4'}
-     * TODO: rename method -> receiveWall
      */
     receiveWall(data) {
         let tempPosition = {x: data.x, y: data.y};
@@ -464,36 +460,31 @@ export default class Game {
 
     }
 
-    // TODO: replace with soft emojis @Angelos
+
     drawReaction(data) {
+        let chat = document.getElementById('echat');
+        let container = document.createElement("div");
+        let message = document.createElement("p");
+
         switch (data.reaction) {
             case "you_suck":
-                document.getElementById("you_suck").style.display = "flex";
-                setTimeout(() => {
-                    document.getElementById("you_suck").style.display = "none";
-                }, 5000);
+                message.innerText = `${data.id}: 🤬`;
                 break;
-
             case "finger":
-                this.reactionContext.drawImage(this.assets['finger'], 15, 10, 75, 75);
-                setTimeout(() => {
-                    this.reactionContext.clearRect(0,0, this.reactionCanvas.width, this.reactionCanvas.height);
-                }, 4000);
+                message.innerText = `${data.id}: 🖕`;
                 break;
             case "love":
-                this.reactionContext.drawImage(this.assets['love'], 13, 160, 75, 75);
-                setTimeout(() => {
-                    this.reactionContext.clearRect(0,0, this.reactionCanvas.width, this.reactionCanvas.height);
-                }, 4000);
+                message.innerText = `${data.id}: ❤️`;
                 break;
             case "lol":
-                this.reactionContext.drawImage(this.assets['lol'], 20, 290, 65, 75);
-                setTimeout(() => {
-                    this.reactionContext.clearRect(0,0, this.reactionCanvas.width, this.reactionCanvas.height);
-                }, 4000);
+                message.innerText = `${data.id}: 😂`;
                 break;
         }
 
+        message.id = "chat_text";
+        container.appendChild(message);
+        chat.appendChild(container);
+        chat.scrollTop = chat.scrollHeight;
     }
 
 
