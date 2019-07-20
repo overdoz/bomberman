@@ -318,7 +318,7 @@ export default class Game {
 
                     if (!player.isARunner && localPlayer) {
 
-                        // TODO
+                        // TODO: delete eventlistener @Sophia
                         document.addEventListener("keydown", (e) => {
                             if (!this.gameOver) {
                                 this.movePlayer({id: this.id, key: e.key}, true)
@@ -512,7 +512,6 @@ export default class Game {
     /**
      * creates an HTML node every time a player has been created
      * @param data = {id: #344gds, amountBombs: 29, amountWalls: 93}
-     * TODO: delete node when dead @Thanh
      */
     creatHTMLnode(data) {
         if (this.players.length > 1) {

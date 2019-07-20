@@ -120,12 +120,6 @@ export default class Bomb extends Element {
             }
             return crossFire
         }
-
-
-
-
-
-
     }
 
     /**
@@ -144,26 +138,40 @@ export default class Bomb extends Element {
 
         // delete affected players
         this.game.players.forEach((player, index) => {
+
             this.getSurroundingPositions().forEach(position => {
+
+                // if explosion position matches player position
                 if (player.position.x === position.x && player.position.y === position.y) {
+
+                    // decrease player health
                     player.health--;
 
+                    // update DOM
                     player.updateHealth(player.id === this.game.id, player.id);
-                    
+
+                    // if player is dead
                     if(player.health < 1) {
 
+                        // delete player from game
                         this.game.players.splice(index, 1);
+
+                        // broadcast deleted player
                         this.game.broadcastDeletedPlayer({id: player.id});
 
+                        // hide enemy inventory
                         try {
                             document.getElementById(player.id).style.display = "none";
                         } catch (e) {
                             console.log(e);
                         }
 
-
+                        // if the dead player is yourself
                         if (player.id === this.game.id) {
+
                             console.log(`${player.id} is dead`);
+
+                            // delete own inventory
                             try {
                                 document.getElementById("inventory").style.display = "none";
                                 document.getElementById("gameOverScreen").style.display = "flex";
@@ -171,9 +179,11 @@ export default class Bomb extends Element {
                                 console.log(e);
                             }
 
+                        // if you are the only remaining player
                         } else if (this.game.checkForWinner()) {
+
+                            // show winner notification
                             try {
-                                // document.getElementById("inventory").style.display = "none";
                                 document.getElementById("youwinscreen").style.display = "flex";
                             } catch (e) {
                                 console.log(e);
