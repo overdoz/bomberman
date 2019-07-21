@@ -53,6 +53,15 @@ export default class Game {
         this.walls = [];
         this.spoils = [];
 
+        this.backgroundMusic = new Audio("/sounds/backgroundMusic.mp4");
+        // background music plays when game starts
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.play();
+        this.backgroundMusic.volume = 0.5;
+        this.spoilMusic = new Audio("/sounds/spoilMusic.mp4");
+        this.spoilMusic.loop = true;
+
+
         this.socket = io.connect('http://localhost:9000');
 
         // send notification to server in order to create your player
@@ -72,6 +81,11 @@ export default class Game {
             }
 
         });
+        //this.spoilMusic.addEventListener('timeupdate', function () {
+            //if (this.spoilMusic.currentTime > Math.round(Number(0) + Number(6)) && !this.paused)  {
+               // this.spoilMusic.pause();
+           // }
+       // });
 
 
 
@@ -299,6 +313,14 @@ export default class Game {
 
         this.players.forEach((player) => {
             if (player.id === data.player.id) {
+                // change the music for the player
+                if (!this.backgroundMusic.paused) {
+                    this.backgroundMusic.currentTime = 0;
+                    this.backgroundMusic.pause();
+                    console.log("Background music stopped!");
+                    this.spoilMusic.play();
+                    console.log("Spoil music is playing!");
+                }
                 if (data.spoil.type === SPOIL_TYPE_BOMB) {
                     console.log("Player gets an extra bomb!");
                     player.updateBombCount(1, localPlayer);
@@ -382,6 +404,9 @@ export default class Game {
             winner = true;
         }
         if (winner) {
+            this.spoilMusic.pause();
+            this.backgroundMusic.pause();
+            this.players[0].winnerMusic.play();
             this.gameOver = true;
         }
         return winner;

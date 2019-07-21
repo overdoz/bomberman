@@ -28,6 +28,10 @@ export default class Player extends Element {
 
         this.gridSize = gridSize;
         this.isARunner = false;
+        this.setBombMusic = new Audio("/sounds/setBombMusic.mp3");
+        this.diedMusic = new Audio("/sounds/diedMusic.mp4");
+        this.loserMusic = new Audio("/sounds/loserMusic.mp4");
+        this.winnerMusic = new Audio("/sounds/winnerMusic.mp4");
 
 
         /**
@@ -267,6 +271,8 @@ export default class Player extends Element {
             this.game.bombs.push(new Bomb({x: this.position.x, y: this.position.y}, 1500, 2, this.assets, this.gridSize, this.game));
 
             this.updateBombCount(-1, true);
+            this.setBombMusic.play();
+
 
             // create object with current position
             let playerState = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};

@@ -144,6 +144,11 @@ export default class Bomb extends Element {
                 // if explosion position matches player position
                 if (player.position.x === position.x && player.position.y === position.y) {
 
+                    // if the player is still alive, then plays died music for the player
+                    if(player.health >= 1){
+                        player.diedMusic.play();
+                    }
+
                     // decrease player health
                     player.health--;
 
@@ -155,6 +160,13 @@ export default class Bomb extends Element {
 
                         // delete player from game
                         this.game.players.splice(index, 1);
+
+                        // play loser music for the player
+                        player.game.backgroundMusic.pause();
+                        player.game.spoilMusic.pause();
+                        player.loserMusic.play();
+                        console.log("Loser music is playing!");
+
 
                         // broadcast deleted player
                         this.game.broadcastDeletedPlayer({id: player.id});
