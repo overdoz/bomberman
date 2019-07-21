@@ -97,7 +97,6 @@ export default class Player extends Element {
      * calls the movePlayer() method in Game.js
      * @param e = {id: '9fh3j4', key: 'ArrowLeft'}
      * @required in Game.js
-     * TODO: delete fastMode? @Sophia
      */
     triggerEvent(e, fastMode=false) {
 
@@ -288,6 +287,11 @@ export default class Player extends Element {
         }
     }
 
+    /**
+     * update player's health
+     * @param isLocal boolean type if it is the local player
+     * @param id id for the current player
+     */
     updateHealth(isLocal, id=null) {
         if (isLocal) {
             document.getElementById("amountLives").innerText = this.health;
@@ -301,6 +305,11 @@ export default class Player extends Element {
         }
     }
 
+    /**
+     *  update player's bomb amount
+     * @param relative the number of bomb changing, positive when adding bomb to the player, negative when minus bomb from the player
+     * @param localPlayer the local player to be updated
+     */
     updateBombCount(relative, localPlayer) {
         this.amountBombs += relative;
 
