@@ -305,14 +305,14 @@ export default class Game {
                 if (data.spoil.type === SPOIL_TYPE_BOMB) {
                     console.log("Player gets an extra bomb!");
                     player.updateBombCount(1, localPlayer);
-                    let state = {id: this.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
+                    let state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
                     this.broadcastInventory(state);
 
                 } else if (data.spoil.type === SPOIL_TYPE_LIFE) {
                     console.log("Player gets an extra life!");
                     player.health++;
                     player.updateHealth(this.id === data.player.id, data.player.id);
-                    let state = {id: this.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
+                    let state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
                     this.broadcastInventory(state);
                 } else if (data.spoil.type === SPOIL_TYPE_RUN) {
 

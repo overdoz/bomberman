@@ -45,6 +45,8 @@ body {
   display: flex;
   flex-direction: row;
   margin-left: 1em;
+  font-size: 40px;
+
 }
 
 #inventoryEnemy {
@@ -55,16 +57,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  font-size: 1em;
+  font-size: 20px;
 }
 
-img {
-  height: 40px;
-  width: 40px;
-}
 
 #nickname {
-  font-size: 1.1em;
   margin-right: 0.9em;
 }
 
@@ -76,7 +73,6 @@ img {
 }
 
 .playerInfos {
-  font-size: 1.5em;
   margin-right: 20px;
   display: flex;
   flex-direction: row;
@@ -127,7 +123,6 @@ p {
   font-family: "Carter One", cursive;
   color: white;
   letter-spacing: 3px;
-  font-size: 40px;
 }
 
 #loginForm {
@@ -148,6 +143,34 @@ p {
   text-shadow: 1px 1px 2px #FF0000;
   display: none;
 }
+
+#keys {
+  display: flex;
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0.5;
+}
+
+#keys > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  font-size: 20px;
+
+}
+
+.key {
+  border: 5px solid white;
+  border-radius: 10px;
+  text-align: center;
+  padding: 6px;
+  margin-right: 20px;
+}
+
 
 #you_suck_text {
   position: absolute;
@@ -232,7 +255,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  font-size: 10px;
+  font-size: 20px;
 }
 
 
