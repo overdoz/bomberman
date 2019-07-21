@@ -20,6 +20,7 @@ import {
     SPOIL_TYPE_BOMB,
     SPOIL_TYPE_RUN,
     HURT_PLAYER,
+    UPDATE_INVENTORY,
 } from "./constant.js";
 import Loot from './Loot.js';
 
@@ -143,13 +144,6 @@ export default class Game {
         // {x: nextPosition.x, y: nextPosition.y, id: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs}
         this.socket.on(PLACE_BOMB, (data) => {
             this.receiveBomb(data);
-
-            try {
-                let bomb = document.getElementById(data.id + 'BombText');
-                bomb.innerText = data.amountBombs;
-            } catch (e) {
-                console.log(e.message);
-            }
         });
 
         // receive spoils created by exploding walls
@@ -160,20 +154,26 @@ export default class Game {
 
         // receive walls set by enemies
         this.socket.on(PLACE_WALL, (data) => {
-            console.log('got wall', data);
             this.receiveWall(data);
-            try {
-                let wall = document.getElementById(data.id + 'WallText');
-                wall.innerText = data.amountWalls;
-            } catch (e) {
-                console.log(e.message);
-            }
         });
 
 
-        this.socket.on('updateHealth', (data) => {
+    /*    this.socket.on('updateHealth', (data) => {
             let healthIndicator = document.getElementById(data.id + 'HealthText');
             healthIndicator.innerText = data.health;
+        });*/
+
+        this.socket.on(UPDATE_INVENTORY, (data) => {
+            try {
+                let bomb = document.getElementById(data.id + 'BombText');
+                bomb.innerText = data.amountBombs;
+                let wall = document.getElementById(data.id + 'WallText');
+                wall.innerText = data.amountWalls;
+                let healthIndicator = document.getElementById(data.id + 'HealthText');
+                healthIndicator.innerText = data.health;
+            } catch (e) {
+                console.log(e)
+            }
         });
 
         this.socket.on(DELETE_PLAYER, (data) => {
@@ -239,17 +239,11 @@ export default class Game {
         this.socket.emit(DELETE_PLAYER, player);
     }
 
-
-    hurtPlayer(hurtPlayer) {
-        if (hurtPlayer.id !== this.id) {
-            this.players.forEach(player => {
-                if (player.id === hurtPlayer.id) {
-                    player.health--;
-                    player.updateHealth(hurtPlayer.id === this.id, player.id);
-                }
-            });
-        }
+    // TODO: sync states
+    broadcastInventory(state) {
+        this.socket.emit(UPDATE_INVENTORY ,state);
     }
+
 
 
 
@@ -295,7 +289,7 @@ export default class Game {
 
         // If there is no player with this particular ID, create new Player
         if (!doesContain) {
-            this.players.push(new Player(position, this.assets, 1, data.amountBombs, data.amountWalls, this.gridSize, this, data.id, data.direction));
+            this.players.push(new Player(position, this.assets, data.health, data.amountBombs, data.amountWalls, this.gridSize, this, data.id, data.direction));
             this.creatHTMLnode(data);
         }
 
@@ -310,6 +304,7 @@ export default class Game {
     pickUpItem(data) {
         let spoil = data.spoil;
         let localPlayer = data.player.id === this.id;
+        let state = {id: this.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
 
         this.players.forEach((player) => {
             if (player.id === data.player.id) {
@@ -324,14 +319,14 @@ export default class Game {
                 if (data.spoil.type === SPOIL_TYPE_BOMB) {
                     console.log("Player gets an extra bomb!");
                     player.updateBombCount(1, localPlayer);
+                    this.broadcastInventory(state);
+
                 } else if (data.spoil.type === SPOIL_TYPE_LIFE) {
                     console.log("Player gets an extra life!");
                     player.health++;
                     player.updateHealth(this.id === data.player.id, data.player.id);
 
-                    let playerState = {id: player.id, health: player.health};
-
-                    this.socket.emit('updateHealth', playerState)
+                    this.broadcastInventory(state);
                 } else if (data.spoil.type === SPOIL_TYPE_RUN) {
 
                     // TODO: stop running after 30 secs @Sophia
@@ -345,7 +340,7 @@ export default class Game {
                             if (!this.gameOver) {
                                 this.movePlayer({id: this.id, key: e.key}, true)
                             }
-                        }
+                        };
 
                         document.addEventListener("keydown", eventFunction);
                         player.isARunner = true;
@@ -404,6 +399,17 @@ export default class Game {
                 player.direction = data.direction;
             }
         });
+    }
+
+    hurtPlayer(hurtPlayer) {
+        if (hurtPlayer.id !== this.id) {
+            this.players.forEach(player => {
+                if (player.id === hurtPlayer.id) {
+                    player.health--;
+                    player.updateHealth(hurtPlayer.id === this.id, player.id);
+                }
+            });
+        }
     }
 
     checkForWinner() {

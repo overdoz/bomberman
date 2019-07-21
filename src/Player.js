@@ -252,6 +252,9 @@ export default class Player extends Element {
                 // display the amount of walls you have currently have
                 document.getElementById("amountWalls").innerText = this.amountWalls;
 
+                let state = {id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs, health: this.health};
+                this.game.broadcastInventory(state);
+
             }
         }
     }
@@ -280,7 +283,8 @@ export default class Player extends Element {
             // send position of your bomb to all enemies
             this.game.broadcastBomb(playerState);
 
-
+            let state = {id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs, health: this.health};
+            this.game.broadcastInventory(state);
         }
     }
 

@@ -20,7 +20,7 @@ const DIRECTIONS = {
     NORTH: 'north',
 };
 
-const AMOUNT_RANDOM_WALLS = 30;
+const AMOUNT_RANDOM_WALLS = 55;
 
 // TODO: couldn't use import {const, ...} -> maybe require()
 const CHANGE_DIRECTION = 'changeDirection';
@@ -405,7 +405,7 @@ io.on('connection', function(socket){
     });
 
 
-    // TODO: sync states at server @Thanh
+ /*   // TODO: sync states at server @Thanh
     socket.on('updateHealth', function (playerState) {
         positionPlayers.forEach((player) => {
             if (player.id === playerState.id) {
@@ -413,7 +413,17 @@ io.on('connection', function(socket){
             }
         });
         socket.broadcast.emit('updateHealth', playerState);
-    })
+    })*/
+    socket.on('updateInventory', function (data) {
+        socket.broadcast.emit('updateInventory', data);
+        positionPlayers.forEach(player => {
+            if (player.id === data.id) {
+                player.amountBombs = data.amountBombs;
+                player.amountWalls = data.amountWalls;
+                player.health = data.health;
+            }
+        });
+    });
 
 });
 
