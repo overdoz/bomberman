@@ -24,6 +24,9 @@ export default class Bomb extends Element {
         this.timeToExplode = timeToExplode;
         this.radius = radius;
 
+
+        this.bombMusic = new Audio("/sounds/bombMusic.mp3");
+
         // TODO: resize spritesheets @Paula
         this.spriteSize = {
             bomb: {
