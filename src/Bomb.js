@@ -73,6 +73,8 @@ export default class Bomb extends Element {
      */
     getSurroundingPositions() {
 
+        let positions = [];
+
         let positionsHorizontal = [
             {x: this.position.x+1, y: this.position.y},
             {x: this.position.x-1, y: this.position.y},
@@ -99,31 +101,24 @@ export default class Bomb extends Element {
             }
         }
 
-
-        if (horizontalCollision === true) {
-            let horizontalFire = [];
+        if (horizontalCollision) {
             for (let i = (-this.radius); i < this.radius+1; i++) {
-                horizontalFire.push({x: this.position.x, y: (this.position.y + i)})
+                positions.push({x: this.position.x, y: (this.position.y + i)})
             }
-            return horizontalFire
-
-        } else if (verticalCollision === true) {
-            let verticalFire = [];
+        } else if (verticalCollision) {
             for (let i = (-this.radius); i < this.radius+1; i++) {
-                verticalFire.push({x: (this.position.x + i), y: this.position.y})
+                positions.push({x: (this.position.x + i), y: this.position.y})
             }
-            return verticalFire
-
         } else {
-            let crossFire = [];
             for (let i = (-this.radius); i < this.radius+1; i++) {
-                crossFire.push({x: this.position.x, y: (this.position.y + i)})
+                positions.push({x: this.position.x, y: (this.position.y + i)})
             }
             for (let i = (-this.radius); i < this.radius+1; i++) {
-                crossFire.push({x: (this.position.x + i), y: this.position.y})
+                if (i === 0) { continue; }
+                positions.push({x: (this.position.x + i), y: this.position.y})
             }
-            return crossFire
         }
+        return positions;
     }
 
     /**
@@ -133,16 +128,17 @@ export default class Bomb extends Element {
      * let position determines the surrounding positions
      */
     destroySurrounding() {
-        // index of the bomb to be deleted
+        // index of this particular bomb in order to delete it
         let index = this.game.bombs.map(bomb => {return bomb.ID}).indexOf(this.ID);
 
-        // delete bomb at index
+        // delete this bomb at its index
         this.game.bombs.splice(index, 1);
 
 
         // delete affected players
         this.game.players.forEach((player, index) => {
 
+            // compare with positions of fire animation
             this.getSurroundingPositions().forEach(position => {
 
                 // if explosion position matches player position

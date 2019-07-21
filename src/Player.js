@@ -44,7 +44,7 @@ export default class Player extends Element {
         this.dead = false;
 
         this.currentAnimationState = 0;
-        this.animationSpeed = 10;
+        this.animationSpeed = 20;
 
 
         this.photo  = (this.id === this.game.id) ? 'bomberman' : 'enemy';

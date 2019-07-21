@@ -1,8 +1,9 @@
 "use strict";
 
-import Player from './Player.js';
-import Wall from './Wall.js';
 import Bomb from "./Bomb.js";
+import Player from './Player.js';
+import Loot from './Loot.js';
+import Wall from './Wall.js';
 import io from "socket.io-client";
 import {
     CHANGE_DIRECTION,
@@ -15,14 +16,13 @@ import {
     CREATE_WALLS,
     DELETE_PLAYER,
     CREATE_SPOIL,
-    GRAB_SPOIL,
+    GRAB_ITEM,
     SPOIL_TYPE_LIFE,
     SPOIL_TYPE_BOMB,
     SPOIL_TYPE_RUN,
     HURT_PLAYER,
     UPDATE_INVENTORY,
 } from "./constant.js";
-import Loot from './Loot.js';
 
 export default class Game {
 
@@ -31,9 +31,6 @@ export default class Game {
         this.canvas = document.getElementById(canvas);
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
-
-
-
 
         // ID of your client
         this.id = id;
@@ -80,7 +77,6 @@ export default class Game {
             if (!this.gameOver) {
                 this.movePlayer({id: id, key: e.key})
             }
-
         });
 
 
@@ -132,7 +128,7 @@ export default class Game {
         });
 
         // player grabbed spoil
-        this.socket.on(GRAB_SPOIL, (data) => {
+        this.socket.on(GRAB_ITEM, (data) => {
             this.pickUpItem(data);
         });
 
@@ -152,12 +148,6 @@ export default class Game {
         this.socket.on(PLACE_WALL, (data) => {
             this.receiveWall(data);
         });
-
-
-    /*    this.socket.on('updateHealth', (data) => {
-            let healthIndicator = document.getElementById(data.id + 'HealthText');
-            healthIndicator.innerText = data.health;
-        });*/
 
         this.socket.on(UPDATE_INVENTORY, (data) => {
             try {
@@ -300,10 +290,10 @@ export default class Game {
     pickUpItem(data) {
         let spoil = data.spoil;
         let localPlayer = data.player.id === this.id;
-        let state = {id: this.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
 
         this.players.forEach((player) => {
             if (player.id === data.player.id) {
+
                 // change the music for the player
                 if (!this.backgroundMusic.paused) {
                     this.backgroundMusic.currentTime = 0;
@@ -315,13 +305,14 @@ export default class Game {
                 if (data.spoil.type === SPOIL_TYPE_BOMB) {
                     console.log("Player gets an extra bomb!");
                     player.updateBombCount(1, localPlayer);
+                    let state = {id: this.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
                     this.broadcastInventory(state);
 
                 } else if (data.spoil.type === SPOIL_TYPE_LIFE) {
                     console.log("Player gets an extra life!");
                     player.health++;
                     player.updateHealth(this.id === data.player.id, data.player.id);
-
+                    let state = {id: this.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
                     this.broadcastInventory(state);
                 } else if (data.spoil.type === SPOIL_TYPE_RUN) {
 
