@@ -56,6 +56,7 @@ export default class Bomb extends Element {
     }
 
     animateExplosion() {
+        this.bombMusic.play();
         this.isExploded = true;
         setTimeout(() => {
             this.destroySurrounding();
