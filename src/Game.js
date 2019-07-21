@@ -81,11 +81,7 @@ export default class Game {
             }
 
         });
-        //this.spoilMusic.addEventListener('timeupdate', function () {
-            //if (this.spoilMusic.currentTime > Math.round(Number(0) + Number(6)) && !this.paused)  {
-               // this.spoilMusic.pause();
-           // }
-       // });
+
 
 
 
@@ -334,7 +330,6 @@ export default class Game {
                     this.socket.emit('updateHealth', playerState)
                 } else if (data.spoil.type === SPOIL_TYPE_RUN) {
 
-                    // TODO: stop running after 30 secs @Sophia
                     console.log("Player becomes faster!");
                     // make player faster
 
@@ -362,6 +357,7 @@ export default class Game {
 
         let removalIndex = -1;
 
+        // update in the spoil arsenal
         for (let i = 0; i < this.spoils.length; i++) {
             let pos = this.spoils[i].position;
             if (pos.x === spoil.position.x && pos.y === spoil.position.y) {
