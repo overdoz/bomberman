@@ -199,6 +199,7 @@ io.on('connection', function(socket){
         };
 
         // TODO: fix full lobby @Angelos
+        // TODO: when all player left and one player logs in, there is still 2-3 players on the server -> remove player from server when refresh
 
         switch (positionPlayers.length) {
             case 0:

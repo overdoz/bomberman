@@ -1,83 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="./src/main.css">
-    <title>Bombastic 4D</title>
-    <link href="https://fonts.googleapis.com/css?family=Asap:700|Carter+One|Fugaz+One&display=swap" rel="stylesheet">
+    <head>
 
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="./src/main.css">
+        <title>Bombastic 4D</title>
+        <link href="https://fonts.googleapis.com/css?family=Asap:700|Carter+One|Fugaz+One&display=swap" rel="stylesheet">
 
+    </head>
+    <body style="margin:0">
 
+        <form id="reactions">
+            <button id ="you_suck_button" type="button">You Suck!!!</button>
+            <button id ="finger_button" type="button">Give some Hate !!!</button>
+            <button id ="love_button" type="button">Give some Love !!!</button>
+            <button id ="lol_button" type="button">L O L !!!</button>
+        </form>
 
-</head>
-<body style="margin:0">
+        <form id="loginForm" >
+            <input type="text" id="lname" name="lname" placeholder="Enter your nickname" maxlength="20" minlength="1">
+            <input type="submit" value="Log in" id="login">
+        </form>
 
-    <form id="reactions">
-        <button id = "you_suck_button" type="button">You Suck!!!</button>
-        <button id = "finger_button" type="button">Give some Hate !!!</button>
-        <button id = "love_button" type="button">Give some Love !!!</button>
-        <button id = "lol_button" type="button">L O L !!!</button>
-    </form>
-
-    <form id="loginForm" >
-        <input type="text" id="lname" name="lname" placeholder="Enter your nickname" maxlength="20" minlength="1">
-        <input type="submit" value="Log in" id="login">
-    </form>
-
-    <div id="inventory">
-        <div id="lives">
+        <div id="inventory">
+            <div id="lives">
                 <img src="images/spoilLife.png" alt="life" />
                 <div class="countBox">
                     <p id="amountLives">0</p>
                 </div>
-        </div>
-        <div id="bombs">
-            <img  src="dist/bomb_icon.png" alt="bomb" />
-            <div class="countBox">
-                <p id="amountBombs">0</p>
+            </div>
+
+            <div id="bombs">
+                <img  src="dist/bomb_icon.png" alt="bomb" />
+                <div class="countBox">
+                    <p id="amountBombs">0</p>
+                </div>
+            </div>
+
+            <div id="walls">
+                <img src="dist/wall.png" alt="wall" />
+                <div class="countBox">
+                    <p id="amountWalls">0</p>
+                </div>
             </div>
         </div>
 
-        <div id="walls">
-            <img src="dist/wall.png" alt="wall" />
-            <div class="countBox">
-                <p id="amountWalls">0</p>
-            </div>
+        <div id="inventoryEnemy">
+
         </div>
-    </div>
-
-    <div id="inventoryEnemy">
-
-    </div>
 
 
-    <h1 class="title">BOMBASTIC 4D</h1>
-    <canvas id="myCanvas" width="520" height="520"></canvas>
+        <h1 class="title">BOMBASTIC 4D</h1>
+        <canvas id="myCanvas" width="520" height="520"></canvas>
 
-    <div id="echat">
+        <div id="echat">
 
-    </div>
-
-
-    <div id="gameOverScreen">
-        <p id="gameOverText">GAME OVER</p>
-    </div>
-
-    <div id="youwinscreen">
-        <p id="youwinText">YOU WIN!!!</p>
-    </div>
-
-    <form id="you_suck">
-        <p id = "you_suck_text">YOU SUCK !!!</p>
-    </form>
-
-    <form id="chat">
-        <p id = "emoji_chat">EMOJI CHAT</p>
-    </form>
+        </div>
 
 
+        <div id="gameOverScreen">
+            <p id="gameOverText">GAME OVER</p>
+        </div>
 
-    <script src="./dist/main.js"></script>
+        <div id="youwinscreen">
+            <p id="youwinText">YOU WIN!!!</p>
+        </div>
 
-</body>
+        <script src="./dist/main.js"></script>
+
+    </body>
 </html>

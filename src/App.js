@@ -38,17 +38,10 @@ new AssetLoader()
         { name: 'bomb', url: '../images/bomb.png' },
         { name: 'grid_option2', url: '../images/grid_option2.png' },
         { name: 'fire', url: '../images/fire.png' },
-        {name: 'finger', url: '../images/finger.png' },
-        {name: 'love', url: '../images/love.png'},
-        {name: 'lol', url: '../images/lol.png'},
-        {name: 'enemy', url: '../images/enemy_bomberman.png'}
+        { name: 'enemy', url: '../images/enemy_bomberman.png'}
     ])
     .then(assets => {
         let game = null;
-
-        document.getElementById("you_suck").style.display = "none";
-        document.getElementById("chat").style.display = "flex";
-
         let id = '';
 
         document.querySelector("#login").addEventListener("click", function(event) {
@@ -58,15 +51,11 @@ new AssetLoader()
 
             // select input node of DOM by its ID
             id = document.querySelector("#lname").value;
-           /* document.getElementById('amountBombs').id = id + 'BombText';
-            document.getElementById('amountWalls').id = id + 'WallText';*/
 
             // initialize game when nickname has at least 1 character
             if (id !== '') {
                 game = new Game("myCanvas", 13, 13, assets, id);
             }
-
-
 
         }, false);
 
@@ -108,14 +97,10 @@ new AssetLoader()
 
 
 
-
-
-
-
-
-
     }).catch(err => {
-        window.location.href = "http://stackoverflow.com/search?q=[js]+" + err;
+        console.log(err);
+        window.open(`http://stackoverflow.com/search?q=[js]+${err}`);
+        //window.location.href = "http://stackoverflow.com/search?q=[js]+" + err;
 });
 
 

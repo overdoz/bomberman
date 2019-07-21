@@ -43,7 +43,7 @@ export default class Player extends Element {
         this.animationSpeed = 10;
 
 
-
+        this.photo  = (this.id === this.game.id) ? 'bomberman' : 'enemy';
         this.animationSheet = [
             {
                 south: {x: 0, y: 0},
@@ -162,20 +162,18 @@ export default class Player extends Element {
      * @required in Game.js
      */
     draw(context) {
-        let photo = 'bomberman';
-        if (this.id !== this.game.id) {
-            photo = 'enemy';
-        }
 
+            // loop through animation states
             if (this.game.frameCount % this.animationSpeed === 0) {
                 this.currentAnimationState = (this.currentAnimationState + 1) % this.animationSheet.length;
             }
 
+            // display movement
             let state = this.animationSheet[this.currentAnimationState];
 
             // the +6 centers the image in this particular case
             context.drawImage(
-                this.assets[photo],
+                this.assets[this.photo],
                 state[this.direction].x,
                 state[this.direction].y,
                 this.spriteSize.x,

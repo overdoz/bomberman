@@ -465,19 +465,22 @@ export default class Game {
         let chat = document.getElementById('echat');
         let container = document.createElement("div");
         let message = document.createElement("p");
+        let name = data.id === this.id ?  'You' : data.id;
 
         switch (data.reaction) {
             case "you_suck":
-                message.innerText = `${data.id}: 🤬`;
+                message.innerText = `${name}: 🤬`;
                 break;
             case "finger":
-                message.innerText = `${data.id}: 🖕`;
+                message.innerText = `${name}: 🖕`;
                 break;
             case "love":
-                message.innerText = `${data.id}: ❤️`;
+                message.innerText = `${name}: ❤️`;
                 break;
             case "lol":
-                message.innerText = `${data.id}: 😂`;
+                message.innerText = `${name}: 😂`;
+                break;
+            default:
                 break;
         }
 
