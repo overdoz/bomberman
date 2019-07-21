@@ -83,6 +83,7 @@ server.listen(PORT, function() {
 let positionPlayers = [];
 let positionWalls = [];
 let spoils = [];
+let server_overload = false;
 
 /**
  * generates an unique ID
@@ -198,8 +199,9 @@ io.on('connection', function(socket){
             health: HEALTH,
         };
 
-        // TODO: fix full lobby @Angelos
-        // TODO: when all player left and one player logs in, there is still 2-3 players on the server -> remove player from server when refresh
+        // The id name of the player that was conected. Used to kick out
+        // the player of the server at: "disconnect"
+        name = data.id;
 
         switch (positionPlayers.length) {
             case 0:
@@ -225,30 +227,34 @@ io.on('connection', function(socket){
                 console.log(playerDetails);
                 break;
             default:
-                break;
+                check_server();
         }
 
-        // store incoming player
-        positionPlayers.push(playerDetails);
+        if (!server_overload) {
 
 
+            // store incoming player
+            positionPlayers.push(playerDetails);
 
-        // create incoming player
-        socket.emit(CREATE_PLAYER, playerDetails);
+
+            // create incoming player
+            socket.emit(CREATE_PLAYER, playerDetails);
 
 
-        // create rest of all currently attending player
-        if (positionPlayers.length > 0) {
-            for (let i = 0; i < positionPlayers.length - 1; i++) {
-                socket.emit(CREATE_PLAYER, positionPlayers[i]);
+            // create rest of all currently attending player
+            if (positionPlayers.length > 0) {
+                for (let i = 0; i < positionPlayers.length - 1; i++) {
+                    socket.emit(CREATE_PLAYER, positionPlayers[i]);
+                }
             }
+
+            // send all wall objects to client
+            socket.emit(CREATE_WALLS, [...positionWalls]);
+
+            // notify each client and send them new incoming player
+            socket.broadcast.emit(CREATE_PLAYER, playerDetails);
+
         }
-
-        // send all wall objects to client
-        socket.emit(CREATE_WALLS, [...positionWalls]);
-
-        // notify each client and send them new incoming player
-        socket.broadcast.emit(CREATE_PLAYER, playerDetails);
     });
 
     /**
@@ -271,6 +277,7 @@ io.on('connection', function(socket){
                 positionPlayers.splice(i,1);
                 socket.broadcast.emit('timeout', {id: name});
                 console.log("JUST KICKED OFF THE PLAYER: " + name);
+                check_server();
             }
         }
     });
@@ -426,6 +433,19 @@ io.on('connection', function(socket){
     });
 
 });
+
+/**
+ * Checks if the server has reached its maximum
+ * capacity
+ */
+function check_server() {
+    if (positionPlayers.length < 4) {
+        server_overload = false;
+    } else {
+        server_overload = true;
+    }
+    console.log("checks server .. and is full === " + server_overload);
+}
 
 
 
