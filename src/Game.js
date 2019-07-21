@@ -340,13 +340,21 @@ export default class Game {
 
                     if (!player.isARunner && localPlayer) {
 
-                        // TODO: delete eventlistener @Sophia
-                        document.addEventListener("keydown", (e) => {
+                        // make the player into a runner by adding key event
+                        let eventFunction =  (e) => {
                             if (!this.gameOver) {
                                 this.movePlayer({id: this.id, key: e.key}, true)
                             }
-                        });
+                        }
+
+                        document.addEventListener("keydown", eventFunction);
                         player.isARunner = true;
+
+                        // set the runner duration as 30 seconds
+                        setTimeout(() => {
+                            document.removeEventListener("keydown", eventFunction);
+                            player.isARunner = false;
+                        }, 30000);
                     }
                 }
             }
