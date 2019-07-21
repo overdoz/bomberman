@@ -61,8 +61,10 @@ new AssetLoader()
            /* document.getElementById('amountBombs').id = id + 'BombText';
             document.getElementById('amountWalls').id = id + 'WallText';*/
 
-            // initialize game
-            game = new Game("myCanvas", 13, 13, assets, id);
+            // initialize game when nickname has at least 1 character
+            if (id !== '') {
+                game = new Game("myCanvas", 13, 13, assets, id);
+            }
 
 
 
