@@ -134,7 +134,7 @@ const generateRandomWalls = (amount) => {
 
 /**
  * checks if there is already a wall at this position
- * @param position = {x: 45, y: 26}
+ * @param position = {x: NUMBER, y: NUMBER}
  * @returns {boolean}
  */
 const isAlreadyExisting = (position) => {
