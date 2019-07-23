@@ -307,7 +307,6 @@ export default class Game {
                     player.updateBombCount(1, localPlayer);
                     let state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
                     this.broadcastInventory(state);
-
                 } else if (data.spoil.type === SPOIL_TYPE_LIFE) {
                     console.log("Player gets an extra life!");
                     player.health++;
@@ -315,19 +314,16 @@ export default class Game {
                     let state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
                     this.broadcastInventory(state);
                 } else if (data.spoil.type === SPOIL_TYPE_RUN) {
-
                     console.log("Player becomes faster!");
+
                     // make player faster
-
                     if (!player.isARunner && localPlayer) {
-
                         // make the player into a runner by adding key event
                         let eventFunction =  (e) => {
                             if (!this.gameOver) {
                                 this.movePlayer({id: this.id, key: e.key}, true)
                             }
                         };
-
                         document.addEventListener("keydown", eventFunction);
                         player.isARunner = true;
 
