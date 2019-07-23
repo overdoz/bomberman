@@ -198,7 +198,7 @@ io.on('connection', function(socket){
             health: HEALTH,
         };
 
-        // The id name of the player that was conected. Used to kick out
+        // The id name of the player that was connected. Used to kick out
         // the player of the server at: "disconnect"
         name = data.id;
 

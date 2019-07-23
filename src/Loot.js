@@ -16,8 +16,8 @@ export default class Loot extends Element {
 
         this.spriteSize = {
             spoil: {
-                x: 28,
-                y: 28,
+                x: 40,
+                y: 40,
             }
         };
 
@@ -28,11 +28,10 @@ export default class Loot extends Element {
 
         this.animationSheet = [
             {x: 0, y: 0},
-            {x: 28, y: 0},
-            {x: 2 * 28, y: 0},
-            {x: 3 * 28, y: 0},
-            {x: 4 * 28, y: 0},
-
+            {x: 40, y: 0},
+            {x: 2 * 40, y: 0},
+            {x: 3 * 40, y: 0},
+            {x: 4 * 40, y: 0},
         ];
 
     }

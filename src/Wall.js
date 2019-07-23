@@ -10,14 +10,8 @@ export default class Wall extends Element {
         // this.strength = strength;
 
         this.spriteSize = {
-            destructible: {
-                x: 32,
-                y: 32,
-            },
-            indestructible: {
-                x: 15,
-                y: 16,
-            }
+            x: 40,
+            y: 40,
         };
 
         this.gridSize = gridSize;
@@ -31,8 +25,8 @@ export default class Wall extends Element {
                 this.assets['wall'],
                 0,
                 0,
-                this.spriteSize.destructible.x,
-                this.spriteSize.destructible.y,
+                this.spriteSize.x,
+                this.spriteSize.y,
                 this.position.x * this.gridSize,
                 this.position.y * this.gridSize,
                 this.gridSize,
@@ -43,8 +37,8 @@ export default class Wall extends Element {
                 this.assets['grid_option2'],
                 0,
                 0,
-                this.spriteSize.indestructible.x,
-                this.spriteSize.indestructible.y,
+                this.spriteSize.x,
+                this.spriteSize.y,
                 this.position.x * this.gridSize,
                 this.position.y * this.gridSize,
                 this.gridSize,

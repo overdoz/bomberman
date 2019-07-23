@@ -57,7 +57,7 @@ export default class Game {
         this.spoilMusic.loop = true;
 
         // set up socket connection
-        this.socket = io.connect('http://localhost:9000');
+        this.socket = io.connect('');
 
         // send notification to server in order to create your player
         this.socket.emit(LOGIN_PLAYER, { id: this.id });
