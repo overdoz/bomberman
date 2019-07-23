@@ -31,42 +31,43 @@ export default class Game {
         this.canvas = document.getElementById(canvas);
         this.context = this.canvas.getContext('2d');
         this.assets = assets;
+        this.frameCount = 0;
 
         // ID of your client
         this.id = id;
+        this.gameOver = false;
+
 
         this.width = width;
         this.height = height;
-
-        this.frameCount = 0;
-
-
         this.gridSize = this.canvas.width / width;
 
-
-        this.gameOver = false;
 
         this.bombs = [];
         this.players = [];
         this.walls = [];
-        this.spoils = [];
+        this.items = [];
 
-        this.backgroundMusic = new Audio("/sounds/backgroundMusic.mp4");
         // background music plays when game starts
+        this.backgroundMusic = new Audio("/sounds/backgroundMusic.mp4");
         this.backgroundMusic.loop = true;
         this.backgroundMusic.play();
         this.backgroundMusic.volume = 0.5;
         this.spoilMusic = new Audio("/sounds/spoilMusic.mp4");
         this.spoilMusic.loop = true;
 
-
+        // set up socket connection
         this.socket = io.connect('http://localhost:9000');
 
         // send notification to server in order to create your player
         this.socket.emit(LOGIN_PLAYER, { id: this.id });
 
+
+
         // disable input
         document.getElementById("login").disabled = true;
+
+        // disable login button
         document.getElementById("lname").disabled = true;
 
         // set focus on canvas
@@ -102,10 +103,10 @@ export default class Game {
         });
 
         // after logging in your player, the server will send you all generated walls
-        this.socket.on(CREATE_WALLS, (data) => {
-            data.forEach(d => {
-                let pos = {x: d.x, y: d.y};
-                this.walls.push(new Wall(pos, 1, d.isDestructible, assets, 40, d.wallId));
+        this.socket.on(CREATE_WALLS, (walls) => {
+            walls.forEach(wall => {
+                let position = {x: wall.x, y: wall.y};
+                this.walls.push(new Wall(position, 1, wall.isDestructible, assets, 40, wall.wallId));
             });
         });
 
@@ -138,7 +139,7 @@ export default class Game {
             this.receiveBomb(data);
         });
 
-        // receive spoils created by exploding walls
+        // receive items created by exploding walls
         // {x: nextPosition.x, y: nextPosition.y, id: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs}
         this.socket.on(CREATE_SPOIL, (data) => {
             this.receiveItem(data);
@@ -149,19 +150,19 @@ export default class Game {
             this.receiveWall(data);
         });
 
+        // update enemy inventory
+        // {id: "NAME", amountWalls: this.amountWalls, amountBombs: this.amountBombs, health: this.health}
         this.socket.on(UPDATE_INVENTORY, (data) => {
             try {
-                let bomb = document.getElementById(data.id + 'BombText');
-                bomb.innerText = data.amountBombs;
-                let wall = document.getElementById(data.id + 'WallText');
-                wall.innerText = data.amountWalls;
-                let healthIndicator = document.getElementById(data.id + 'HealthText');
-                healthIndicator.innerText = data.health;
+                document.getElementById(data.id + 'BombText').innerText = data.amountBombs;
+                document.getElementById(data.id + 'WallText').innerText = data.amountWalls;
+                document.getElementById(data.id + 'HealthText').innerText = data.health;
             } catch (e) {
                 console.log(e)
             }
         });
 
+        // update remaining players
         this.socket.on(DELETE_PLAYER, (data) => {
             this.players.forEach((player, index) => {
                 if (player.id === data.id) {
@@ -187,28 +188,26 @@ export default class Game {
 //                                                   //
 //###################################################//
 
+
+    /**
+     * all broadcast functions are being evoked by Player.js
+     */
     broadcastReaction(reaction) {
-        this.socket.emit("reaction", {id:this.id, reaction:reaction});
+        this.socket.emit("reaction", {id:this.id, reaction: reaction});
     }
 
-    // evoked by Player.js
     broadcastPosition(position) {
         this.socket.emit(MOVE_PLAYER, position);
     }
 
-    // evoked by Player.js
     broadcastDirection(direction) {
         this.socket.emit(CHANGE_DIRECTION, direction);
     }
 
-    // evoked by Player.js
-    // {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs}
     broadcastWall(wall) {
         this.socket.emit(PLACE_WALL, wall);
     }
 
-    // evoked by Player.js
-    // {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs}
     broadcastBomb(bomb) {
         this.socket.emit(PLACE_BOMB, bomb);
     }
@@ -225,7 +224,6 @@ export default class Game {
         this.socket.emit(DELETE_PLAYER, player);
     }
 
-    // TODO: sync states
     broadcastInventory(state) {
         this.socket.emit(UPDATE_INVENTORY ,state);
     }
@@ -257,7 +255,7 @@ export default class Game {
     /**
      * create new player
      * is being called in App.js whenever socket receives a signal
-     * @param data = {id: data.id, x: 0, y: 0, direction: 'east', amountWalls: 99, amountBombs: 99, health: 99}
+     * @param data = {id: STRING, x: NUMBER, y: NUMBER, direction: STRING, amountWalls: NUMBER, amountBombs: NUMBER, health: NUMBER}
      */
     pushPlayer(data) {
         // create position of this player
@@ -276,7 +274,9 @@ export default class Game {
         // If there is no player with this particular ID, create new Player
         if (!doesContain) {
             this.players.push(new Player(position, this.assets, data.health, data.amountBombs, data.amountWalls, this.gridSize, this, data.id, data.direction));
-            this.creatHTMLnode(data);
+
+            // attach html node to enemy stats
+            this.displayEnemyInventory(data);
         }
 
 
@@ -285,7 +285,7 @@ export default class Game {
      * the player grab the spoil
      * is being called in App.js whenever socket receives a signal
      * check the type of the spoil and update then broadcast it
-     * @param data = {id: data.id, x: 0, y: 0, direction: 'east', amountWalls: 99, amountBombs: 99, health: 99}
+     * @param data = {id: STRING, x: NUMBER, y: NUMBER, direction: STRING, amountWalls: NUMBER, amountBombs: NUMBER, health: NUMBER}
      */
     pickUpItem(data) {
         let spoil = data.spoil;
@@ -340,8 +340,8 @@ export default class Game {
         let removalIndex = -1;
 
         // update in the spoil arsenal
-        for (let i = 0; i < this.spoils.length; i++) {
-            let pos = this.spoils[i].position;
+        for (let i = 0; i < this.items.length; i++) {
+            let pos = this.items[i].position;
             if (pos.x === spoil.position.x && pos.y === spoil.position.y) {
                 removalIndex = i;
                 break;
@@ -349,7 +349,7 @@ export default class Game {
         }
 
         if (removalIndex >= 0) {
-            this.spoils.splice(removalIndex, 1);
+            this.items.splice(removalIndex, 1);
         }
     }
 
@@ -357,7 +357,7 @@ export default class Game {
     /**
      * move own player
      * is being called in App.js whenever user presses a key
-     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     * @param data = {id: STRING, x: NUMBER, y: NUMBER, direction: STRING}
      * @param fastMode type boolean
      */
     movePlayer(data, fastMode) {
@@ -372,7 +372,7 @@ export default class Game {
     /**
      * receive movement from enemy players
      * is being called in App.js whenever socket receives a signal
-     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     * @param data = {id: STRING, x: NUMBER, y: NUMBER, direction: STRING}
      */
     moveEnemy(data) {
         this.players.forEach(player => {
@@ -413,7 +413,7 @@ export default class Game {
     /**
      * receive direction change from enemy players
      * is being called in App.js whenever socket receives a signal
-     * @param data = {id: data.id, x: 0, y: 0, direction: 'east'}
+     * @param data = {id: STRING, x: NUMBER, y: NUMBER, direction: STRING}
      */
     changeDirection(data) {
         this.players.forEach(player => {
@@ -427,20 +427,24 @@ export default class Game {
     /**
      * receive bombs from enemy players
      * is being called in App.js whenever socket receives a signal
-     * @param position = {x: 0, y: 0}
+     * @param position = {x: NUMBER, y: NUMBER}
      */
     receiveBomb(position) {
         this.bombs.push(new Bomb(position, 1500, 2, this.assets, this.gridSize, this, true));
     }
 
+    /**
+     * receive item
+     * @param data = {position: {x: NUMBER, y: NUMBER}, type: STRING}
+     */
     receiveItem(data) {
-        this.spoils.push(new Loot(data.position, data.type, this.assets, this.gridSize, this));
+        this.items.push(new Loot(data.position, data.type, this.assets, this.gridSize, this));
     }
 
     /**
      * receive walls from enemy players
      * is being called in App.js whenever socket receives a signal
-     * @param data = {x: 0, y: 0, id: 'dasr43g4'}
+     * @param data = {wallId: STRING, x: NUMBER, y: NUMBER, id: STRING}
      */
     receiveWall(data) {
         let tempPosition = {x: data.x, y: data.y};
@@ -476,13 +480,16 @@ export default class Game {
             wall.draw(this.context);
         });
 
-        this.spoils.forEach(spoil => {
-            spoil.draw(this.context);
+        this.items.forEach(item => {
+            item.draw(this.context);
         });
 
     }
 
-
+    /**
+     * update emoji chat
+     * @param data = {id: STRING, reaction: STRING}
+     */
     drawReaction(data) {
         let chat = document.getElementById('echat');
         let container = document.createElement("div");
@@ -536,9 +543,9 @@ export default class Game {
 
     /**
      * creates an HTML node every time a player has been created
-     * @param data = {id: #344gds, amountBombs: 29, amountWalls: 93}
+     * @param data = {id: STRING, amountBombs: NUMBER, amountWalls: NUMBER}
      */
-    creatHTMLnode(data) {
+    displayEnemyInventory(data) {
         if (this.players.length > 1) {
 
             let enemyInventory = document.getElementById('inventoryEnemy');

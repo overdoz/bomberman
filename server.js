@@ -34,6 +34,8 @@ const CREATE_WALLS = 'createWalls';
 const CREATE_SPOIL = 'createSpoil';
 const GRAB_SPOIL = 'grabSpoil';
 const HURT_PLAYER = 'hurtPlayer';
+const UPDATE_INVENTORY = 'updateInventory';
+const REACTION = 'reaction';
 
 
 
@@ -94,8 +96,9 @@ const generateRandomID = () => {
 };
 
 /**
- * creates wall objects and stores them in positionWalls array
+ * creates wall objects and returns them
  * @param amount = amount of walls to be generated
+ * @returns [walls]
  */
 const generateRandomWalls = (amount) => {
 
@@ -131,7 +134,7 @@ const generateRandomWalls = (amount) => {
 
 /**
  * checks if there is already a wall at this position
- * @param position = {x: 45, y: 26}
+ * @param position = {x: NUMBER, y: NUMBER}
  * @returns {boolean}
  */
 const isAlreadyExisting = (position) => {
@@ -153,17 +156,13 @@ const isAlreadyExisting = (position) => {
                     return true;
                 case ((position.x === (GAME_WIDTH-1-i)) && (position.y === j)):
                     return true;
+                default:
+                    break;
             }
         }
     }
     return false;
 };
-
-/**
- * create destructible and indestructible walls after server starts
- * @param amount = number
- */
-// generateRandomWalls(AMOUNT_RANDOM_WALLS);
 
 
 
@@ -184,7 +183,7 @@ io.on('connection', function(socket){
 
     /**
      * broadcast new player registration after user has pressed the login button
-     * @param data = {id: 'MICKEYMOUSE'}
+     * @param data = {id: STRING}
      */
     socket.on('loginPlayer', function (data) {
 
@@ -232,14 +231,11 @@ io.on('connection', function(socket){
 
         if (!server_overload) {
 
-
             // store incoming player
             positionPlayers.push(playerDetails);
 
-
             // create incoming player
             socket.emit(CREATE_PLAYER, playerDetails);
-
 
             // create rest of all currently attending player
             if (positionPlayers.length > 0) {
@@ -253,13 +249,12 @@ io.on('connection', function(socket){
 
             // notify each client and send them new incoming player
             socket.broadcast.emit(CREATE_PLAYER, playerDetails);
-
         }
     });
 
     /**
      * broadcast new direction change to each client
-     * @param data = {id: 'SANTACLAUS', direction: this.direction}
+     * @param data = {id: STRING, direction: STRING}
      */
     socket.on(CHANGE_DIRECTION, function(data) {
         socket.broadcast.emit(CHANGE_DIRECTION, data);
@@ -281,6 +276,7 @@ io.on('connection', function(socket){
             }
         }
     });
+
     socket.on(HURT_PLAYER, function(data) {
         socket.broadcast.emit(HURT_PLAYER, data);
         positionPlayers.forEach(player => {
@@ -293,7 +289,7 @@ io.on('connection', function(socket){
 
     /**
      * broadcast new player movement to each client
-     * @param data = {x: 4, y: 2, id: 'THOR', direction: 'east'}
+     * @param data = {id: STRING, x: NUMBER, y: NUMBER, direction: STRING}
      */
     socket.on(MOVE_PLAYER, function(data) {
         socket.broadcast.emit(MOVE_PLAYER, data);
@@ -303,7 +299,6 @@ io.on('connection', function(socket){
                 player.x = data.x;
                 player.y = data.y;
                 player.direction = data.direction;
-
 
                 let spoilIndex = -1;
                 let spoil = null;
@@ -321,9 +316,7 @@ io.on('connection', function(socket){
                     socket.broadcast.emit(GRAB_SPOIL, {spoil: spoil, player: player});
                     socket.emit(GRAB_SPOIL, {spoil: spoil, player: player});
                     console.log("A player cought the spoil at: ", spoil.position);
-                    
                 }
-
             }
         });
 
@@ -332,7 +325,7 @@ io.on('connection', function(socket){
 
     /**
      * broadcast new bomb object to each client
-     * @param data = {x: 4, y: 2}
+     * @param data = {id: STRING, x: NUMBER, y: NUMBER, amountBombs: NUMBER}
      */
     socket.on(PLACE_BOMB, function(data) {
         socket.broadcast.emit(PLACE_BOMB, data);
@@ -346,7 +339,7 @@ io.on('connection', function(socket){
 
     /**
      * broadcast new available spoil object to each client
-     * @param data = {position: {x: 4, y: 2}, type: "spoil_life"}
+     * @param data = {position: {x: NUMBER, y: NUMBER}, type: "spoil_life"}
      */
     socket.on(CREATE_SPOIL, function(data) {
         socket.broadcast.emit(CREATE_SPOIL, data);
@@ -363,7 +356,7 @@ io.on('connection', function(socket){
 
     /**
      * broadcast new wall object to each client
-     * @param data = {x: 4, y: 2, id: 'SPIDERMAN'}
+     * @param data = {id: STRING, wallId: STRING, x: NUMBER, y: NUMBER, amountWalls: NUMBER}
      */
     socket.on(PLACE_WALL, function(data) {
         socket.broadcast.emit(PLACE_WALL, data);
@@ -378,7 +371,7 @@ io.on('connection', function(socket){
 
     /**
      * look for index of the player to be deleted based on data.id
-     * @param data = {id: 'HULK'}
+     * @param data = {id: STRING}
      */
     socket.on(DELETE_PLAYER, function (data) {
         positionPlayers.forEach((player, i) => {
@@ -392,13 +385,12 @@ io.on('connection', function(socket){
 
     /**
      * look for index of the wall to be deleted based on data.id
-     * @param data = {id: 'BATMAN'}
+     * @param data = {id: STRING}
      */
     socket.on(DELETE_WALL, function (data) {
         for (let i = positionWalls.length - 1; i > 0; i--) {
             if (positionWalls[i].wallId === data.wallId) {
                 console.log('wall to delete: ', positionWalls[i]);
-
                 positionWalls.splice(i, 1);
             }
         }
@@ -407,22 +399,16 @@ io.on('connection', function(socket){
     /**
      * Sends reaction to the rest players
      */
-    socket.on("reaction", function(data) {
-        socket.broadcast.emit('reaction', data);
+    socket.on(REACTION, function(data) {
+        socket.broadcast.emit(REACTION, data);
     });
 
-
- /*   // TODO: sync states at server @Thanh
-    socket.on('updateHealth', function (playerState) {
-        positionPlayers.forEach((player) => {
-            if (player.id === playerState.id) {
-                player.health = playerState.health;
-            }
-        });
-        socket.broadcast.emit('updateHealth', playerState);
-    })*/
-    socket.on('updateInventory', function (data) {
-        socket.broadcast.emit('updateInventory', data);
+    /**
+     * update player inventory
+     * @param data = {id: STRING, amountWalls: NUMBER, amountBombs: NUMBER, health: NUMBER}
+     */
+    socket.on(UPDATE_INVENTORY, function (data) {
+        socket.broadcast.emit(UPDATE_INVENTORY, data);
         positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.amountBombs = data.amountBombs;
