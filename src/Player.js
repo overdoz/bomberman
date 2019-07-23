@@ -228,14 +228,11 @@ export default class Player extends Element {
             // initialize next position
             let nextPosition = this.getNextPosition();
 
-            let randomID = '';
-
             // if next position is not blocked by an object
             if (this.isPositionColliding(nextPosition)) {
 
                 // generate randomID for easier removal
-                randomID = '_' + Math.random().toString(36).substr(2, 9);
-
+                let randomID = '_' + Math.random().toString(36).substr(2, 9);
 
                 // push wall at into our wall array
                 this.game.walls.push(new Wall(nextPosition, 1, true, this.assets, this.gridSize, randomID));
@@ -244,7 +241,6 @@ export default class Player extends Element {
 
                 // data to be send to server
                 let data = {id: this.id, x: nextPosition.x, y: nextPosition.y, wallId: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs};
-
 
                 this.game.broadcastWall(data);
 
@@ -268,13 +264,12 @@ export default class Player extends Element {
         // if there's enough bombs left
         if (this.amountBombs > 0) {
 
-
             // place bomb inside your game
             this.game.bombs.push(new Bomb({x: this.position.x, y: this.position.y}, 1500, 2, this.assets, this.gridSize, this.game));
 
             this.updateBombCount(-1, true);
-            this.setBombMusic.play();
 
+            this.setBombMusic.play();
 
             // create object with current position
             let playerState = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};
@@ -297,8 +292,7 @@ export default class Player extends Element {
             document.getElementById("amountLives").innerText = this.health;
         } else {
             try {
-                let healthIndicator = document.getElementById(id + 'HealthText');
-                healthIndicator.innerText = this.health;
+                document.getElementById(id + 'HealthText').innerText = this.health;
             } catch (e) {
                 console.log(e.message);
             }

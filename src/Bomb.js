@@ -241,7 +241,7 @@ export default class Bomb extends Element {
                 console.log("spoil is: ", lootType);
                 
                 this.game.broadcastSpoil({position:position, type: lootType});
-                this.game.spoils.push(new Loot({x: position.x, y: position.y}, lootType, this.assets, this.gridSize, this.game));
+                this.game.items.push(new Loot({x: position.x, y: position.y}, lootType, this.assets, this.gridSize, this.game));
                 console.log("Creating spoil with type: ", lootType);
             } else {
                 console.log("Not creating a new spoil at position: ", position);
