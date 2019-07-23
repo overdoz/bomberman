@@ -12,16 +12,23 @@ npm install
 ```
 
 #Run
-To start the server use:
+To build your bundle, run:
 ```bash
 npm run build
+```
+or
+```bash
+webpack
+```
 
+To start the server:
+```bash
 node server
 ```
-for development use:
+for development use (auto refresh):
 ```bash
-nodemon server.js
+nodemon server
 ```
-This refreshes the server automatically after save.
+
 
 Now open your browser and visit **localhost:9000**.
