@@ -8,10 +8,4 @@ export default class Element {
         this.position = position;
         this.assets = assets;
     }
-
-    getPosition() {
-        return this.position;
-    }
-
-
 }

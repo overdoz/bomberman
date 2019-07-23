@@ -22,8 +22,9 @@ import {
     SPOIL_TYPE_RUN,
     HURT_PLAYER,
     UPDATE_INVENTORY,
+    TIMEOUT,
+    REACTION,
 } from "./constant.js";
-
 export default class Game {
 
     constructor(canvas, width=13, height=13, assets, id) {
@@ -94,11 +95,11 @@ export default class Game {
 //                                                   //
 //###################################################//
 
-        this.socket.on('reaction', (data) => {
+        this.socket.on(REACTION, (data) => {
             this.drawReaction(data);
         });
 
-        this.socket.on('timeout', (data) => {
+        this.socket.on(TIMEOUT, (data) => {
             this.disconnected(data);
         });
 
@@ -151,7 +152,7 @@ export default class Game {
         });
 
         // update enemy inventory
-        // {id: "NAME", amountWalls: this.amountWalls, amountBombs: this.amountBombs, health: this.health}
+        // {id: STRING, amountWalls: NUMBER, amountBombs: NUMBER, health: NUMBER}
         this.socket.on(UPDATE_INVENTORY, (data) => {
             try {
                 document.getElementById(data.id + 'BombText').innerText = data.amountBombs;
@@ -193,7 +194,7 @@ export default class Game {
      * all broadcast functions are being evoked by Player.js
      */
     broadcastReaction(reaction) {
-        this.socket.emit("reaction", {id:this.id, reaction: reaction});
+        this.socket.emit(REACTION, {id:this.id, reaction: reaction});
     }
 
     broadcastPosition(position) {
@@ -278,9 +279,8 @@ export default class Game {
             // attach html node to enemy stats
             this.displayEnemyInventory(data);
         }
-
-
     }
+
     /**
      * the player grab the spoil
      * is being called in App.js whenever socket receives a signal
@@ -493,21 +493,21 @@ export default class Game {
     drawReaction(data) {
         let chat = document.getElementById('echat');
         let container = document.createElement("div");
-        let message = document.createElement("p");
+        let message = document.createElement("div");
         let name = data.id === this.id ?  'You' : data.id;
 
         switch (data.reaction) {
             case "you_suck":
-                message.innerText = `${name}: 🤬`;
+                message.innerHTML = `<p>${name}:</p><h1>🤬</h1>`;
                 break;
             case "finger":
-                message.innerText = `${name}: 🖕`;
+                message.innerHTML = `<p>${name}:</p><h1>🖕</h1>`;
                 break;
             case "love":
-                message.innerText = `${name}: ❤️`;
+                message.innerHTML = `<p>${name}:</p><h1>❤️</h1>`;
                 break;
             case "lol":
-                message.innerText = `${name}: 😂`;
+                message.innerHTML = `<p>${name}:</p><h1>😂</h1>`;
                 break;
             default:
                 break;

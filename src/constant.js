@@ -11,6 +11,9 @@ export const LOGIN_PLAYER = 'loginPlayer';
 export const CREATE_WALLS = 'createWalls';
 export const GRAB_ITEM = 'grabSpoil';
 export const UPDATE_INVENTORY = 'updateInventory';
+export const TIMEOUT = 'timeout';
+export const REACTION = 'reaction';
+
 
 export const SPRITE_SIZE = 40;
 

@@ -9,6 +9,7 @@
 const GAME_WIDTH = 13;
 const GAME_HEIGHT = 13;
 
+const AMOUNT_RANDOM_WALLS = 55;
 const AMOUNT_BOMBS = 20;
 const AMOUNT_WALLS = 20;
 const HEALTH = 1;
@@ -20,9 +21,6 @@ const DIRECTIONS = {
     NORTH: 'north',
 };
 
-const AMOUNT_RANDOM_WALLS = 55;
-
-// TODO: couldn't use import {const, ...} -> maybe require()
 const CHANGE_DIRECTION = 'changeDirection';
 const MOVE_PLAYER = 'movePlayer';
 const PLACE_BOMB = 'placeBomb';
@@ -36,6 +34,7 @@ const GRAB_SPOIL = 'grabSpoil';
 const HURT_PLAYER = 'hurtPlayer';
 const UPDATE_INVENTORY = 'updateInventory';
 const REACTION = 'reaction';
+const TIMEOUT = 'timeout';
 
 
 
@@ -270,7 +269,7 @@ io.on('connection', function(socket){
         for (let i = 0; i < positionPlayers.length; i++) {
             if (name === positionPlayers[i].id) {
                 positionPlayers.splice(i,1);
-                socket.broadcast.emit('timeout', {id: name});
+                socket.broadcast.emit(TIMEOUT, {id: name});
                 console.log("JUST KICKED OFF THE PLAYER: " + name);
                 check_server();
             }
