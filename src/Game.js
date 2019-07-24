@@ -129,7 +129,7 @@ export default class Game {
             this.moveEnemy(data);
         });
 
-        // player grabbed spoil
+        // player grabbed item
         this.socket.on(GRAB_ITEM, (data) => {
             this.pickUpItem(data);
         });
@@ -483,7 +483,6 @@ export default class Game {
         this.items.forEach(item => {
             item.draw(this.context);
         });
-
     }
 
     /**
@@ -553,13 +552,12 @@ export default class Game {
             container.className = 'playerInfos';
             container.id = data.id;
 
-
+            // create enemy ID
             let id = document.createElement("p");
             id.innerText = data.id;
             id.id = "nickname";
 
-            // START LIVES
-
+            // create heart icon and counter
             let healthImage = document.createElement("img");
             healthImage.id = data.id + 'LifeImg';
             healthImage.src = "images/spoilLife.png";
@@ -572,11 +570,11 @@ export default class Game {
             healthText.innerText = data.health;
             healthBox.appendChild(healthText);
 
-            // LIVES END
 
+            // create bomb icon and counter
             let bombImage = document.createElement("img");
             bombImage.id = data.id + 'BombImg';
-            bombImage.src = "dist/bomb_icon.png";
+            bombImage.src = "images/bomb_icon.png";
 
             let bombBox = document.createElement("div");
             bombBox.className = "countBox";
@@ -586,9 +584,11 @@ export default class Game {
             bombText.innerText = data.amountBombs;
             bombBox.appendChild(bombText);
 
+
+            // create wall icon and counter
             let wallImage = document.createElement("img");
             wallImage.id = data.id + 'WallImg';
-            wallImage.src = "dist/wall.png";
+            wallImage.src = "images/wall.png";
 
             let wallBox = document.createElement("div");
             wallBox.className = "countBox";
@@ -599,13 +599,22 @@ export default class Game {
             wallBox.appendChild(wallText);
 
 
+            // enemy ID
             container.appendChild(id);
+
+            // enemy health count
             container.appendChild(healthImage);
             container.appendChild(healthBox);
+
+            // enemy bomb count
             container.appendChild(bombImage);
             container.appendChild(bombBox);
+
+            // enemy wall count
             container.appendChild(wallImage);
             container.appendChild(wallBox);
+
+            // attach to HTML node
             enemyInventory.appendChild(container);
 
         }
