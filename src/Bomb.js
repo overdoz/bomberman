@@ -28,14 +28,8 @@ export default class Bomb extends Element {
         this.bombMusic = new Audio("/sounds/bombMusic.mp3");
 
         this.spriteSize = {
-            bomb: {
                 x: 40,
                 y: 40,
-            },
-            fire: {
-                x: 40,
-                y: 40,
-            }
         };
 
         this.currentAnimationState = 0;
@@ -239,8 +233,8 @@ export default class Bomb extends Element {
                 this.assets['bomb'],
                 this.animationSheet[this.currentAnimationState].x,
                 0,
-                this.spriteSize.bomb.x,
-                this.spriteSize.bomb.y,
+                this.spriteSize.x,
+                this.spriteSize.y,
                 this.position.x * this.gridSize,
                 this.position.y * this.gridSize,
                 this.gridSize,
@@ -253,8 +247,8 @@ export default class Bomb extends Element {
                     this.assets['fire'],
                     0,
                     0,
-                    this.spriteSize.fire.x,
-                    this.spriteSize.fire.y,
+                    this.spriteSize.x,
+                    this.spriteSize.y,
                     position.x * this.gridSize,
                     position.y * this.gridSize,
                     this.gridSize,
