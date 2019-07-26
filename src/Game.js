@@ -491,16 +491,13 @@ export default class Game {
 
         switch (data.reaction) {
             case "you_suck":
-                message.innerHTML = `<p>${name}:</p><h1>🤬</h1>`;
-                break;
-            case "finger":
-                message.innerHTML = `<p>${name}:</p><h1>🖕</h1>`;
+                message.innerHTML = `<p>${name}:</p><h1>&#x1F621;</h1>`;
                 break;
             case "love":
-                message.innerHTML = `<p>${name}:</p><h1>❤️</h1>`;
+                message.innerHTML = `<p>${name}:</p><h1>&#x1F496;️</h1>`;
                 break;
             case "lol":
-                message.innerHTML = `<p>${name}:</p><h1>😂</h1>`;
+                message.innerHTML = `<p>${name}:</p><h1>&#x1F602;</h1>`;
                 break;
             default:
                 break;

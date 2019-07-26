@@ -255,7 +255,6 @@ io.on('connection', function(socket){
             // notify each client and send them new incoming player
             socket.broadcast.emit(CREATE_PLAYER, playerDetails);
 
-            console.log(positionPlayers);
         }
     });
 
@@ -434,7 +433,5 @@ function isNameUnique(name) {
         }
     }
     return true;
-    // console.log("name is unique: " + unique_name);
-
 
 }

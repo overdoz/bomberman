@@ -13,10 +13,6 @@ export const GRAB_ITEM = 'grabSpoil';
 export const UPDATE_INVENTORY = 'updateInventory';
 export const TIMEOUT = 'timeout';
 export const REACTION = 'reaction';
-
-
-export const SPRITE_SIZE = 40;
-
 export const SPOIL_TYPE_LIFE = "spoilLife";
 export const SPOIL_TYPE_BOMB = "spoilBomb";
 export const SPOIL_TYPE_RUN = "spoilRun";

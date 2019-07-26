@@ -131,15 +131,7 @@ p {
 
 
 
-#emoji_chat {
-  position: absolute;
-  top: 160px;
-  right: 10px;
-  font-size: 1em;
-  font-family : "Carter One", cursive;
-  text-shadow: 1px 1px 2px #FF0000;
-  display: none;
-}
+
 
 #keys {
   display: flex;
@@ -227,7 +219,6 @@ button {
   font-size: 1.1em;
   border-radius: 4px;
   height: 40px;
-  width: 200px;
   margin: 5px;
   text-align: left;
 }
@@ -236,9 +227,9 @@ button {
   height: 5vh;
   display: flex;
   align-content: space-between;
-  flex-direction: column;
+  flex-direction: row;
   position: absolute;
-  left: 10px;
+  right: 10px;
   top: 15vh;
 }
 
@@ -246,7 +237,7 @@ button {
   height: 50vh;
   position: absolute;
   right: 10px;
-  top: 15vh;
+  top: 25vh;
   overflow-y: scroll;
   float: right;
   display: flex;
