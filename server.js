@@ -10,9 +10,9 @@ const GAME_WIDTH = 13;
 const GAME_HEIGHT = 13;
 
 const AMOUNT_RANDOM_WALLS = 55;
-const AMOUNT_BOMBS = 20;
+const AMOUNT_BOMBS = 30;
 const AMOUNT_WALLS = 20;
-const HEALTH = 1;
+const HEALTH = 2;
 
 const DIRECTIONS = {
     EAST: 'east',
@@ -445,7 +445,7 @@ function check_server() {
 
 
 /**
- * Checks if name that wants to join already exists in game
+ * Checks if name that wants to join already exists in positionPlayers array
  */
 function isNameUnique(name) {
 
@@ -459,15 +459,3 @@ function isNameUnique(name) {
 
 
 }
-
- /*
-
-
-// checks if name is already taken
-for (let i=0; i<positionPlayers.length; i++) {
-    if (positionPlayers[i].id === playerDetails.id) {
-        console.log('name already taken: ', playerDetails.id);
-    }
-}
-
-*/

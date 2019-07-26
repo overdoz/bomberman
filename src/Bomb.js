@@ -27,7 +27,6 @@ export default class Bomb extends Element {
 
         this.bombMusic = new Audio("/sounds/bombMusic.mp3");
 
-        // TODO: resize spritesheets @Paula
         this.spriteSize = {
             bomb: {
                 x: 40,
