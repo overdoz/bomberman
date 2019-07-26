@@ -10,9 +10,9 @@ const GAME_WIDTH = 13;
 const GAME_HEIGHT = 13;
 
 const AMOUNT_RANDOM_WALLS = 55;
-const AMOUNT_BOMBS = 20;
+const AMOUNT_BOMBS = 30;
 const AMOUNT_WALLS = 20;
-const HEALTH = 1;
+const HEALTH = 2;
 
 const DIRECTIONS = {
     EAST: 'east',
@@ -85,6 +85,7 @@ let positionPlayers = [];
 let positionWalls = [];
 let spoils = [];
 let server_overload = false;
+let name = "";
 
 /**
  * generates an unique ID
@@ -178,7 +179,7 @@ const isAlreadyExisting = (position) => {
 // TODO: check for duplicates @Paula
 io.on('connection', function(socket){
 
-    let name = "";
+    // let name = "";
 
     /**
      * broadcast new player registration after user has pressed the login button
@@ -205,30 +206,35 @@ io.on('connection', function(socket){
             case 0:
                 positionWalls = generateRandomWalls(AMOUNT_RANDOM_WALLS);
                 console.log(playerDetails);
+
                 break;
             case 1:
                 playerDetails.x = GAME_WIDTH - 1;
                 playerDetails.y = 0;
                 playerDetails.direction = DIRECTIONS.SOUTH;
                 console.log(playerDetails);
+
                 break;
             case 2:
                 playerDetails.x = GAME_WIDTH - 1;
                 playerDetails.y = GAME_HEIGHT - 1;
                 playerDetails.direction = DIRECTIONS.WEST;
                 console.log(playerDetails);
+
                 break;
             case 3:
                 playerDetails.x = 0;
                 playerDetails.y = GAME_HEIGHT - 1;
                 playerDetails.direction = DIRECTIONS.NORTH;
                 console.log(playerDetails);
+
                 break;
             default:
                 check_server();
         }
 
-        if (!server_overload) {
+        if ((!server_overload) && isNameUnique(name)) {
+
 
             // store incoming player
             positionPlayers.push(playerDetails);
@@ -248,6 +254,8 @@ io.on('connection', function(socket){
 
             // notify each client and send them new incoming player
             socket.broadcast.emit(CREATE_PLAYER, playerDetails);
+
+            console.log(positionPlayers);
         }
     });
 
@@ -423,9 +431,18 @@ function check_server() {
 }
 
 
+/**
+ * Checks if name that wants to join already exists in positionPlayers array
+ */
+function isNameUnique(name) {
+
+    for (let i = 0; i < positionPlayers.length; i++) {
+        if (positionPlayers[i].id === name) {
+            return false;
+        }
+    }
+    return true;
+    // console.log("name is unique: " + unique_name);
 
 
-
-
-
-
+}

@@ -240,13 +240,6 @@ export default class Game {
 
 
     disconnected(data) {
-        console.log("-------------------------------------------------------");
-        // this.players.forEach((player, i) => {
-        //     if (this.players[i].id === data.id) {
-        //         document.getElementById(this.players[i].id).style.display = "none";
-        //         this.players.splice(i, 1);
-        //     }
-        // });
         function isDisconnected(player) {
             if (player.id === data.id) {
                 document.getElementById(player.id).style.display = "none";
@@ -553,6 +546,24 @@ export default class Game {
             this.draw();
         }
         this.frameCount++;
+    }
+
+    playMusic(music) {
+        switch(music) {
+            case "setBombMusic":
+
+                break;
+            case "backgroundMusic":
+                break;
+            case "diedMusic":
+                break;
+            case "loserMusic":
+                break;
+            case "spoilMusic":
+                break;
+            case "winnerMusic":
+                break;
+        }
     }
 
 
