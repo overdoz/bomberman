@@ -99,10 +99,6 @@ export default class Game {
             this.drawReaction(data);
         });
 
-        this.socket.on(TIMEOUT, (data) => {
-            this.disconnected(data);
-        });
-
         // after logging in your player, the server will send you all generated walls
         this.socket.on(CREATE_WALLS, (walls) => {
             walls.forEach(wall => {
@@ -238,18 +234,6 @@ export default class Game {
 //                                                   //
 //###################################################//
 
-
-    disconnected(data) {
-        function isDisconnected(player) {
-            if (player.id === data.id) {
-                document.getElementById(player.id).style.display = "none";
-                return true;
-            } else {
-                return false;
-            }
-        }
-        this.players = this.players.filter(isDisconnected);
-    }
 
     /**
      * create new player
