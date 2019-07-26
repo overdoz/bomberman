@@ -128,12 +128,8 @@ export default class Bomb extends Element {
      * let position determines the surrounding positions
      */
     destroySurrounding() {
-        // index of this particular bomb in order to delete it
-        let index = this.game.bombs.map(bomb => {return bomb.ID}).indexOf(this.ID);
 
-        // delete this bomb at its index
-        this.game.bombs.splice(index, 1);
-
+        this.game.bombs = this.game.bombs.filter(bomb => bomb.ID !== this.ID);
 
         // delete affected players
         this.game.players.forEach((player, index) => {
@@ -158,9 +154,6 @@ export default class Bomb extends Element {
                     // if player is dead
                     if(player.health < 1) {
 
-                        // delete player from game
-                        this.game.players.splice(index, 1);
-
                         // play loser music for the player
                         player.game.backgroundMusic.pause();
                         player.game.spoilMusic.pause();
@@ -170,6 +163,7 @@ export default class Bomb extends Element {
 
                         // broadcast deleted player
                         this.game.broadcastDeletedPlayer({id: player.id});
+                        this.game.deletePlayer({id: player.id});
 
                         // hide enemy inventory
                         try {
@@ -178,46 +172,32 @@ export default class Bomb extends Element {
                             console.log(e);
                         }
 
-                        // if the dead player is yourself
-                        if (player.id === this.game.id) {
-
-                            console.log(`${player.id} is dead`);
-
-                            // delete own inventory
-                            try {
-                                document.getElementById("inventory").style.display = "none";
-                                document.getElementById("gameOverScreen").style.display = "flex";
-                            } catch (e) {
-                                console.log(e);
-                            }
-
-                        // if you are the only remaining player
-                        } else if (this.game.checkForWinner()) {
-
+        
+                        if (this.game.checkForWinner()) {
                             // show winner notification
                             try {
                                 document.getElementById("youwinscreen").style.display = "flex";
                             } catch (e) {
                                 console.log(e);
                             }
-
                         }
                     }
                 }
             })
         });
 
+
+
         // delete affected walls
         let indexes = [];
         this.game.walls.forEach((wall, index) => {
             this.getSurroundingPositions().forEach(position => {
                 if (wall.position.x === position.x && wall.position.y === position.y && wall.isDestructible === true) {
-                    // v = this.game.walls.splice(index, 1, null);
                     indexes.push(index);
-
                 }
             })
         });
+        
         // IMPORTANT! Because .splice() shortens the array, we safe all indexes, which have to be deleted inside of 'let indexes'
         indexes.sort((a, b) => {return b-a}).forEach((index) => {
             let wallId = this.game.walls[index].id;

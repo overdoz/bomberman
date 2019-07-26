@@ -165,11 +165,7 @@ export default class Game {
 
         // update remaining players
         this.socket.on(DELETE_PLAYER, (data) => {
-            this.players.forEach((player, index) => {
-                if (player.id === data.id) {
-                    this.players.splice(index, 1);
-                }
-            })
+            this.deletePlayer(data);
         });
 
 
@@ -245,12 +241,21 @@ export default class Game {
 
     disconnected(data) {
         console.log("-------------------------------------------------------");
-        this.players.forEach((player, i) => {
-            if (this.players[i].id === data.id) {
-                document.getElementById(this.players[i].id).style.display = "none";
-                this.players.splice(i, 1);
+        // this.players.forEach((player, i) => {
+        //     if (this.players[i].id === data.id) {
+        //         document.getElementById(this.players[i].id).style.display = "none";
+        //         this.players.splice(i, 1);
+        //     }
+        // });
+        function isDisconnected(player) {
+            if (player.id === data.id) {
+                document.getElementById(player.id).style.display = "none";
+                return true;
+            } else {
+                return false;
             }
-        });
+        }
+        this.players = this.players.filter(isDisconnected);
     }
 
     /**
@@ -278,6 +283,19 @@ export default class Game {
 
             // attach html node to enemy stats
             this.displayEnemyInventory(data);
+        }
+    }
+
+    deletePlayer(data) {
+        this.players = this.players.filter(player => player.id !== data.id);
+
+        if (data.id === this.id) {
+            try {
+                document.getElementById("inventory").style.display = "none";
+                document.getElementById("gameOverScreen").style.display = "flex";
+            } catch (e) {
+                console.log(e);
+            }
         }
     }
 

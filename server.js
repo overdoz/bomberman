@@ -274,14 +274,26 @@ io.on('connection', function(socket){
     });
 
     socket.on('disconnect', function() {
-        for (let i = 0; i < positionPlayers.length; i++) {
-            if (name === positionPlayers[i].id) {
-                positionPlayers.splice(i,1);
+        // for (let i = 0; i < positionPlayers.length; i++) {
+        //     if (name === positionPlayers[i].id) {
+        //         positionPlayers.splice(i,1);
+        //         socket.broadcast.emit(TIMEOUT, {id: name});
+        //         console.log("JUST KICKED OFF THE PLAYER: " + name);
+        //         check_server();
+        //     }
+        // }
+        
+        function isDisconnected(player) {
+            if (player.id === name) {
                 socket.broadcast.emit(TIMEOUT, {id: name});
                 console.log("JUST KICKED OFF THE PLAYER: " + name);
                 check_server();
+                return true;
+            } else {
+                return false;
             }
         }
+        positionPlayers = positionPlayers.filter(isDisconnected);
     });
 
     socket.on(HURT_PLAYER, function(data) {
@@ -381,12 +393,8 @@ io.on('connection', function(socket){
      * @param data = {id: STRING}
      */
     socket.on(DELETE_PLAYER, function (data) {
-        positionPlayers.forEach((player, i) => {
-            if (player.id === data.id) {
-                positionPlayers.splice(i, 1);
-            }
-        });
-        socket.broadcast.emit()
+        positionPlayers = positionPlayers.filter(player => player.id !== data.id);
+        socket.broadcast.emit(DELETE_PLAYER, data);
     });
 
 
@@ -395,12 +403,7 @@ io.on('connection', function(socket){
      * @param data = {id: STRING}
      */
     socket.on(DELETE_WALL, function (data) {
-        for (let i = positionWalls.length - 1; i > 0; i--) {
-            if (positionWalls[i].wallId === data.wallId) {
-                console.log('wall to delete: ', positionWalls[i]);
-                positionWalls.splice(i, 1);
-            }
-        }
+        positionWalls = positionWalls.filter(wall => wall.wallId !== data.wallId);
     });
 
     /**
