@@ -273,17 +273,9 @@ io.on('connection', function(socket){
     });
 
     socket.on('disconnect', function() {
-        function isDisconnected(player) {
-            if (player.id === name) {
-                socket.broadcast.emit(TIMEOUT, {id: name});
-                console.log("JUST KICKED OFF THE PLAYER: " + name);
-                check_server();
-                return true;
-            } else {
-                return false;
-            }
-        }
-        positionPlayers = positionPlayers.filter(isDisconnected);
+        positionPlayers = positionPlayers.filter(player => player.id !== name);
+        socket.broadcast.emit(DELETE_PLAYER, {id: name});
+
     });
 
     socket.on(HURT_PLAYER, function(data) {
