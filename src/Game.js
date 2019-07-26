@@ -266,6 +266,13 @@ export default class Game {
     deletePlayer(data) {
         this.players = this.players.filter(player => player.id !== data.id);
 
+        // hide enemy inventory
+        try {
+            document.getElementById(data.id).style.display = "none";
+        } catch (e) {
+            console.log(e);
+        }
+
         if (data.id === this.id) {
             try {
                 document.getElementById("inventory").style.display = "none";

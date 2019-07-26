@@ -164,13 +164,6 @@ export default class Bomb extends Element {
                         this.game.broadcastDeletedPlayer({id: player.id});
                         this.game.deletePlayer({id: player.id});
 
-                        // hide enemy inventory
-                        try {
-                            document.getElementById(player.id).style.display = "none";
-                        } catch (e) {
-                            console.log(e);
-                        }
-
         
                         if (this.game.checkForWinner()) {
                             // show winner notification
