@@ -30,12 +30,12 @@ export default class Bomb extends Element {
         // TODO: resize spritesheets @Paula
         this.spriteSize = {
             bomb: {
-                x: 28,
-                y: 28,
+                x: 40,
+                y: 40,
             },
             fire: {
-                x: 38,
-                y: 38,
+                x: 40,
+                y: 40,
             }
         };
 
@@ -45,10 +45,10 @@ export default class Bomb extends Element {
 
         this.animationSheet = [
             {x: 0, y: 0},
-            {x: 28, y: 0},
-            {x: 2 * 28, y: 0},
-            {x: 3 * 28, y: 0},
-            {x: 4 * 28, y: 0},
+            {x: 40, y: 0},
+            {x: 2 * 40, y: 0},
+            {x: 3 * 40, y: 0},
+            {x: 4 * 40, y: 0},
 
         ];
 
