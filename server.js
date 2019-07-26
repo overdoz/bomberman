@@ -255,7 +255,6 @@ io.on('connection', function(socket){
             // notify each client and send them new incoming player
             socket.broadcast.emit(CREATE_PLAYER, playerDetails);
 
-            console.log(positionPlayers);
         }
     });
 
@@ -435,11 +434,7 @@ io.on('connection', function(socket){
  * capacity
  */
 function check_server() {
-    if (positionPlayers.length < 4) {
-        server_overload = false;
-    } else {
-        server_overload = true;
-    }
+    server_overload = positionPlayers.length >= 4;
     console.log("checks server .. and is full === " + server_overload);
 }
 
@@ -455,7 +450,5 @@ function isNameUnique(name) {
         }
     }
     return true;
-    // console.log("name is unique: " + unique_name);
-
 
 }
