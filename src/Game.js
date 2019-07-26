@@ -502,7 +502,6 @@ export default class Game {
      */
     drawReaction(data) {
         let chat = document.getElementById('echat');
-        let container = document.createElement("div");
         let message = document.createElement("div");
         let name = data.id === this.id ?  'You' : data.id;
 
@@ -521,8 +520,7 @@ export default class Game {
         }
 
         message.id = "chat_text";
-        container.appendChild(message);
-        chat.appendChild(container);
+        chat.appendChild(message);
         chat.scrollTop = chat.scrollHeight;
     }
 

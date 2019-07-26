@@ -273,15 +273,6 @@ io.on('connection', function(socket){
     });
 
     socket.on('disconnect', function() {
-        // for (let i = 0; i < positionPlayers.length; i++) {
-        //     if (name === positionPlayers[i].id) {
-        //         positionPlayers.splice(i,1);
-        //         socket.broadcast.emit(TIMEOUT, {id: name});
-        //         console.log("JUST KICKED OFF THE PLAYER: " + name);
-        //         check_server();
-        //     }
-        // }
-        
         function isDisconnected(player) {
             if (player.id === name) {
                 socket.broadcast.emit(TIMEOUT, {id: name});

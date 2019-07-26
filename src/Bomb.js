@@ -131,7 +131,7 @@ export default class Bomb extends Element {
         this.game.bombs = this.game.bombs.filter(bomb => bomb.ID !== this.ID);
 
         // delete affected players
-        this.game.players.forEach((player, index) => {
+        this.game.players.forEach((player) => {
 
             // compare with positions of fire animation
             this.getSurroundingPositions().forEach(position => {
