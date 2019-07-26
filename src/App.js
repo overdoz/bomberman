@@ -68,15 +68,6 @@ new AssetLoader()
             }
         });
 
-        document.querySelector('#finger_button').addEventListener('click', function (event) {
-           event.preventDefault();
-           const FINGER = 'finger';
-           if (game != null) {
-               game.broadcastReaction(FINGER);
-               game.drawReaction({id: game.id, reaction: FINGER})
-           }
-        });
-
         document.querySelector('#love_button').addEventListener('click', function (event) {
             event.preventDefault();
             const LOVE = 'love';
