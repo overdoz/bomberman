@@ -142,16 +142,6 @@ export default class Bomb extends Element {
                         // broadcast deleted player
                         this.game.broadcastDeletedPlayer({id: player.id});
                         this.game.deletePlayer({id: player.id});
-
-        
-                        if (this.game.checkForWinner()) {
-                            // show winner notification
-                            try {
-                                document.getElementById("youwinscreen").style.display = "flex";
-                            } catch (e) {
-                                console.log(e);
-                            }
-                        }
                     }
                 }
             })

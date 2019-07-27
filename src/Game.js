@@ -281,6 +281,15 @@ export default class Game {
                 console.log(e);
             }
         }
+
+        if (this.checkForWinner()) {
+            // show winner notification
+            try {
+                document.getElementById("youwinscreen").style.display = "flex";
+            } catch (e) {
+                console.log(e);
+            }
+        }
     }
 
     /**
@@ -393,10 +402,8 @@ export default class Game {
     }
 
     checkForWinner() {
-        let winner = false;
-        if (this.players.length === 1 && this.players[0].id === this.id) {
-            winner = true;
-        }
+        let winner = this.players.length === 1 && this.players[0].id === this.id;
+
         if (winner) {
             this.spoilMusic.pause();
             this.backgroundMusic.pause();
