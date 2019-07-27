@@ -25,8 +25,6 @@ export default class Bomb extends Element {
         this.radius = radius;
 
 
-        this.bombMusic = new Audio("/sounds/bombMusic.mp3");
-
         this.spriteSize = {
                 x: 40,
                 y: 40,
@@ -52,7 +50,7 @@ export default class Bomb extends Element {
     }
 
     animateExplosion() {
-        this.bombMusic.play();
+        this.game.playMusic("bombMusic");
         this.isExploded = true;
         setTimeout(() => {
             this.destroySurrounding();
@@ -132,11 +130,7 @@ export default class Bomb extends Element {
 
                 // if explosion position matches player position
                 if (player.position.x === position.x && player.position.y === position.y) {
-
-                    // if the player is still alive, then plays died music for the player
-                    if(player.health >= 1){
-                        player.diedMusic.play();
-                    }
+                    this.game.playMusic("diedMusic");
 
                     // decrease player health
                     player.health--;
@@ -146,13 +140,7 @@ export default class Bomb extends Element {
 
                     // if player is dead
                     if(player.health < 1) {
-
-                        // play loser music for the player
-                        player.game.backgroundMusic.pause();
-                        player.game.spoilMusic.pause();
-                        player.loserMusic.play();
-                        console.log("Loser music is playing!");
-
+                        this.game.playMusic("loserMusic");
 
                         // broadcast deleted player
                         this.game.broadcastDeletedPlayer({id: player.id});
