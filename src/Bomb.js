@@ -133,10 +133,7 @@ export default class Bomb extends Element {
                     this.game.playMusic("diedMusic");
 
                     // decrease player health
-                    player.health--;
-
-                    // update DOM
-                    player.updateHealth(player.id === this.game.id, player.id);
+                    player.decrementHealth();
 
                     // if player is dead
                     if(player.health < 1) {

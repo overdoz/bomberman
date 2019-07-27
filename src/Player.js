@@ -42,8 +42,13 @@ export default class Player extends Element {
         this.currentAnimationState = 0;
         this.animationSpeed = 20;
 
+        this.showBurnedPlayer = false;
 
-        this.photo  = (this.id === this.game.id) ? 'bomberman' : 'enemy';
+        this.photo  = {
+            regular: (this.id === this.game.id) ? 'bomberman' : 'enemy',
+            burned: 'burned',
+        };
+
         this.animationSheet = [
             {
                 south: {x: 0, y: 0},
@@ -75,9 +80,11 @@ export default class Player extends Element {
 
         // display initial bombs and walls counter on HTML
         try {
-            document.getElementById("amountBombs").innerText = this.amountBombs;
-            document.getElementById("amountWalls").innerText = this.amountWalls;
-            document.getElementById("amountLives").innerText = this.health;
+            if (this.id === this.game.id) {
+                document.getElementById("amountBombs").innerText = this.amountBombs;
+                document.getElementById("amountWalls").innerText = this.amountWalls;
+                document.getElementById("amountLives").innerText = this.health;
+            }
         } catch (e) {
             console.log(e)
         }
@@ -170,9 +177,11 @@ export default class Player extends Element {
             // display movement
             let state = this.animationSheet[this.currentAnimationState];
 
+            let photo = this.showBurnedPlayer ? this.photo.burned : this.photo.regular;
+
             // the +6 centers the image in this particular case
             context.drawImage(
-                this.assets[this.photo],
+                this.assets[photo],
                 state[this.direction].x,
                 state[this.direction].y,
                 this.spriteSize.x,
@@ -306,6 +315,28 @@ export default class Player extends Element {
             // set counter of your bombs in the browser
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
         }
+    }
+
+    decrementHealth() {
+        this.health--;
+        let that = this;
+        that.showBurnedPlayer = true;
+
+        if (this.id === this.game.id) {
+            document.getElementById("amountLives").innerText = this.health;
+        } else {
+            try {
+                document.getElementById(this.id + 'HealthText').innerText = this.health;
+            } catch (e) {
+                console.log(e.message);
+            }
+        }
+
+        setTimeout(() => {
+            that.showBurnedPlayer = false;
+        }, 1000);
+
+
     }
 
 

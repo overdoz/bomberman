@@ -316,8 +316,9 @@ io.on('connection', function(socket){
 
                 if (spoilIndex >= 0) {
                     spoils.splice(spoilIndex, 1);
+                    let data = {spoil: spoil, player: player};
                     socket.broadcast.emit(GRAB_SPOIL, {spoil: spoil, player: player});
-                    socket.emit(GRAB_SPOIL, {spoil: spoil, player: player});
+                    socket.emit(GRAB_SPOIL, data);
                     console.log("A player cought the spoil at: ", spoil.position);
                 }
             }

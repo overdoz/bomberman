@@ -22,9 +22,10 @@ import {
     SPOIL_TYPE_RUN,
     HURT_PLAYER,
     UPDATE_INVENTORY,
-    TIMEOUT,
     REACTION,
 } from "./constant.js";
+
+
 export default class Game {
 
     constructor(canvas, width=13, height=13, assets, id) {
@@ -258,6 +259,10 @@ export default class Game {
         }
     }
 
+    /**
+     * remove player from array and hide his inventory
+     * @param data
+     */
     deletePlayer(data) {
         this.players = this.players.filter(player => player.id !== data.id);
 
@@ -553,6 +558,7 @@ export default class Game {
 
             let healthText = document.createElement("p");
             healthText.id = data.id + 'HealthText';
+            console.log(data.health);
             healthText.innerText = data.health;
             healthBox.appendChild(healthText);
 
