@@ -327,40 +327,40 @@ export default class Game {
             if (player.id === data.player.id) {
 
                 // change the music for the player
-             this.playMusic("spoilMusic");
+                this.playMusic("spoilMusic");
 
-                if (data.spoil.type === SPOIL_TYPE_BOMB) {
-                    console.log("Player gets an extra bomb!");
-                    player.updateBombCount(1, localPlayer);
-                    let state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
-                    this.broadcastInventory(state);
-                } else if (data.spoil.type === SPOIL_TYPE_LIFE) {
-                    console.log("Player gets an extra life!");
-                    player.health++;
-                    player.updateHealth(this.id === data.player.id, data.player.id);
-                    let state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
-                    this.broadcastInventory(state);
-                } else if (data.spoil.type === SPOIL_TYPE_RUN) {
-                    console.log("Player becomes faster!");
+                switch(data.spoil.type) {
+                    case SPOIL_TYPE_BOMB:
+                        player.updateBombCount(1, localPlayer);
+                        break;
+                    case SPOIL_TYPE_LIFE:
+                        player.health++;
+                        player.updateHealth(this.id === data.player.id, data.player.id);
+                        break;
+                    case SPOIL_TYPE_RUN:
+                        // make player faster
+                        if (!player.isARunner && localPlayer) {
+                            // make the player into a runner by adding key event
+                            let eventFunction =  (e) => {
+                                if (!this.gameOver) {
+                                    this.movePlayer({id: this.id, key: e.key}, true)
+                                }
+                            };
+                            document.addEventListener("keydown", eventFunction);
+                            player.isARunner = true;
 
-                    // make player faster
-                    if (!player.isARunner && localPlayer) {
-                        // make the player into a runner by adding key event
-                        let eventFunction =  (e) => {
-                            if (!this.gameOver) {
-                                this.movePlayer({id: this.id, key: e.key}, true)
-                            }
-                        };
-                        document.addEventListener("keydown", eventFunction);
-                        player.isARunner = true;
-
-                        // set the runner duration as 30 seconds
-                        setTimeout(() => {
-                            document.removeEventListener("keydown", eventFunction);
-                            player.isARunner = false;
-                        }, 30000);
-                    }
+                            // set the runner duration as 30 seconds
+                            setTimeout(() => {
+                                document.removeEventListener("keydown", eventFunction);
+                                player.isARunner = false;
+                            }, 30000);
+                        }
+                        break;
+                    default:
+                        break;
                 }
+                let state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
+                this.broadcastInventory(state);
             }
         });
 
