@@ -85,7 +85,6 @@ let positionPlayers = [];
 let positionWalls = [];
 let spoils = [];
 let server_overload = false;
-let name = "";
 
 /**
  * generates an unique ID
@@ -179,7 +178,7 @@ const isAlreadyExisting = (walls, position) => {
 // TODO: check for duplicates @Paula
 io.on('connection', function(socket){
 
-    // let name = "";
+    let name = "";
 
     /**
      * broadcast new player registration after user has pressed the login button
