@@ -50,12 +50,7 @@ export default class Game {
         this.items = [];
 
         // background music plays when game starts
-        this.backgroundMusic = new Audio("/sounds/backgroundMusic.mp4");
-        this.backgroundMusic.loop = true;
-        this.backgroundMusic.play();
-        this.backgroundMusic.volume = 0.5;
-        this.spoilMusic = new Audio("/sounds/spoilMusic.mp4");
-        this.spoilMusic.loop = true;
+        this.playMusic("backgroundMusic")
 
         // set up socket connection
         this.socket = io.connect('');
@@ -297,13 +292,8 @@ export default class Game {
             if (player.id === data.player.id) {
 
                 // change the music for the player
-                if (!this.backgroundMusic.paused) {
-                    this.backgroundMusic.currentTime = 0;
-                    this.backgroundMusic.pause();
-                    console.log("Background music stopped!");
-                    this.spoilMusic.play();
-                    console.log("Spoil music is playing!");
-                }
+             this.playMusic("spoilMusic");
+
                 if (data.spoil.type === SPOIL_TYPE_BOMB) {
                     console.log("Player gets an extra bomb!");
                     player.updateBombCount(1, localPlayer);
@@ -536,25 +526,6 @@ export default class Game {
         this.frameCount++;
     }
 
-    playMusic(music) {
-        switch(music) {
-            case "setBombMusic":
-
-                break;
-            case "backgroundMusic":
-                break;
-            case "diedMusic":
-                break;
-            case "loserMusic":
-                break;
-            case "spoilMusic":
-                break;
-            case "winnerMusic":
-                break;
-        }
-    }
-
-
     /**
      * creates an HTML node every time a player has been created
      * @param data = {id: STRING, amountBombs: NUMBER, amountWalls: NUMBER}
@@ -634,4 +605,58 @@ export default class Game {
 
         }
     }
+
+    /**
+     * control the music play of the game
+     * @param music input music type
+     */
+    playMusic(music) {
+        switch(music) {
+            case "bombMusic":
+                this.bombMusic = new Audio("/sounds/bombMusic.mp3");
+                this.bombMusic.play();
+                break;
+            case "setBombMusic":
+                this.setBombMusic = new Audio("/sounds/setBombMusic.mp3");
+                this.setBombMusic.play();
+                break;
+            case "backgroundMusic":
+                this.backgroundMusic = new Audio("/sounds/backgroundMusic.mp4");
+                this.backgroundMusic.loop = true;
+                this.backgroundMusic.play();
+                break;
+            case "diedMusic":
+                this.diedMusic = new Audio("/sounds/diedMusic.mp4");
+                this.diedMusic.play();
+                break;
+            case "loserMusic":
+                if(this.backgroundMusic || this.spoilMusic){
+                    this.backgroundMusic.pause();
+                    this.spoilMusic.pause();
+                }
+                this.loserMusic = new Audio("/sounds/loserMusic.mp4");
+                this.loserMusic.play();
+                break;
+            case "spoilMusic":
+                if(!this.spoilMusic) {
+                    this.backgroundMusic.pause();
+                    this.spoilMusic = new Audio("/sounds/spoilMusic.mp4");
+                    this.spoilMusic.loop = true;
+                    this.spoilMusic.play();
+                    console.log("player changed music!");
+                }
+                break;
+            case "winnerMusic":
+                if(this.backgroundMusic || this.spoilMusic){
+                    this.backgroundMusic.pause();
+                    this.spoilMusic.pause();
+                }
+                this.winnerMusic = new Audio("/sounds/winnerMusic.mp4");
+                this.winnerMusic.play();
+                break;
+            default:
+                console.log("Spoil should have type, but here no type!")
+        }
+    }
+
 }

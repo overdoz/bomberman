@@ -120,7 +120,7 @@ const generateRandomWalls = (amount) => {
         let atRandomPosition = {x: random(GAME_WIDTH), y: random(GAME_HEIGHT)};
 
         // if there is already a wall object at this position, add an extra loop
-        if (isAlreadyExisting(atRandomPosition)) {
+        if (isAlreadyExisting(randomWalls, atRandomPosition)) {
             i--;
         } else {
             // if not, generate an unique ID and push object into positionWalls
@@ -137,9 +137,9 @@ const generateRandomWalls = (amount) => {
  * @param position = {x: NUMBER, y: NUMBER}
  * @returns {boolean}
  */
-const isAlreadyExisting = (position) => {
-    for (let i = 0; i < positionWalls.length; i++) {
-        if (position.x === positionWalls[i].x && position.y === positionWalls[i].y) {
+const isAlreadyExisting = (walls, position) => {
+    for (let i = 0; i < walls.length; i++) {
+        if (position.x === walls[i].x && position.y === walls[i].y) {
             return true;
         }
     }
@@ -195,7 +195,7 @@ io.on('connection', function(socket){
             direction: DIRECTIONS.EAST,
             amountBombs: AMOUNT_BOMBS,
             amountWalls: AMOUNT_WALLS,
-            health: HEALTH,
+            health: HEALTH
         };
 
         // The id name of the player that was connected. Used to kick out
@@ -251,6 +251,9 @@ io.on('connection', function(socket){
 
             // send all wall objects to client
             socket.emit(CREATE_WALLS, [...positionWalls]);
+            spoils.forEach((spoil) => {
+                socket.emit(CREATE_SPOIL, spoil);
+            });
 
             // notify each client and send them new incoming player
             socket.broadcast.emit(CREATE_PLAYER, playerDetails);
