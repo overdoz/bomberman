@@ -292,6 +292,27 @@ export default class Game {
         }
     }
 
+    createLoot(position, remote) {
+        if (Math.random() <= 0.3 && !remote) {
+            let lootType = SPOIL_TYPE_LIFE;
+            let spoilDetermination = Math.random();
+
+            if (spoilDetermination > 0.66) {
+                lootType = SPOIL_TYPE_BOMB;
+            } else if (spoilDetermination > 0.33) {
+                lootType = SPOIL_TYPE_RUN;
+            }
+
+            console.log("spoil is: ", lootType);
+
+            this.broadcastSpoil({position:position, type: lootType});
+            this.items.push(new Loot({x: position.x, y: position.y}, lootType, this.assets, this.gridSize, this));
+            console.log("Creating spoil with type: ", lootType);
+        } else {
+            console.log("Not creating a new spoil at position: ", position);
+        }
+    }
+
     /**
      * the player grab the spoil
      * is being called in App.js whenever socket receives a signal

@@ -1,11 +1,4 @@
 import Element from './Element.js';
-import Loot from './Loot.js';
-
-import {
-    SPOIL_TYPE_BOMB,
-    SPOIL_TYPE_LIFE,
-    SPOIL_TYPE_RUN
-} from "./constant.js";
 
 export default class Bomb extends Element {
 
@@ -132,16 +125,14 @@ export default class Bomb extends Element {
                 if (player.position.x === position.x && player.position.y === position.y) {
                     this.game.playMusic("diedMusic");
 
-                    // decrease player health
                     player.decrementHealth();
 
-                    // if player is dead
                     if(player.health < 1) {
-                        this.game.playMusic("loserMusic");
 
                         // broadcast deleted player
                         this.game.broadcastDeletedPlayer({id: player.id});
                         this.game.deletePlayer({id: player.id});
+                        this.game.playMusic("loserMusic");
                     }
                 }
             })
@@ -168,25 +159,7 @@ export default class Bomb extends Element {
             // this.socket.emit('deleteWall', {id: this.game.walls[index].id});
             this.game.walls.splice(index, 1);
 
-
-            if (Math.random() <= 0.3 && !this.remoteBomb) {
-                let lootType = SPOIL_TYPE_LIFE;
-                let spoilDetermination = Math.random();
-
-                if (spoilDetermination > 0.66) {
-                    lootType = SPOIL_TYPE_BOMB;
-                } else if (spoilDetermination > 0.33) {
-                    lootType = SPOIL_TYPE_RUN;
-                }
-
-                console.log("spoil is: ", lootType);
-                
-                this.game.broadcastSpoil({position:position, type: lootType});
-                this.game.items.push(new Loot({x: position.x, y: position.y}, lootType, this.assets, this.gridSize, this.game));
-                console.log("Creating spoil with type: ", lootType);
-            } else {
-                console.log("Not creating a new spoil at position: ", position);
-            }
+            this.game.createLoot(position, this.remoteBomb);
 
         });
     }
