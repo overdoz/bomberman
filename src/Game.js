@@ -395,7 +395,7 @@ export default class Game {
         if (winner) {
             this.spoilMusic.pause();
             this.backgroundMusic.pause();
-            this.players[0].winnerMusic.play();
+            this.players[0].game.playMusic("winnerMusic");
             this.gameOver = true;
         }
         return winner;
@@ -630,10 +630,13 @@ export default class Game {
                 this.diedMusic.play();
                 break;
             case "loserMusic":
-                if(this.backgroundMusic || this.spoilMusic){
+                if(this.backgroundMusic) {
                     this.backgroundMusic.pause();
-                    this.spoilMusic.pause();
                 }
+                    else if(this.spoilMusic) {
+                        this.spoilMusic.pause();
+                    }
+
                 this.loserMusic = new Audio("/sounds/loserMusic.mp4");
                 this.loserMusic.play();
                 break;
@@ -647,10 +650,13 @@ export default class Game {
                 }
                 break;
             case "winnerMusic":
-                if(this.backgroundMusic || this.spoilMusic){
+                if(this.backgroundMusic) {
                     this.backgroundMusic.pause();
+                }
+                else if(this.spoilMusic) {
                     this.spoilMusic.pause();
                 }
+
                 this.winnerMusic = new Audio("/sounds/winnerMusic.mp4");
                 this.winnerMusic.play();
                 break;
