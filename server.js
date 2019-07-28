@@ -29,12 +29,11 @@ const DELETE_PLAYER = 'deletePlayer';
 const DELETE_WALL = 'deleteWall';
 const CREATE_PLAYER ='createPlayer';
 const CREATE_WALLS = 'createWalls';
-const CREATE_SPOIL = 'createSpoil';
-const GRAB_SPOIL = 'grabSpoil';
+const CREATE_ITEM = 'createItem';
+const GRAB_ITEM = 'grabItem';
 const HURT_PLAYER = 'hurtPlayer';
 const UPDATE_INVENTORY = 'updateInventory';
 const REACTION = 'reaction';
-const TIMEOUT = 'timeout';
 
 
 
@@ -83,7 +82,7 @@ server.listen(PORT, function() {
 
 let positionPlayers = [];
 let positionWalls = [];
-let spoils = [];
+let positionItems = [];
 let server_overload = false;
 
 /**
@@ -175,7 +174,6 @@ const isAlreadyExisting = (walls, position) => {
 //###################################################//
 
 
-// TODO: check for duplicates @Paula
 io.on('connection', function(socket){
 
     let name = "";
@@ -234,7 +232,6 @@ io.on('connection', function(socket){
 
         if ((!server_overload) && isNameUnique(name)) {
 
-
             // store incoming player
             positionPlayers.push(playerDetails);
 
@@ -250,8 +247,10 @@ io.on('connection', function(socket){
 
             // send all wall objects to client
             socket.emit(CREATE_WALLS, [...positionWalls]);
-            spoils.forEach((spoil) => {
-                socket.emit(CREATE_SPOIL, spoil);
+
+            // send all items to client
+            positionItems.forEach((item) => {
+                socket.emit(CREATE_ITEM, item);
             });
 
             // notify each client and send them new incoming player
@@ -303,23 +302,22 @@ io.on('connection', function(socket){
                 player.y = data.y;
                 player.direction = data.direction;
 
-                let spoilIndex = -1;
-                let spoil = null;
-                for (let i = 0; i < spoils.length; i++) {
-                    spoil = spoils[i];
+                let indexOfItem = -1;
+                let item = null;
+                for (let i = 0; i < positionItems.length; i++) {
+                    item = positionItems[i];
 
-                    if (spoil.position.x === data.x && spoil.position.y === data.y) {
-                        spoilIndex = i;
+                    if (item.position.x === data.x && item.position.y === data.y) {
+                        indexOfItem = i;
                         break;
                     }
                 }
 
-                if (spoilIndex >= 0) {
-                    spoils.splice(spoilIndex, 1);
-                    let data = {spoil: spoil, player: player};
-                    socket.broadcast.emit(GRAB_SPOIL, {spoil: spoil, player: player});
-                    socket.emit(GRAB_SPOIL, data);
-                    console.log("A player cought the spoil at: ", spoil.position);
+                if (indexOfItem >= 0) {
+                    positionItems.splice(indexOfItem, 1);
+                    let data = {item: item, player: player};
+                    socket.broadcast.emit(GRAB_ITEM, data);
+                    socket.emit(GRAB_ITEM, data);
                 }
             }
         });
@@ -333,27 +331,27 @@ io.on('connection', function(socket){
      */
     socket.on(PLACE_BOMB, function(data) {
         socket.broadcast.emit(PLACE_BOMB, data);
+
         positionPlayers.forEach(player => {
             if (player.id === data.id) {
                 player.amountBombs = data.amountBombs;
-                console.log(player)
             }
         })
     });
 
     /**
-     * broadcast new available spoil object to each client
-     * @param data = {position: {x: NUMBER, y: NUMBER}, type: "spoil_life"}
+     * broadcast new available item object to each client
+     * @param data = {position: {x: NUMBER, y: NUMBER}, type: STRING}
      */
-    socket.on(CREATE_SPOIL, function(data) {
-        socket.broadcast.emit(CREATE_SPOIL, data);
+    socket.on(CREATE_ITEM, function(data) {
+        socket.broadcast.emit(CREATE_ITEM, data);
 
-        let spoilDetails = {
+        let itemDetails = {
             position: data.position,
             type: data.type,
         };
 
-        spoils.push(spoilDetails);
+        positionItems.push(itemDetails);
 
     });
 

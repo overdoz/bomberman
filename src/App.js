@@ -3,6 +3,18 @@
 import Game from "./Game.js";
 import _ from 'lodash';
 import './main.css';
+import {
+    ITEM_EXTRA_LIFE,
+    ITEM_EXTRA_BOMB,
+    ITEM_RUN_FASTER,
+    BOMBERMAN_BURNED,
+    BOMBERMAN_ENEMY,
+    BOMBERMAN_LOCAL,
+    WALL_BROWN,
+    WALL_GREY,
+    BOMB,
+    FIRE,
+} from "./constant.js";
 
 
 export class AssetLoader {
@@ -30,16 +42,16 @@ export class AssetLoader {
 
 new AssetLoader()
     .loadAssets([
-        { name: 'bomberman', url: '../images/bomberman.png' },
-        { name: 'wall', url: '../images/wall.png' },
-        { name: 'spoilLife', url: '../images/spoilLife.png' },
-        { name: 'spoilRun', url: '../images/spoilRun.png' },
-        { name: 'spoilBomb', url: '../images/spoilBomb.png' },
-        { name: 'bomb', url: '../images/bomb.png' },
-        { name: 'grid_option2', url: '../images/grid_option2.png' },
-        { name: 'fire', url: '../images/fire.png' },
-        { name: 'enemy', url: '../images/enemy_bomberman.png'},
-        { name: 'burned', url: '../images/burned_bomberman.png'}
+        { name: BOMBERMAN_LOCAL, url: '../images/bomberman.png' },
+        { name: WALL_BROWN, url: '../images/wall.png' },
+        { name: ITEM_EXTRA_LIFE, url: '../images/spoilLife.png' },
+        { name: ITEM_RUN_FASTER, url: '../images/spoilRun.png' },
+        { name: ITEM_EXTRA_BOMB, url: '../images/spoilBomb.png' },
+        { name: BOMB, url: '../images/bomb.png' },
+        { name: WALL_GREY, url: '../images/grid_option2.png' },
+        { name: FIRE, url: '../images/fire.png' },
+        { name: BOMBERMAN_ENEMY, url: '../images/enemy_bomberman.png'},
+        { name: BOMBERMAN_BURNED, url: '../images/burned_bomberman.png'}
     ])
     .then(assets => {
         let game = null;

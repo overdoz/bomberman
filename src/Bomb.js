@@ -1,4 +1,8 @@
 import Element from './Element.js';
+import {
+    BOMB,
+    FIRE,
+} from "./constant.js";
 
 export default class Bomb extends Element {
 
@@ -159,7 +163,7 @@ export default class Bomb extends Element {
             // this.socket.emit('deleteWall', {id: this.game.walls[index].id});
             this.game.walls.splice(index, 1);
 
-            this.game.createLoot(position, this.remoteBomb);
+            this.game.createItems(position, this.remoteBomb);
 
         });
     }
@@ -171,7 +175,7 @@ export default class Bomb extends Element {
                 this.currentAnimationState = (this.currentAnimationState + 1) % this.animationSheet.length;
             }
             context.drawImage(
-                this.assets['bomb'],
+                this.assets[BOMB],
                 this.animationSheet[this.currentAnimationState].x,
                 0,
                 this.spriteSize.x,
@@ -185,7 +189,7 @@ export default class Bomb extends Element {
             // draw surrounding fire
             this.getSurroundingPositions().forEach(position => {
                 context.drawImage(
-                    this.assets['fire'],
+                    this.assets[FIRE],
                     0,
                     0,
                     this.spriteSize.x,

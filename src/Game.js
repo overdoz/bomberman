@@ -2,7 +2,7 @@
 
 import Bomb from "./Bomb.js";
 import Player from './Player.js';
-import Loot from './Loot.js';
+import Item from './Item.js';
 import Wall from './Wall.js';
 import io from "socket.io-client";
 import {
@@ -15,11 +15,11 @@ import {
     LOGIN_PLAYER,
     CREATE_WALLS,
     DELETE_PLAYER,
-    CREATE_SPOIL,
+    CREATE_ITEM,
     GRAB_ITEM,
-    SPOIL_TYPE_LIFE,
-    SPOIL_TYPE_BOMB,
-    SPOIL_TYPE_RUN,
+    ITEM_EXTRA_LIFE,
+    ITEM_EXTRA_BOMB,
+    ITEM_RUN_FASTER,
     HURT_PLAYER,
     UPDATE_INVENTORY,
     REACTION,
@@ -134,7 +134,7 @@ export default class Game {
 
         // receive items created by exploding walls
         // {x: nextPosition.x, y: nextPosition.y, id: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs}
-        this.socket.on(CREATE_SPOIL, (data) => {
+        this.socket.on(CREATE_ITEM, (data) => {
             this.receiveItem(data);
         });
 
@@ -201,8 +201,8 @@ export default class Game {
         this.socket.emit(PLACE_BOMB, bomb);
     }
 
-    broadcastSpoil(spoil) {
-        this.socket.emit(CREATE_SPOIL, spoil);
+    broadcastItem(item) {
+        this.socket.emit(CREATE_ITEM, item);
     }
 
     broadcastDestroyedWall(wall) {
@@ -280,10 +280,7 @@ export default class Game {
             } catch (e) {
                 console.log(e);
             }
-        }
-
-        if (this.checkForWinner()) {
-            // show winner notification
+        } else if (this.checkForWinner()) {
             try {
                 document.getElementById("youwinscreen").style.display = "flex";
             } catch (e) {
@@ -292,35 +289,30 @@ export default class Game {
         }
     }
 
-    createLoot(position, remote) {
+    createItems(position, remote) {
         if (Math.random() <= 0.3 && !remote) {
-            let lootType = SPOIL_TYPE_LIFE;
-            let spoilDetermination = Math.random();
+            let item_type = ITEM_EXTRA_LIFE;
+            let itemDetermination = Math.random();
 
-            if (spoilDetermination > 0.66) {
-                lootType = SPOIL_TYPE_BOMB;
-            } else if (spoilDetermination > 0.33) {
-                lootType = SPOIL_TYPE_RUN;
+            if (itemDetermination > 0.66) {
+                item_type = ITEM_EXTRA_BOMB;
+            } else if (itemDetermination > 0.33) {
+                item_type = ITEM_RUN_FASTER;
             }
 
-            console.log("spoil is: ", lootType);
-
-            this.broadcastSpoil({position:position, type: lootType});
-            this.items.push(new Loot({x: position.x, y: position.y}, lootType, this.assets, this.gridSize, this));
-            console.log("Creating spoil with type: ", lootType);
-        } else {
-            console.log("Not creating a new spoil at position: ", position);
+            this.broadcastItem({position:position, type: item_type});
+            this.items.push(new Item({x: position.x, y: position.y}, item_type, this.assets, this.gridSize, this));
         }
     }
 
     /**
-     * the player grab the spoil
+     * the player grab the item
      * is being called in App.js whenever socket receives a signal
-     * check the type of the spoil and update then broadcast it
+     * check the type of the item and update then broadcast it
      * @param data = {id: STRING, x: NUMBER, y: NUMBER, direction: STRING, amountWalls: NUMBER, amountBombs: NUMBER, health: NUMBER}
      */
     pickUpItem(data) {
-        let spoil = data.spoil;
+        let itemObject = data.item;
         let localPlayer = data.player.id === this.id;
 
         this.players.forEach((player) => {
@@ -329,15 +321,15 @@ export default class Game {
                 // change the music for the player
                 this.playMusic("spoilMusic");
 
-                switch(data.spoil.type) {
-                    case SPOIL_TYPE_BOMB:
+                switch(itemObject.type) {
+                    case ITEM_EXTRA_BOMB:
                         player.updateBombCount(1, localPlayer);
                         break;
-                    case SPOIL_TYPE_LIFE:
+                    case ITEM_EXTRA_LIFE:
                         player.health++;
                         player.updateHealth(this.id === data.player.id, data.player.id);
                         break;
-                    case SPOIL_TYPE_RUN:
+                    case ITEM_RUN_FASTER:
                         // make player faster
                         if (!player.isARunner && localPlayer) {
                             // make the player into a runner by adding key event
@@ -366,10 +358,10 @@ export default class Game {
 
         let removalIndex = -1;
 
-        // update in the spoil arsenal
+        // update in the item arsenal
         for (let i = 0; i < this.items.length; i++) {
             let pos = this.items[i].position;
-            if (pos.x === spoil.position.x && pos.y === spoil.position.y) {
+            if (pos.x === itemObject.position.x && pos.y === itemObject.position.y) {
                 removalIndex = i;
                 break;
             }
@@ -463,7 +455,7 @@ export default class Game {
      * @param data = {position: {x: NUMBER, y: NUMBER}, type: STRING}
      */
     receiveItem(data) {
-        this.items.push(new Loot(data.position, data.type, this.assets, this.gridSize, this));
+        this.items.push(new Item(data.position, data.type, this.assets, this.gridSize, this));
     }
 
     /**
@@ -473,13 +465,14 @@ export default class Game {
      */
     receiveWall(data) {
         let tempPosition = {x: data.x, y: data.y};
-        console.log('Game received wall: ', tempPosition);
         let doesntContains = true;
+
         this.walls.forEach(wall => {
             if (wall.wallId === data.wallId) {
                 doesntContains = false;
             }
         });
+
         if (doesntContains) {
             this.walls.push(new Wall(tempPosition, 1, true, this.assets, this.gridSize, data.wallId));
         }
@@ -586,7 +579,6 @@ export default class Game {
 
             let healthText = document.createElement("p");
             healthText.id = data.id + 'HealthText';
-            console.log(data.health);
             healthText.innerText = data.health;
             healthBox.appendChild(healthText);
 
@@ -666,10 +658,9 @@ export default class Game {
             case "loserMusic":
                 if(this.backgroundMusic) {
                     this.backgroundMusic.pause();
+                } else if(this.spoilMusic) {
+                    this.spoilMusic.pause();
                 }
-                    else if(this.spoilMusic) {
-                        this.spoilMusic.pause();
-                    }
 
                 this.loserMusic = new Audio("/sounds/loserMusic.mp4");
                 this.loserMusic.play();
@@ -680,7 +671,6 @@ export default class Game {
                     this.spoilMusic = new Audio("/sounds/spoilMusic.mp4");
                     this.spoilMusic.loop = true;
                     this.spoilMusic.play();
-                    console.log("player changed music!");
                 }
                 break;
             case "winnerMusic":

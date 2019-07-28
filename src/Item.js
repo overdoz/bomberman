@@ -1,7 +1,7 @@
 import Element from './Element.js';
 
 
-export default class Loot extends Element {
+export default class Item extends Element {
 
 
     constructor(position, type, assets, gridSize, game) {

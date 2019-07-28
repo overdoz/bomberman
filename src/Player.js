@@ -2,6 +2,11 @@
 import Element from './Element.js';
 import Bomb from './Bomb.js';
 import Wall from './Wall.js';
+import {
+    BOMBERMAN_BURNED,
+    BOMBERMAN_ENEMY,
+    BOMBERMAN_LOCAL,
+} from "./constant.js";
 
 
 export default class Player extends Element {
@@ -45,8 +50,8 @@ export default class Player extends Element {
         this.showBurnedPlayer = false;
 
         this.photo  = {
-            regular: (this.id === this.game.id) ? 'bomberman' : 'enemy',
-            burned: 'burned',
+            regular: (this.id === this.game.id) ? BOMBERMAN_LOCAL : BOMBERMAN_ENEMY,
+            burned: BOMBERMAN_BURNED,
         };
 
         this.animationSheet = [

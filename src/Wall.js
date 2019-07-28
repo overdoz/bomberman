@@ -1,4 +1,8 @@
 import Element from './Element.js';
+import {
+    WALL_BROWN,
+    WALL_GREY,
+} from "./constant.js";
 
 export default class Wall extends Element {
 
@@ -22,7 +26,7 @@ export default class Wall extends Element {
     draw(context) {
         if (this.isDestructible === true) {
             context.drawImage(
-                this.assets['wall'],
+                this.assets[WALL_BROWN],
                 0,
                 0,
                 this.spriteSize.x,
@@ -34,7 +38,7 @@ export default class Wall extends Element {
             )
         } else {
             context.drawImage(
-                this.assets['grid_option2'],
+                this.assets[WALL_GREY],
                 0,
                 0,
                 this.spriteSize.x,
