@@ -37,8 +37,9 @@ export default class Bomb extends Element {
             {x: 2 * 40, y: 0},
             {x: 3 * 40, y: 0},
             {x: 4 * 40, y: 0},
-
         ];
+
+        this.surroundingPositions = this.getSurroundingPositions();
 
         // bomb destroys itself after being created
         setTimeout(() => {
@@ -123,7 +124,7 @@ export default class Bomb extends Element {
         this.game.players.forEach((player) => {
 
             // compare with positions of fire animation
-            this.getSurroundingPositions().forEach(position => {
+            this.surroundingPositions.forEach(position => {
 
                 // if explosion position matches player position
                 if (player.position.x === position.x && player.position.y === position.y) {

@@ -269,29 +269,27 @@ export default class Game {
         this.players = this.players.filter(player => player.id !== data.id);
 
         // hide enemy inventory
-        try {
-            document.getElementById(data.id).style.display = "none";
-        } catch (e) {
-            console.log(e);
-        }
-
-        if (data.id === this.id) {
+        if (data.id !== this.id) {
+            try {
+                document.getElementById(data.id).style.display = "none";
+            } catch (e) {
+                console.log(e);
+            }
+        } else if (data.id === this.id) {
             try {
                 document.getElementById("inventory").style.display = "none";
                 document.getElementById("gameOverScreen").style.display = "flex";
             } catch (e) {
                 console.log(e);
             }
-        }
-
-        if (this.checkForWinner()) {
-            console.log(this.checkForWinner());
+        } else if (this.checkForWinner()) {
             try {
                 document.getElementById("youwinscreen").style.display = "flex";
             } catch (e) {
                 console.log(e);
             }
         }
+
     }
 
     createItems(position, remote) {
@@ -410,12 +408,11 @@ export default class Game {
         });
     }
 
-    hurtPlayer(hurtPlayer) {
-        if (hurtPlayer.id !== this.id) {
+    hurtPlayer(data) {
+        if (data.id !== this.id) {
             this.players.forEach(player => {
-                if (player.id === hurtPlayer.id) {
-                    player.health--;
-                    player.updateHealth(hurtPlayer.id === this.id, player.id);
+                if (player.id === data.id) {
+                    player.updateHealth(-1);
                 }
             });
         }
