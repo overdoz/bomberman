@@ -107,7 +107,7 @@ export default class Player extends Element {
      * @param fastMode
      * @required in Game.js
      */
-    triggerEvent(e, fastMode=false) {
+    triggerEvent(e, fastMode = false) {
 
         if (!this.dead) {
             let isWalking = true;
@@ -280,20 +280,20 @@ export default class Player extends Element {
 
             // send position of your bomb to all enemies
             let bombDetails = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};
-            this.game.broadcastBomb(bombDetails);
-
             let playerDetails = {id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs, health: this.health};
+
+            this.game.broadcastBomb(bombDetails);
             this.game.broadcastInventory(playerDetails);
         }
     }
 
     /**
      * update player's health
-     * @param isLocal boolean type if it is the local player
-     * @param id id for the current player
+     * @param amount = NUMBER
      */
     updateHealth(amount) {
         this.health += amount;
+
         if (this.id === this.game.id) {
             document.getElementById("amountLives").innerText = this.health;
         }
@@ -301,27 +301,33 @@ export default class Player extends Element {
 
     /**
      *  update player's bomb amount
-     * @param relative the number of bomb changing, positive when adding bomb to the player, negative when minus bomb from the player
-     * @param localPlayer the local player to be updated
+     * @param amount = NUMBER
      */
     updateBombCount(amount) {
         this.amountBombs += amount;
 
         if (this.id === this.game.id) {
             // set counter of your bombs in the browser
-            document.getElementById("amountBombs").innerHTML = this.amountBombs;
+            document.getElementById("amountBombs").innerText = this.amountBombs;
         }
     }
 
+    /**
+     * update player's wall count
+     * @param amount = NUMBER
+     */
     updateWallCount(amount) {
         this.amountWalls += amount;
 
         if (this.id === this.game.id) {
             // set counter of your bombs in the browser
-            document.getElementById("amountWalls").innerHTML = this.amountWalls;
+            document.getElementById("amountWalls").innerText = this.amountWalls;
         }
     }
 
+    /**
+     * player got touched by fire
+     */
     decrementHealth() {
         this.health--;
         let that = this;

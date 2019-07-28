@@ -257,7 +257,7 @@ export default class Game {
             this.players.push(new Player(position, this.assets, data.health, data.amountBombs, data.amountWalls, this.gridSize, this, data.id, data.direction));
 
             // attach html node to enemy stats
-            this.displayEnemyInventory(data);
+            this.createEnemyInventory(data);
         }
     }
 
@@ -572,7 +572,7 @@ export default class Game {
      * creates an HTML node every time a player has been created
      * @param data = {id: STRING, amountBombs: NUMBER, amountWalls: NUMBER}
      */
-    displayEnemyInventory(data) {
+    createEnemyInventory(data) {
         if (this.players.length > 1) {
 
             let enemyInventory = document.getElementById('inventoryEnemy');
