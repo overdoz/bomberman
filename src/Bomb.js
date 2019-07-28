@@ -137,7 +137,6 @@ export default class Bomb extends Element {
                         // broadcast deleted player
                         this.game.broadcastDeletedPlayer({id: player.id});
                         this.game.deletePlayer({id: player.id});
-                        this.game.playMusic("loserMusic");
                     }
                 }
             })
