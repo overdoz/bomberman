@@ -2,6 +2,8 @@ import Element from './Element.js';
 import {
     BOMB,
     FIRE,
+    BOMBMUSIC,
+    DIEDMUSIC,
 } from "./constant.js";
 
 export default class Bomb extends Element {
@@ -48,7 +50,7 @@ export default class Bomb extends Element {
     }
 
     animateExplosion() {
-        this.game.playMusic("bombMusic");
+        this.game.playMusic(BOMBMUSIC);
         this.isExploded = true;
         setTimeout(() => {
             this.destroySurrounding();
@@ -128,7 +130,7 @@ export default class Bomb extends Element {
 
                 // if explosion position matches player position
                 if (player.position.x === position.x && player.position.y === position.y) {
-                    this.game.playMusic("diedMusic");
+                    this.game.playMusic(DIEDMUSIC);
 
                     player.decrementHealth();
 

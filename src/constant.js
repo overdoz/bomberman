@@ -24,4 +24,13 @@ export const WALL_BROWN = 'wall_brown';
 export const BOMB = 'bomb';
 export const FIRE = 'fire';
 
+export const BACKGROUNDMUSIC = 'backgroundMusic';
+export const BOMBMUSIC = 'bombMusic';
+export const DIEDMUSIC = 'diedMusic';
+export const LOSERMUSIC = 'loserMusic';
+export const SETBOMBMUSIC = 'setBombMusic';
+export const SPOILMUSIC = 'spoilMusic';
+export const WINNERMUSIC = 'winnerMusic';
+
+
 
