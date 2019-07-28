@@ -20,6 +20,7 @@ or
 ```bash
 webpack
 ```
+This will create the `./dist` folder
 
 To start the server:
 ```bash
@@ -31,4 +32,4 @@ nodemon server
 ```
 
 
-Now open your browser and visit **localhost:9000**.
+Now open your browser and visit http://localhost:9000/.

@@ -146,12 +146,14 @@ export default class Game {
         // update enemy inventory
         // {id: STRING, amountWalls: NUMBER, amountBombs: NUMBER, health: NUMBER}
         this.socket.on(UPDATE_INVENTORY, (data) => {
-            try {
-                document.getElementById(data.id + 'BombText').innerText = data.amountBombs;
-                document.getElementById(data.id + 'WallText').innerText = data.amountWalls;
-                document.getElementById(data.id + 'HealthText').innerText = data.health;
-            } catch (e) {
-                console.log(e)
+            if (data.id !== this.id) {
+                try {
+                    document.getElementById(data.id + 'BombText').innerText = data.amountBombs;
+                    document.getElementById(data.id + 'WallText').innerText = data.amountWalls;
+                    document.getElementById(data.id + 'HealthText').innerText = data.health;
+                } catch (e) {
+                    console.log(e)
+                }
             }
         });
 
@@ -280,7 +282,10 @@ export default class Game {
             } catch (e) {
                 console.log(e);
             }
-        } else if (this.checkForWinner()) {
+        }
+
+        if (this.checkForWinner()) {
+            console.log(this.checkForWinner());
             try {
                 document.getElementById("youwinscreen").style.display = "flex";
             } catch (e) {
@@ -320,14 +325,18 @@ export default class Game {
 
                 // change the music for the player
                 this.playMusic("spoilMusic");
+                let state = null;
 
                 switch(itemObject.type) {
                     case ITEM_EXTRA_BOMB:
-                        player.updateBombCount(1, localPlayer);
+                        player.updateBombCount(1);
+                        state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
+                        this.broadcastInventory(state);
                         break;
                     case ITEM_EXTRA_LIFE:
-                        player.health++;
-                        player.updateHealth(this.id === data.player.id, data.player.id);
+                        player.updateHealth(1);
+                        state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
+                        this.broadcastInventory(state);
                         break;
                     case ITEM_RUN_FASTER:
                         // make player faster
@@ -351,8 +360,6 @@ export default class Game {
                     default:
                         break;
                 }
-                let state = {id: player.id, amountWalls: player.amountWalls, amountBombs: player.amountBombs, health: player.health};
-                this.broadcastInventory(state);
             }
         });
 
@@ -415,13 +422,18 @@ export default class Game {
     }
 
     checkForWinner() {
-        let winner = this.players.length === 1 && this.players[0].id === this.id;
+        let winner = (this.players.length === 1) && (this.players[0].id === this.id);
 
         if (winner) {
-            this.spoilMusic.pause();
-            this.backgroundMusic.pause();
-            this.players[0].game.playMusic("winnerMusic");
-            this.gameOver = true;
+            try {
+                this.spoilMusic.pause();
+                this.backgroundMusic.pause();
+                this.players[0].game.playMusic("winnerMusic");
+                this.gameOver = true;
+            } catch (e) {
+                console.log(e);
+            }
+
         }
         return winner;
     }

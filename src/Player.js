@@ -277,17 +277,16 @@ export default class Player extends Element {
             // place bomb inside your game
             this.game.bombs.push(new Bomb({x: this.position.x, y: this.position.y}, 1500, 2, this.assets, this.gridSize, this.game));
 
-            this.updateBombCount(-1, true);
+            this.updateBombCount(-1);
+
             this.game.playMusic("setBombMusic");
 
-            // create object with current position
-            let playerState = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};
-
             // send position of your bomb to all enemies
-            this.game.broadcastBomb(playerState);
+            let bombDetails = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};
+            this.game.broadcastBomb(bombDetails);
 
-            let state = {id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs, health: this.health};
-            this.game.broadcastInventory(state);
+            let playerDetails = {id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs, health: this.health};
+            this.game.broadcastInventory(playerDetails);
         }
     }
 
@@ -296,16 +295,17 @@ export default class Player extends Element {
      * @param isLocal boolean type if it is the local player
      * @param id id for the current player
      */
-    updateHealth(isLocal, id=null) {
-        if (isLocal) {
+    updateHealth(amount) {
+        this.health += amount;
+        if (this.id === this.game.id) {
             document.getElementById("amountLives").innerText = this.health;
-        } else {
+        } /*else {
             try {
                 document.getElementById(id + 'HealthText').innerText = this.health;
             } catch (e) {
                 console.log(e.message);
             }
-        }
+        }*/
     }
 
     /**
@@ -313,10 +313,10 @@ export default class Player extends Element {
      * @param relative the number of bomb changing, positive when adding bomb to the player, negative when minus bomb from the player
      * @param localPlayer the local player to be updated
      */
-    updateBombCount(relative, localPlayer) {
-        this.amountBombs += relative;
+    updateBombCount(amount) {
+        this.amountBombs += amount;
 
-        if (localPlayer) {
+        if (this.id === this.game.id) {
             // set counter of your bombs in the browser
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
         }
