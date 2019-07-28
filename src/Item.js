@@ -25,8 +25,6 @@ export default class Item extends Element {
 
         this.currentAnimationState = 0;
 
-        this.animationSpeed = 20;
-
         this.animationSheet = [
             {x: 0, y: 0},
             {x: 40, y: 0},
