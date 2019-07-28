@@ -253,6 +253,8 @@ io.on('connection', function(socket){
                 socket.emit(CREATE_ITEM, item);
             });
 
+
+
             // notify each client and send them new incoming player
             socket.broadcast.emit(CREATE_PLAYER, playerDetails);
 
@@ -265,12 +267,13 @@ io.on('connection', function(socket){
      */
     socket.on(CHANGE_DIRECTION, function(data) {
         socket.broadcast.emit(CHANGE_DIRECTION, data);
-        positionPlayers.forEach(player => {
-            if (player.id === data.id) {
-                player.direction = data.direction;
-            }
-        });
-
+        let player = positionPlayers.find(player => player.id === data.id);
+        player.direction = data.direction;
+        // positionPlayers.forEach(player => {
+        //     if (player.id === data.id) {
+        //         player.direction = data.direction;
+        //     }
+        // });
     });
 
     socket.on('disconnect', function() {
@@ -281,11 +284,15 @@ io.on('connection', function(socket){
 
     socket.on(HURT_PLAYER, function(data) {
         socket.broadcast.emit(HURT_PLAYER, data);
-        positionPlayers.forEach(player => {
-            if (player.id === data.id) {
-                player.health--;
-            }
-        });
+
+        let player = positionPlayers.find(player => player.id === data.id);
+        player.health--;
+
+        // positionPlayers.forEach(player => {
+        //     if (player.id === data.id) {
+        //         player.health--;
+        //     }
+        // });
 
     });
 
@@ -332,11 +339,14 @@ io.on('connection', function(socket){
     socket.on(PLACE_BOMB, function(data) {
         socket.broadcast.emit(PLACE_BOMB, data);
 
-        positionPlayers.forEach(player => {
-            if (player.id === data.id) {
-                player.amountBombs = data.amountBombs;
-            }
-        })
+        let player = positionPlayers.find(player => player.id === data.id);
+        player.amountBombs = data.amountBombs;
+
+        // positionPlayers.forEach(player => {
+        //     if (player.id === data.id) {
+        //         player.amountBombs = data.amountBombs;
+        //     }
+        // })
     });
 
     /**
@@ -362,11 +372,15 @@ io.on('connection', function(socket){
      */
     socket.on(PLACE_WALL, function(data) {
         socket.broadcast.emit(PLACE_WALL, data);
-        positionPlayers.forEach(player => {
-            if (player.id === data.id) {
-                player.amountWalls = data.amountWalls;
-            }
-        });
+
+        let player = positionPlayers.find(player => player.id === data.id);
+        player.amountWalls = data.amountWalls;
+
+        // positionPlayers.forEach(player => {
+        //     if (player.id === data.id) {
+        //         player.amountWalls = data.amountWalls;
+        //     }
+        // });
         positionWalls.push({id: data.wallId, x: data.x, y: data.y, isDestructible: true});
     });
 
@@ -402,13 +416,19 @@ io.on('connection', function(socket){
      */
     socket.on(UPDATE_INVENTORY, function (data) {
         socket.broadcast.emit(UPDATE_INVENTORY, data);
-        positionPlayers.forEach(player => {
-            if (player.id === data.id) {
-                player.amountBombs = data.amountBombs;
-                player.amountWalls = data.amountWalls;
-                player.health = data.health;
-            }
-        });
+
+        let player = positionPlayers.find(player => player.id === data.id);
+        player.amountBombs = data.amountBombs;
+        player.amountWalls = data.amountWalls;
+        player.health = data.health;
+
+        // positionPlayers.forEach(player => {
+        //     if (player.id === data.id) {
+        //         player.amountBombs = data.amountBombs;
+        //         player.amountWalls = data.amountWalls;
+        //         player.health = data.health;
+        //     }
+        // });
     });
 
 });
