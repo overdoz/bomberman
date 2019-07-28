@@ -11,7 +11,7 @@ const GAME_HEIGHT = 13;
 
 const AMOUNT_RANDOM_WALLS = 55;
 const AMOUNT_BOMBS = 30;
-const AMOUNT_WALLS = 20;
+const AMOUNT_WALLS = 50;
 const HEALTH = 2;
 
 const DIRECTIONS = {
