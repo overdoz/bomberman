@@ -6,6 +6,7 @@ import {
     BOMBERMAN_BURNED,
     BOMBERMAN_ENEMY,
     BOMBERMAN_LOCAL,
+    SETBOMBMUSIC,
 } from "./constant.js";
 
 
@@ -276,7 +277,7 @@ export default class Player extends Element {
 
             this.updateBombCount(-1);
 
-            this.game.playMusic("setBombMusic");
+            this.game.playMusic(SETBOMBMUSIC);
 
             // send position of your bomb to all enemies
             let bombDetails = {id: this.id, x: this.position.x, y: this.position.y, amountBombs: this.amountBombs};

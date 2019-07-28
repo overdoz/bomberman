@@ -23,6 +23,13 @@ import {
     HURT_PLAYER,
     UPDATE_INVENTORY,
     REACTION,
+    BACKGROUNDMUSIC,
+    BOMBMUSIC,
+    DIEDMUSIC,
+    LOSERMUSIC,
+    SETBOMBMUSIC,
+    SPOILMUSIC,
+    WINNERMUSIC,
 } from "./constant.js";
 
 
@@ -51,7 +58,7 @@ export default class Game {
         this.items = [];
 
         // background music plays when game starts
-        this.playMusic("backgroundMusic")
+        this.playMusic(BACKGROUNDMUSIC);
 
         // set up socket connection
         this.socket = io.connect('');
@@ -278,7 +285,7 @@ export default class Game {
         }
 
         if (data.id === this.id) {
-            this.playMusic("loserMusic");
+            this.playMusic(LOSERMUSIC);
             try {
                 document.getElementById("inventory").style.display = "none";
                 document.getElementById("gameOverScreen").style.display = "flex";
@@ -287,8 +294,8 @@ export default class Game {
             }
         }
 
-        if (this.haveYouWon()) {
-            this.playMusic("winnerMusic");
+        if (this.checkForWinner()) {
+            this.playMusic(WINNERMUSIC);
             try {
                 document.getElementById("youwinscreen").style.display = "flex";
             } catch (e) {
@@ -328,7 +335,7 @@ export default class Game {
             if (player.id === data.player.id) {
 
                 // change the music for the player
-                this.playMusic("spoilMusic");
+                this.playMusic(SPOILMUSIC);
                 let state = null;
 
                 switch(itemObject.type) {
@@ -414,10 +421,6 @@ export default class Game {
         });
     }
 
-    /**
-     *
-     * @param data = {id: STRING}
-     */
     hurtPlayer(data) {
         if (data.id !== this.id) {
             this.players.forEach(player => {
@@ -428,11 +431,7 @@ export default class Game {
         }
     }
 
-    /**
-     *
-     * @returns {boolean}
-     */
-    haveYouWon() {
+    checkForWinner() {
         let winner = (this.players.length === 1) && (this.players[0].id === this.id);
 
         if (winner) {
@@ -587,42 +586,42 @@ export default class Game {
 
             // create heart icon and counter
             let healthImage = document.createElement("img");
-            healthImage.id = `${data.id}LifeImg`;
+            healthImage.id = data.id + 'LifeImg';
             healthImage.src = "images/spoilLife.png";
 
             let healthBox = document.createElement("div");
             healthBox.className = "countBox";
 
             let healthText = document.createElement("p");
-            healthText.id = `${data.id}HealthText`;
+            healthText.id = data.id + 'HealthText';
             healthText.innerText = data.health;
             healthBox.appendChild(healthText);
 
 
             // create bomb icon and counter
             let bombImage = document.createElement("img");
-            bombImage.id = `${data.id}BombImg`;
+            bombImage.id = data.id + 'BombImg';
             bombImage.src = "images/bomb_icon.png";
 
             let bombBox = document.createElement("div");
             bombBox.className = "countBox";
 
             let bombText = document.createElement("p");
-            bombText.id = `${data.id}BombText`;
+            bombText.id = data.id + 'BombText';
             bombText.innerText = data.amountBombs;
             bombBox.appendChild(bombText);
 
 
             // create wall icon and counter
             let wallImage = document.createElement("img");
-            wallImage.id = `${data.id}WallImg`;
+            wallImage.id = data.id + 'WallImg';
             wallImage.src = "images/wall.png";
 
             let wallBox = document.createElement("div");
             wallBox.className = "countBox";
 
             let wallText = document.createElement("p");
-            wallText.id = `${data.id}WallText`;
+            wallText.id = data.id + 'WallText';
             wallText.innerText = data.amountWalls;
             wallBox.appendChild(wallText);
 
@@ -654,24 +653,24 @@ export default class Game {
      */
     playMusic(music) {
         switch(music) {
-            case "bombMusic":
+            case BOMBMUSIC:
                 this.bombMusic = new Audio("/sounds/bombMusic.mp3");
                 this.bombMusic.play();
                 break;
-            case "setBombMusic":
+            case SETBOMBMUSIC:
                 this.setBombMusic = new Audio("/sounds/setBombMusic.mp3");
                 this.setBombMusic.play();
                 break;
-            case "backgroundMusic":
+            case BACKGROUNDMUSIC:
                 this.backgroundMusic = new Audio("/sounds/backgroundMusic.mp4");
                 this.backgroundMusic.loop = true;
                 this.backgroundMusic.play();
                 break;
-            case "diedMusic":
+            case DIEDMUSIC:
                 this.diedMusic = new Audio("/sounds/diedMusic.mp4");
                 this.diedMusic.play();
                 break;
-            case "loserMusic":
+            case LOSERMUSIC:
                 if(this.backgroundMusic) {
                     this.backgroundMusic.pause();
                 } else if(this.spoilMusic) {
@@ -681,7 +680,7 @@ export default class Game {
                 this.loserMusic = new Audio("/sounds/loserMusic.mp4");
                 this.loserMusic.play();
                 break;
-            case "spoilMusic":
+            case SETBOMBMUSIC:
                 if(!this.spoilMusic) {
                     this.backgroundMusic.pause();
                     this.spoilMusic = new Audio("/sounds/spoilMusic.mp4");
@@ -689,7 +688,7 @@ export default class Game {
                     this.spoilMusic.play();
                 }
                 break;
-            case "winnerMusic":
+            case WINNERMUSIC:
                 if(this.backgroundMusic) {
                     this.backgroundMusic.pause();
                 }
@@ -701,7 +700,7 @@ export default class Game {
                 this.winnerMusic.play();
                 break;
             default:
-                console.log("Spoil should have type, but here no type!")
+                console.log("Item should have a type, but here has no type!")
         }
     }
 
