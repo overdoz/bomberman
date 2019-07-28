@@ -275,14 +275,18 @@ export default class Game {
             } catch (e) {
                 console.log(e);
             }
-        } else if (data.id === this.id) {
+        }
+
+        if (data.id === this.id) {
             try {
                 document.getElementById("inventory").style.display = "none";
                 document.getElementById("gameOverScreen").style.display = "flex";
             } catch (e) {
                 console.log(e);
             }
-        } else if (this.checkForWinner()) {
+        }
+
+        if (this.haveYouWon()) {
             try {
                 document.getElementById("youwinscreen").style.display = "flex";
             } catch (e) {
@@ -408,6 +412,10 @@ export default class Game {
         });
     }
 
+    /**
+     *
+     * @param data = {id: STRING}
+     */
     hurtPlayer(data) {
         if (data.id !== this.id) {
             this.players.forEach(player => {
@@ -418,7 +426,11 @@ export default class Game {
         }
     }
 
-    checkForWinner() {
+    /**
+     *
+     * @returns {boolean}
+     */
+    haveYouWon() {
         let winner = (this.players.length === 1) && (this.players[0].id === this.id);
 
         if (winner) {
@@ -573,42 +585,42 @@ export default class Game {
 
             // create heart icon and counter
             let healthImage = document.createElement("img");
-            healthImage.id = data.id + 'LifeImg';
+            healthImage.id = `${data.id}LifeImg`;
             healthImage.src = "images/spoilLife.png";
 
             let healthBox = document.createElement("div");
             healthBox.className = "countBox";
 
             let healthText = document.createElement("p");
-            healthText.id = data.id + 'HealthText';
+            healthText.id = `${data.id}HealthText`;
             healthText.innerText = data.health;
             healthBox.appendChild(healthText);
 
 
             // create bomb icon and counter
             let bombImage = document.createElement("img");
-            bombImage.id = data.id + 'BombImg';
+            bombImage.id = `${data.id}BombImg`;
             bombImage.src = "images/bomb_icon.png";
 
             let bombBox = document.createElement("div");
             bombBox.className = "countBox";
 
             let bombText = document.createElement("p");
-            bombText.id = data.id + 'BombText';
+            bombText.id = `${data.id}BombText`;
             bombText.innerText = data.amountBombs;
             bombBox.appendChild(bombText);
 
 
             // create wall icon and counter
             let wallImage = document.createElement("img");
-            wallImage.id = data.id + 'WallImg';
+            wallImage.id = `${data.id}WallImg`;
             wallImage.src = "images/wall.png";
 
             let wallBox = document.createElement("div");
             wallBox.className = "countBox";
 
             let wallText = document.createElement("p");
-            wallText.id = data.id + 'WallText';
+            wallText.id = `${data.id}WallText`;
             wallText.innerText = data.amountWalls;
             wallBox.appendChild(wallText);
 

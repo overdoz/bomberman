@@ -104,6 +104,7 @@ export default class Player extends Element {
      * @description is being called in App.js every time the user presses a key
      * calls the movePlayer() method in Game.js
      * @param e = {id: '9fh3j4', key: 'ArrowLeft'}
+     * @param fastMode
      * @required in Game.js
      */
     triggerEvent(e, fastMode=false) {
@@ -214,7 +215,7 @@ export default class Player extends Element {
             // initialize next move
             let nextPosition = this.getNextPosition();
             // if next position is not blocked by an object
-            if (this.isPositionColliding(nextPosition)) {
+            if (this.isPositionFree(nextPosition)) {
                 this.position.x = nextPosition.x;
                 this.position.y = nextPosition.y;
 
@@ -239,7 +240,7 @@ export default class Player extends Element {
             let nextPosition = this.getNextPosition();
 
             // if next position is not blocked by an object
-            if (this.isPositionColliding(nextPosition)) {
+            if (this.isPositionFree(nextPosition)) {
 
                 // generate randomID for easier removal
                 let randomID = '_' + Math.random().toString(36).substr(2, 9);
@@ -247,18 +248,14 @@ export default class Player extends Element {
                 // push wall at into our wall array
                 this.game.walls.push(new Wall(nextPosition, 1, true, this.assets, this.gridSize, randomID));
 
-                this.amountWalls--;
+                this.updateWallCount(-1);
 
                 // data to be send to server
-                let data = {id: this.id, x: nextPosition.x, y: nextPosition.y, wallId: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs};
+                let wallDetails = {id: this.id, x: nextPosition.x, y: nextPosition.y, wallId: randomID, amountWalls: this.amountWalls, amountBombs: this.amountBombs};
+                let playerDetails = {id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs, health: this.health};
 
-                this.game.broadcastWall(data);
-
-                // display the amount of walls you have currently have
-                document.getElementById("amountWalls").innerText = this.amountWalls;
-
-                let state = {id: this.id, amountWalls: this.amountWalls, amountBombs: this.amountBombs, health: this.health};
-                this.game.broadcastInventory(state);
+                this.game.broadcastWall(wallDetails);
+                this.game.broadcastInventory(playerDetails);
 
             }
         }
@@ -299,13 +296,7 @@ export default class Player extends Element {
         this.health += amount;
         if (this.id === this.game.id) {
             document.getElementById("amountLives").innerText = this.health;
-        } /*else {
-            try {
-                document.getElementById(id + 'HealthText').innerText = this.health;
-            } catch (e) {
-                console.log(e.message);
-            }
-        }*/
+        }
     }
 
     /**
@@ -319,6 +310,15 @@ export default class Player extends Element {
         if (this.id === this.game.id) {
             // set counter of your bombs in the browser
             document.getElementById("amountBombs").innerHTML = this.amountBombs;
+        }
+    }
+
+    updateWallCount(amount) {
+        this.amountWalls += amount;
+
+        if (this.id === this.game.id) {
+            // set counter of your bombs in the browser
+            document.getElementById("amountWalls").innerHTML = this.amountWalls;
         }
     }
 
@@ -351,7 +351,7 @@ export default class Player extends Element {
      * @returns {boolean}
      * @requires this.game.walls & this.game.players
      */
-    isPositionColliding(position) {
+    isPositionFree(position) {
         return !this.doesPlayerCrossPlayer(position)
             && !this.doesPlayerTouchAWall(position)
             && !this.isPlayerOutOfBounds(position)

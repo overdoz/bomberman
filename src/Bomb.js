@@ -161,7 +161,7 @@ export default class Bomb extends Element {
             let position = this.game.walls[index].position;
 
             this.game.broadcastDestroyedWall({wallId: wallId});
-            // this.socket.emit('deleteWall', {id: this.game.walls[index].id});
+
             this.game.walls.splice(index, 1);
 
             this.game.createItems(position, this.remoteBomb);
