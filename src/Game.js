@@ -418,8 +418,6 @@ export default class Game {
         let winner = this.players.length === 1 && this.players[0].id === this.id;
 
         if (winner) {
-            this.spoilMusic.pause();
-            this.backgroundMusic.pause();
             this.players[0].game.playMusic("winnerMusic");
             this.gameOver = true;
         }
