@@ -275,14 +275,20 @@ export default class Game {
             } catch (e) {
                 console.log(e);
             }
-        } else if (data.id === this.id) {
+        }
+
+        if (data.id === this.id) {
+            this.playMusic("loserMusic");
             try {
                 document.getElementById("inventory").style.display = "none";
                 document.getElementById("gameOverScreen").style.display = "flex";
             } catch (e) {
                 console.log(e);
             }
-        } else if (this.checkForWinner()) {
+        }
+
+        if (this.checkForWinner()) {
+            this.playMusic("winnerMusic");
             try {
                 document.getElementById("youwinscreen").style.display = "flex";
             } catch (e) {
