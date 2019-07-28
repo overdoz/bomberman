@@ -437,7 +437,6 @@ export default class Game {
         let winner = (this.players.length === 1) && (this.players[0].id === this.id);
 
         if (winner) {
-            this.players[0].game.playMusic("winnerMusic");
             this.gameOver = true;
         }
         return winner;
@@ -684,6 +683,14 @@ export default class Game {
                 break;
             case SETBOMBMUSIC:
                 if(!this.spoilMusic) {
+                    this.backgroundMusic.pause();
+                    this.spoilMusic = new Audio("/sounds/spoilMusic.mp4");
+                    this.spoilMusic.loop = true;
+                    this.spoilMusic.play();
+                }
+                break;
+            case SPOILMUSIC:
+                if(this.backgroundMusic) {
                     this.backgroundMusic.pause();
                     this.spoilMusic = new Audio("/sounds/spoilMusic.mp4");
                     this.spoilMusic.loop = true;
