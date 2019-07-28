@@ -269,11 +269,6 @@ io.on('connection', function(socket){
         socket.broadcast.emit(CHANGE_DIRECTION, data);
         let player = positionPlayers.find(player => player.id === data.id);
         player.direction = data.direction;
-        // positionPlayers.forEach(player => {
-        //     if (player.id === data.id) {
-        //         player.direction = data.direction;
-        //     }
-        // });
     });
 
     socket.on('disconnect', function() {
@@ -287,12 +282,6 @@ io.on('connection', function(socket){
 
         let player = positionPlayers.find(player => player.id === data.id);
         player.health--;
-
-        // positionPlayers.forEach(player => {
-        //     if (player.id === data.id) {
-        //         player.health--;
-        //     }
-        // });
 
     });
 
@@ -342,11 +331,6 @@ io.on('connection', function(socket){
         let player = positionPlayers.find(player => player.id === data.id);
         player.amountBombs = data.amountBombs;
 
-        // positionPlayers.forEach(player => {
-        //     if (player.id === data.id) {
-        //         player.amountBombs = data.amountBombs;
-        //     }
-        // })
     });
 
     /**
@@ -376,11 +360,6 @@ io.on('connection', function(socket){
         let player = positionPlayers.find(player => player.id === data.id);
         player.amountWalls = data.amountWalls;
 
-        // positionPlayers.forEach(player => {
-        //     if (player.id === data.id) {
-        //         player.amountWalls = data.amountWalls;
-        //     }
-        // });
         positionWalls.push({id: data.wallId, x: data.x, y: data.y, isDestructible: true});
     });
 
@@ -422,13 +401,6 @@ io.on('connection', function(socket){
         player.amountWalls = data.amountWalls;
         player.health = data.health;
 
-        // positionPlayers.forEach(player => {
-        //     if (player.id === data.id) {
-        //         player.amountBombs = data.amountBombs;
-        //         player.amountWalls = data.amountWalls;
-        //         player.health = data.health;
-        //     }
-        // });
     });
 
 });
