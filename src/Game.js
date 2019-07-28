@@ -288,6 +288,7 @@ export default class Game {
             this.playMusic(LOSERMUSIC);
             try {
                 document.getElementById("inventory").style.display = "none";
+                document.getElementById("youwinscreen").style.display = "none";
                 document.getElementById("gameOverScreen").style.display = "flex";
             } catch (e) {
                 console.log(e);
@@ -297,6 +298,7 @@ export default class Game {
         if (this.checkForWinner()) {
             this.playMusic(WINNERMUSIC);
             try {
+                document.getElementById("gameOverScreen").style.display = "none";
                 document.getElementById("youwinscreen").style.display = "flex";
             } catch (e) {
                 console.log(e);
