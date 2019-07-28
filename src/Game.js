@@ -425,15 +425,8 @@ export default class Game {
         let winner = (this.players.length === 1) && (this.players[0].id === this.id);
 
         if (winner) {
-            try {
-                this.spoilMusic.pause();
-                this.backgroundMusic.pause();
-                this.players[0].game.playMusic("winnerMusic");
-                this.gameOver = true;
-            } catch (e) {
-                console.log(e);
-            }
-
+            this.players[0].game.playMusic("winnerMusic");
+            this.gameOver = true;
         }
         return winner;
     }
