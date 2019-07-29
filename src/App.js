@@ -1,7 +1,6 @@
 "use strict";
 
 import Game from "./Game.js";
-import _ from 'lodash';
 import './main.css';
 import {
     ITEM_EXTRA_LIFE,
