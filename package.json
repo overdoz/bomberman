@@ -8,10 +8,6 @@
     "watch": "webpack --watch",
     "build": "webpack"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://gitlab2.cip.ifi.lmu.de/banzhoff/sepjs-19ss-dd"
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {
